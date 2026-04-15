@@ -10,13 +10,7 @@ import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/constants/app_spacing.dart';
 import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
 import 'package:toko_emas_digital/core/utils/app_validator.dart';
-
-// Helper for Color
-extension HexColorLogin on String {
-  Color toColor() {
-    return Color(int.parse(replaceFirst('#', '0xff')));
-  }
-}
+import 'package:toko_emas_digital/core/utils/color_extension.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

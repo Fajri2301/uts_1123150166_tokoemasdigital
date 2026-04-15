@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
-
-// Extension to convert Hex String to Color
-extension HexColorCard on String {
-  Color toColor() {
-    return Color(int.parse(replaceFirst('#', '0xff')));
-  }
-}
+import 'package:toko_emas_digital/core/utils/color_extension.dart';
 
 class ProductCard extends StatelessWidget {
   final String name;

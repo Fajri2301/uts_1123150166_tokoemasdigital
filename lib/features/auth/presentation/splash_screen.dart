@@ -5,13 +5,7 @@ import 'package:toko_emas_digital/features/auth/presentation/login_screen.dart';
 import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
 import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_screen.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
-
-// Helper for Color
-extension HexColorSplash on String {
-  Color toColor() {
-    return Color(int.parse(replaceFirst('#', '0xff')));
-  }
-}
+import 'package:toko_emas_digital/core/utils/color_extension.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);

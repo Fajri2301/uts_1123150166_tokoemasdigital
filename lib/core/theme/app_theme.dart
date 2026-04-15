@@ -3,13 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
 import 'package:toko_emas_digital/core/constants/app_spacing.dart';
-
-// Extension to convert Hex String to Color (Copy from HomeScreen or make it Global)
-extension HexColorTheme on String {
-  Color toColor() {
-    return Color(int.parse(replaceFirst('#', '0xff')));
-  }
-}
+import 'package:toko_emas_digital/core/utils/color_extension.dart';
 
 class AppTheme {
   static ThemeData get darkTheme {

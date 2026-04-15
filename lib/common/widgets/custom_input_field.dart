@@ -1,49 +1,54 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../constants/app_spacing.dart';
-import '../constants/app_dimensions.dart';
+import 'package:toko_emas_digital/core/constants/app_colors.dart';
+import 'package:toko_emas_digital/core/constants/app_spacing.dart';
+import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
+import 'package:toko_emas_digital/core/utils/color_extension.dart';
 
 class CustomInputField extends StatelessWidget {
   final String hintText;
   final TextEditingController? controller;
-  final TextInputType? keyboardType;
   final bool obscureText;
+  final TextInputType? keyboardType;
   final String? Function(String?)? validator;
 
   const CustomInputField({
-    Key? key,
+    super.key,
     required this.hintText,
     this.controller,
-    this.keyboardType,
     this.obscureText = false,
+    this.keyboardType,
     this.validator,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: AppDimensions.inputHeight,
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        validator: validator,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Color(0xFF666666)),
-          filled: true,
-          fillColor: Color(0xFF1A1A1A),
-          border: OutlineInputBorder(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: AppDimensions.inputHeight,
+          decoration: BoxDecoration(
+            color: AppColors.divider.toColor(),
             borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-            borderSide: BorderSide.none,
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.padding,
-            vertical: AppSpacing.spacingSmall,
+          child: TextFormField(
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            validator: validator,
+            style: TextStyle(color: AppColors.textPrimary.toColor()),
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: TextStyle(color: AppColors.textSecondary.toColor()),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.padding,
+                vertical: AppSpacing.spacingSmall,
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
