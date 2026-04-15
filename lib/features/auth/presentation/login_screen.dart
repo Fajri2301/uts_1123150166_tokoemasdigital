@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/features/auth/services/auth_service.dart';
 import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
+import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_screen.dart';
 import 'package:toko_emas_digital/features/auth/presentation/register_screen.dart';
 import 'package:toko_emas_digital/common/widgets/custom_input_field.dart';
 import 'package:toko_emas_digital/common/widgets/gold_button.dart';
@@ -11,7 +12,7 @@ import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
 import 'package:toko_emas_digital/core/utils/app_validator.dart';
 
 // Helper for Color
-extension HexColor on String {
+extension HexColorLogin on String {
   Color toColor() {
     return Color(int.parse(replaceFirst('#', '0xff')));
   }
@@ -54,9 +55,20 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+        // Cek Role setelah login berhasil
+        String role = await _authService.getUserRole(user.uid);
+        
+        if (mounted) {
+          if (role == 'admin') {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+            );
+          } else {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          }
+        }
       }
     } catch (e) {
       setState(() {
@@ -80,9 +92,20 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       User? user = await _authService.signInWithGoogle();
       if (user != null && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+        // Cek Role setelah Google Login berhasil
+        String role = await _authService.getUserRole(user.uid);
+        
+        if (mounted) {
+          if (role == 'admin') {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+            );
+          } else {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          }
+        }
       }
     } catch (e) {
       setState(() {
@@ -111,7 +134,6 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 60),
-                // Logo dan Title
                 Center(
                   child: Container(
                     width: 80,
@@ -148,7 +170,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // Error Message
                 if (_errorMessage != null)
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.spacingMedium),
@@ -165,18 +186,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                // Input Fields
                 CustomInputField(
                   hintText: 'Email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Email wajib diisi';
-                    }
-                    if (!AppValidator.isValidEmail(value)) {
-                      return 'Email tidak valid';
-                    }
+                    if (value == null || value.isEmpty) return 'Email wajib diisi';
+                    if (!AppValidator.isValidEmail(value)) return 'Email tidak valid';
                     return null;
                   },
                 ),
@@ -186,18 +202,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   obscureText: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Password wajib diisi';
-                    }
-                    if (!AppValidator.isValidPassword(value)) {
-                      return 'Password minimal 6 karakter';
-                    }
+                    if (value == null || value.isEmpty) return 'Password wajib diisi';
+                    if (!AppValidator.isValidPassword(value)) return 'Password minimal 6 karakter';
                     return null;
                   },
                 ),
                 const SizedBox(height: 32),
 
-                // Login Button
                 _isLoading
                     ? const Center(
                         child: CircularProgressIndicator(
@@ -210,7 +221,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                 const SizedBox(height: AppSpacing.spacingLarge),
 
-                // Divider "Or"
                 Row(
                   children: [
                     Expanded(child: Divider(color: AppColors.divider.toColor())),
@@ -226,7 +236,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppSpacing.spacingLarge),
 
-                // Google Login Button
                 OutlinedButton.icon(
                   onPressed: _isLoading ? null : _handleGoogleLogin,
                   icon: const Icon(Icons.g_mobiledata, size: 30),
@@ -242,7 +251,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppSpacing.spacingLarge),
 
-                // Register Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

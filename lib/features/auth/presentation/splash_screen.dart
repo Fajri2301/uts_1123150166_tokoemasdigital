@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../features/auth/presentation/login_screen.dart';
-import '../features/home/presentation/home_screen.dart';
+import 'package:toko_emas_digital/features/auth/services/auth_service.dart';
+import 'package:toko_emas_digital/features/auth/presentation/login_screen.dart';
+import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
+import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_screen.dart';
+import 'package:toko_emas_digital/core/constants/app_colors.dart';
+
+// Helper for Color
+extension HexColorSplash on String {
+  Color toColor() {
+    return Color(int.parse(replaceFirst('#', '0xff')));
+  }
+}
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -11,21 +21,34 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final AuthService _authService = AuthService();
+
   @override
   void initState() {
     super.initState();
-    _navigateToNextScreen();
+    _checkAuth();
   }
 
-  Future<void> _navigateToNextScreen() async {
+  Future<void> _checkAuth() async {
     await Future.delayed(const Duration(seconds: 2));
 
     if (mounted) {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+        // Cek Role User: Admin atau User?
+        String role = await _authService.getUserRole(user.uid);
+        
+        if (mounted) {
+          if (role == 'admin') {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
+            );
+          } else {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          }
+        }
       } else {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -37,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: AppColors.background.toColor(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -46,30 +69,30 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFD700),
+                color: AppColors.goldAccent.toColor(),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.monetization_on,
                 size: 60,
-                color: Color(0xFF0D0D0D),
+                color: AppColors.background.toColor(),
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Toko Emas Digital',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFFFD700),
+                color: AppColors.goldAccent.toColor(),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Investasi Emas Mudah & Aman',
               style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFFB0B0B0),
+                color: AppColors.textSecondary.toColor(),
               ),
             ),
           ],

@@ -115,4 +115,18 @@ class AuthService {
       throw Exception('Failed to get user data: $e');
     }
   }
+
+  // Get user role specifically
+  Future<String> getUserRole(String userId) async {
+    try {
+      DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return data['role'] ?? 'user';
+      }
+      return 'user';
+    } catch (e) {
+      return 'user';
+    }
+  }
 }
