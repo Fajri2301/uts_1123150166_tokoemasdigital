@@ -4,30 +4,50 @@ import 'package:toko_emas_digital/core/utils/color_extension.dart';
 import 'package:toko_emas_digital/common/widgets/custom_app_bar.dart';
 import 'package:toko_emas_digital/common/widgets/custom_input_field.dart';
 import 'package:toko_emas_digital/common/widgets/gold_button.dart';
+import 'package:toko_emas_digital/features/digital_gold/models/transaction_model.dart'; // Import model
 
 class AddEditProductScreen extends StatefulWidget {
-  final String? productId; // Tambahkan parameter productId untuk mode edit
-  const AddEditProductScreen({Key? key, this.productId}) : super(key: key);
+  final ProductModel? product; // Menggunakan ProductModel agar data lengkap terbaca
+  const AddEditProductScreen({Key? key, this.product}) : super(key: key);
 
   @override
   State<AddEditProductScreen> createState() => _AddEditProductScreenState();
 }
 
 class _AddEditProductScreenState extends State<AddEditProductScreen> {
-  final _nameController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _descController = TextEditingController();
-  final _categoryController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _priceController;
+  late TextEditingController _descController;
+  late TextEditingController _categoryController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Inisialisasi controller dengan data lama jika dalam mode edit
+    _nameController = TextEditingController(text: widget.product?.name ?? '');
+    _priceController = TextEditingController(text: widget.product?.price.toString() ?? '');
+    _descController = TextEditingController(text: widget.product?.description ?? '');
+    _categoryController = TextEditingController(text: widget.product?.category ?? '');
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _descController.dispose();
+    _categoryController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final bool isEdit = widget.productId != null;
+    final bool isEdit = widget.product != null;
 
     return Scaffold(
       backgroundColor: AppColors.background.toColor(),
       appBar: CustomAppBar(
         title: isEdit ? 'Edit Produk' : 'Tambah Produk Baru',
-        showBackButton: isEdit, // Tampilkan tombol kembali jika dalam mode edit
+        showBackButton: isEdit,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -48,7 +68,10 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                 children: [
                   Icon(Icons.add_a_photo_outlined, color: AppColors.goldAccent.toColor(), size: 40),
                   const SizedBox(height: 8),
-                  Text('Upload Foto Produk', style: TextStyle(color: AppColors.textSecondary.toColor())),
+                  Text(
+                    isEdit ? 'Ubah Foto Produk' : 'Upload Foto Produk',
+                    style: TextStyle(color: AppColors.textSecondary.toColor()),
+                  ),
                 ],
               ),
             ),
@@ -74,7 +97,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
               text: isEdit ? 'Update Produk' : 'Simpan Produk',
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(isEdit ? 'Produk berhasil diperbarui!' : 'Produk berhasil disimpan!')),
+                  SnackBar(content: Text(isEdit ? 'Perubahan berhasil disimpan!' : 'Produk baru berhasil ditambahkan!')),
                 );
               },
             ),
