@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'core/theme/app_theme.dart';
-import 'features/auth/presentation/splash_screen.dart';
+import 'package:toko_emas_digital/core/services/notification_service.dart';
+import 'package:toko_emas_digital/core/theme/app_theme.dart';
+import 'package:toko_emas_digital/features/auth/presentation/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Firebase
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+    // Initialize Notifications
+    await NotificationService().initialize();
+  } catch (e) {
+    debugPrint("Initialization failed: $e");
+  }
   
   runApp(const TokoEmasApp());
 }

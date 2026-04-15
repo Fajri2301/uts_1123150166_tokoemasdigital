@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/auth_service.dart';
-import '../../home/presentation/home_screen.dart';
-import 'register_screen.dart';
-import '../../../common/widgets/custom_input_field.dart';
-import '../../../common/widgets/gold_button.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_dimensions.dart';
-import '../../../core/utils/app_validator.dart';
+import 'package:toko_emas_digital/features/auth/services/auth_service.dart';
+import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
+import 'package:toko_emas_digital/features/auth/presentation/register_screen.dart';
+import 'package:toko_emas_digital/common/widgets/custom_input_field.dart';
+import 'package:toko_emas_digital/common/widgets/gold_button.dart';
+import 'package:toko_emas_digital/core/constants/app_colors.dart';
+import 'package:toko_emas_digital/core/constants/app_spacing.dart';
+import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
+import 'package:toko_emas_digital/core/utils/app_validator.dart';
+
+// Helper for Color
+extension HexColor on String {
+  Color toColor() {
+    return Color(int.parse(replaceFirst('#', '0xff')));
+  }
+}
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -64,12 +71,38 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _handleGoogleLogin() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      User? user = await _authService.signInWithGoogle();
+      if (user != null && mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString().replaceAll('Exception: ', '');
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: AppColors.background.toColor(),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.padding),
           child: Form(
             key: _formKey,
@@ -77,36 +110,39 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const SizedBox(height: 60),
                 // Logo dan Title
-                Container(
-                  width: 80,
-                  height: 80,
-                  margin: const EdgeInsets.only(bottom: AppSpacing.spacingXLarge),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFD700),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                  ),
-                  child: const Icon(
-                    Icons.monetization_on,
-                    size: 50,
-                    color: Color(0xFF0D0D0D),
+                Center(
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    margin: const EdgeInsets.only(bottom: AppSpacing.spacingXLarge),
+                    decoration: BoxDecoration(
+                      color: AppColors.goldAccent.toColor(),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                    ),
+                    child: Icon(
+                      Icons.monetization_on,
+                      size: 50,
+                      color: AppColors.background.toColor(),
+                    ),
                   ),
                 ),
-                const Text(
+                Text(
                   'Selamat Datang',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppColors.textPrimary.toColor(),
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Masuk ke akun Anda untuk melanjutkan',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFFB0B0B0),
+                    color: AppColors.textSecondary.toColor(),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -118,13 +154,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.all(AppSpacing.spacingMedium),
                     margin: const EdgeInsets.only(bottom: AppSpacing.spacingLarge),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF44336).withOpacity(0.1),
+                      color: AppColors.error.toColor().withOpacity(0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                      border: Border.all(color: const Color(0xFFF44336)),
+                      border: Border.all(color: AppColors.error.toColor()),
                     ),
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(color: Color(0xFFF44336)),
+                      style: TextStyle(color: AppColors.error.toColor()),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -174,13 +210,45 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                 const SizedBox(height: AppSpacing.spacingLarge),
 
+                // Divider "Or"
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: AppColors.divider.toColor())),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Atau masuk dengan',
+                        style: TextStyle(color: AppColors.textSecondary.toColor(), fontSize: 12),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: AppColors.divider.toColor())),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.spacingLarge),
+
+                // Google Login Button
+                OutlinedButton.icon(
+                  onPressed: _isLoading ? null : _handleGoogleLogin,
+                  icon: const Icon(Icons.g_mobiledata, size: 30),
+                  label: const Text('Masuk dengan Google'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.textPrimary.toColor(),
+                    side: BorderSide(color: AppColors.divider.toColor()),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.spacingLarge),
+
                 // Register Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Belum punya akun?',
-                      style: TextStyle(color: Color(0xFFB0B0B0)),
+                      style: TextStyle(color: AppColors.textSecondary.toColor()),
                     ),
                     TextButton(
                       onPressed: () {
@@ -188,10 +256,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           MaterialPageRoute(builder: (_) => const RegisterScreen()),
                         );
                       },
-                      child: const Text(
+                      child: Text(
                         'Daftar',
                         style: TextStyle(
-                          color: Color(0xFFFFD700),
+                          color: AppColors.goldAccent.toColor(),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
