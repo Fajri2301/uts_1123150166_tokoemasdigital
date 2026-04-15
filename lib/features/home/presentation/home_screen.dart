@@ -6,6 +6,7 @@ import '../../core/constants/app_spacing.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../core/services/firestore_service.dart';
+import '../../core/services/gold_price_api_service.dart';
 import '../../common/widgets/custom_input_field.dart';
 import '../../features/digital_gold/presentation/digital_gold_screen.dart';
 import '../../features/physical_gold/presentation/physical_gold_screen.dart';
@@ -21,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
+  final GoldPriceApiService _goldPriceApiService = GoldPriceApiService();
   final TextEditingController _searchController = TextEditingController();
   
   double goldPrice = 0.0;
@@ -53,6 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     }
+    
+    // Auto update gold price dari API saat app dibuka
+    _goldPriceApiService.autoUpdateGoldPrice();
   }
 
   Future<void> _handleRefresh() async {
