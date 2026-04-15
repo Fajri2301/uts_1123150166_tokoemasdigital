@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
@@ -31,7 +33,7 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image (Placeholder or Network Image)
+            // Product Image (Handles Network and Base64)
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -41,21 +43,7 @@ class ProductCard extends StatelessWidget {
                     top: Radius.circular(AppDimensions.radiusCard),
                   ),
                 ),
-                child: imageUrl.startsWith('http')
-                    ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Icon(
-                          Icons.image_outlined,
-                          color: AppColors.goldAccent.toColor(),
-                          size: 40,
-                        ),
-                      )
-                    : Icon(
-                        Icons.image_outlined,
-                        color: AppColors.goldAccent.toColor(),
-                        size: 40,
-                      ),
+                child: _buildImage(),
               ),
             ),
             Padding(
@@ -97,6 +85,37 @@ class ProductCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildImage() {
+    if (imageUrl.isEmpty || imageUrl == 'placeholder') {
+      return Icon(Icons.image_outlined, color: AppColors.goldAccent.toColor(), size: 40);
+    }
+
+    // Handle Base64
+    if (imageUrl.contains('base64,')) {
+      try {
+        final base64String = imageUrl.split(',').last;
+        final Uint8List bytes = base64Decode(base64String);
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusCard)),
+          child: Image.memory(bytes, fit: BoxFit.cover),
+        );
+      } catch (e) {
+        return Icon(Icons.error_outline, color: AppColors.error.toColor());
+      }
+    }
+
+    // Handle Network Image
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusCard)),
+      child: Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            Icon(Icons.image_outlined, color: AppColors.goldAccent.toColor(), size: 40),
       ),
     );
   }

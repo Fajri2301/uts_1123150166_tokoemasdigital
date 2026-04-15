@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
-import 'package:toko_emas_digital/common/widgets/product_card.dart';
 import 'package:toko_emas_digital/core/utils/color_extension.dart';
+import 'package:toko_emas_digital/common/widgets/product_card.dart';
+import 'package:toko_emas_digital/features/digital_gold/services/catalog_service.dart';
+import 'package:toko_emas_digital/features/digital_gold/models/transaction_model.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -235,54 +238,55 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // 5. Product Catalog Grid
+  // 5. Real-time Product Catalog Grid
   Widget _buildProductCatalog() {
-    // Mock data for catalog (Now with descriptions as required by UTS Draft)
-    final products = [
-      {
-        'name': 'Cincin Emas 24K',
-        'price': 'Rp 2.500.000',
-        'description': 'Emas murni 24K dengan desain klasik elegan.',
-        'imageUrl': 'placeholder'
-      },
-      {
-        'name': 'Kalung Berlian',
-        'price': 'Rp 15.200.000',
-        'description': 'Kalung emas putih dengan liontin berlian asli.',
-        'imageUrl': 'placeholder'
-      },
-      {
-        'name': 'Gelang Rose Gold',
-        'price': 'Rp 5.400.000',
-        'description': 'Gelang cantik warna rose gold 18K.',
-        'imageUrl': 'placeholder'
-      },
-      {
-        'name': 'Anting Minimalis',
-        'price': 'Rp 1.200.000',
-        'description': 'Anting harian simple namun tetap mewah.',
-        'imageUrl': 'placeholder'
-      },
-    ];
+    final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: AppDimensions.gridColumns,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        childAspectRatio: AppDimensions.gridAspectRatio,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return ProductCard(
-          name: products[index]['name']!,
-          price: products[index]['price']!,
-          description: products[index]['description']!,
-          imageUrl: products[index]['imageUrl']!,
-          onTap: () {
-            // Future navigation to product detail
+    return StreamBuilder<List<ProductModel>>(
+      stream: CatalogService().getProducts(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFFFFD700)),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Terjadi kesalahan: ${snapshot.error}',
+                style: const TextStyle(color: Colors.white)),
+          );
+        }
+
+        final products = snapshot.data ?? [];
+        if (products.isEmpty) {
+          return const Center(
+            child: Text('Katalog produk masih kosong.',
+                style: TextStyle(color: Colors.white70)),
+          );
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: AppDimensions.gridColumns,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            childAspectRatio: AppDimensions.gridAspectRatio,
+          ),
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final product = products[index];
+            return ProductCard(
+              name: product.name,
+              price: currencyFormat.format(product.price),
+              description: product.description,
+              imageUrl: product.imageUrl,
+              onTap: () {
+                // Product detail navigation
+              },
+            );
           },
         );
       },
