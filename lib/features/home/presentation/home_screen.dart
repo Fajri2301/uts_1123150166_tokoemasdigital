@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
+import 'package:toko_emas_digital/common/widgets/product_card.dart';
 
 // Extension to convert Hex String to Color
-extension HexColor on String {
+extension HexColorHome on String {
   Color toColor() {
     return Color(int.parse(replaceFirst('#', '0xff')));
   }
@@ -242,12 +243,32 @@ class HomeScreen extends StatelessWidget {
 
   // 5. Product Catalog Grid
   Widget _buildProductCatalog() {
-    // Mock data for catalog
+    // Mock data for catalog (Now with descriptions as required by UTS Draft)
     final products = [
-      {'name': 'Cincin Emas 24K', 'price': 'Rp 2.500.000', 'weight': '2 gr'},
-      {'name': 'Kalung Berlian', 'price': 'Rp 15.200.000', 'weight': '5 gr'},
-      {'name': 'Gelang Rose Gold', 'price': 'Rp 5.400.000', 'weight': '3 gr'},
-      {'name': 'Anting Minimalis', 'price': 'Rp 1.200.000', 'weight': '1 gr'},
+      {
+        'name': 'Cincin Emas 24K',
+        'price': 'Rp 2.500.000',
+        'description': 'Emas murni 24K dengan desain klasik elegan.',
+        'imageUrl': 'placeholder'
+      },
+      {
+        'name': 'Kalung Berlian',
+        'price': 'Rp 15.200.000',
+        'description': 'Kalung emas putih dengan liontin berlian asli.',
+        'imageUrl': 'placeholder'
+      },
+      {
+        'name': 'Gelang Rose Gold',
+        'price': 'Rp 5.400.000',
+        'description': 'Gelang cantik warna rose gold 18K.',
+        'imageUrl': 'placeholder'
+      },
+      {
+        'name': 'Anting Minimalis',
+        'price': 'Rp 1.200.000',
+        'description': 'Anting harian simple namun tetap mewah.',
+        'imageUrl': 'placeholder'
+      },
     ];
 
     return GridView.builder(
@@ -261,67 +282,14 @@ class HomeScreen extends StatelessWidget {
       ),
       itemCount: products.length,
       itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.divider.toColor(),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Placeholder image
-              Container(
-                height: 120,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white12,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(AppDimensions.radiusCard),
-                  ),
-                ),
-                child: Icon(
-                  Icons.image_outlined,
-                  color: AppColors.goldAccent.toColor(),
-                  size: 40,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      products[index]['name']!,
-                      style: TextStyle(
-                        color: AppColors.textPrimary.toColor(),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      products[index]['weight']!,
-                      style: TextStyle(
-                        color: AppColors.textSecondary.toColor(),
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      products[index]['price']!,
-                      style: TextStyle(
-                        color: AppColors.goldAccent.toColor(),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        return ProductCard(
+          name: products[index]['name']!,
+          price: products[index]['price']!,
+          description: products[index]['description']!,
+          imageUrl: products[index]['imageUrl']!,
+          onTap: () {
+            // Future navigation to product detail
+          },
         );
       },
     );
