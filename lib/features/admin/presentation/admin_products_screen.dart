@@ -167,7 +167,6 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => AddEditProductScreen(
-                        productId: productId,
                         product: product,
                       ),
                     ),
