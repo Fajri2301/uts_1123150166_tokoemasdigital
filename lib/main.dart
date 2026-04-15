@@ -9,23 +9,34 @@ import 'package:toko_emas_digital/features/auth/presentation/splash_screen.dart'
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Firebase
+  // Inisialisasi Firebase secara eksplisit
   try {
-    await Firebase.initializeApp(
-      options: kIsWeb ? const FirebaseOptions(
-        apiKey: FirebaseConfig.apiKey,
-        appId: FirebaseConfig.appId,
-        messagingSenderId: FirebaseConfig.messagingSenderId,
-        projectId: FirebaseConfig.projectId,
-        authDomain: FirebaseConfig.authDomain,
-        storageBucket: FirebaseConfig.storageBucket,
-        measurementId: FirebaseConfig.measurementId,
-      ) : null,
-    );
-    // Initialize Notifications
+    if (kIsWeb) {
+      // Wajib menggunakan options untuk platform Web
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: FirebaseConfig.apiKey,
+          appId: FirebaseConfig.appId,
+          messagingSenderId: FirebaseConfig.messagingSenderId,
+          projectId: FirebaseConfig.projectId,
+          authDomain: FirebaseConfig.authDomain,
+          storageBucket: FirebaseConfig.storageBucket,
+          measurementId: FirebaseConfig.measurementId,
+        ),
+      );
+      debugPrint("Firebase initialized for Web");
+    } else {
+      // Android/iOS otomatis membaca dari google-services.json / GoogleService-Info.plist
+      await Firebase.initializeApp();
+      debugPrint("Firebase initialized for Mobile");
+    }
+
+    // Inisialisasi Notifikasi hanya jika Firebase berhasil
     await NotificationService().initialize();
+    
   } catch (e) {
-    debugPrint("Initialization failed: $e");
+    debugPrint("CRITICAL ERROR: Firebase initialization failed: $e");
+    // Tetap jalankan aplikasi tapi mungkin akan muncul error di layar jika Firebase dipanggil
   }
   
   runApp(const TokoEmasApp());
