@@ -36,6 +36,9 @@ dependencies:
   
   # UUID Generator
   uuid: ^4.3.3
+  
+  # Google Fonts untuk tipografi premium (Kompatibel dengan Flutter 3.16.x)
+  google_fonts: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -44,14 +47,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  
-  fonts:
-    - family: Poppins
-      fonts:
-        - asset: assets/fonts/Poppins-Regular.ttf
-        - asset: assets/fonts/Poppins-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Poppins-Bold.ttf
-          weight: 700
