@@ -6,7 +6,7 @@ import 'package:toko_emas_digital/features/auth/presentation/login_screen.dart';
 import 'package:toko_emas_digital/common/widgets/custom_app_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// Import sub-screens (Kita akan buat di bawah atau di file terpisah)
+// Import sub-screens
 import 'admin_products_screen.dart';
 import 'add_edit_product_screen.dart';
 

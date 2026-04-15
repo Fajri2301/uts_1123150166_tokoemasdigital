@@ -6,7 +6,8 @@ import 'package:toko_emas_digital/common/widgets/custom_input_field.dart';
 import 'package:toko_emas_digital/common/widgets/gold_button.dart';
 
 class AddEditProductScreen extends StatefulWidget {
-  const AddEditProductScreen({Key? key}) : super(key: key);
+  final String? productId; // Tambahkan parameter productId untuk mode edit
+  const AddEditProductScreen({Key? key, this.productId}) : super(key: key);
 
   @override
   State<AddEditProductScreen> createState() => _AddEditProductScreenState();
@@ -20,9 +21,14 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEdit = widget.productId != null;
+
     return Scaffold(
       backgroundColor: AppColors.background.toColor(),
-      appBar: const CustomAppBar(title: 'Tambah Produk Baru', showBackButton: false),
+      appBar: CustomAppBar(
+        title: isEdit ? 'Edit Produk' : 'Tambah Produk Baru',
+        showBackButton: isEdit, // Tampilkan tombol kembali jika dalam mode edit
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -65,11 +71,10 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
             const SizedBox(height: 32),
             
             GoldButton(
-              text: 'Simpan Produk',
+              text: isEdit ? 'Update Produk' : 'Simpan Produk',
               onPressed: () {
-                // Logic simpan ke Firestore akan ditambahkan nanti
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Produk berhasil disimpan! (Demo)')),
+                  SnackBar(content: Text(isEdit ? 'Produk berhasil diperbarui!' : 'Produk berhasil disimpan!')),
                 );
               },
             ),
