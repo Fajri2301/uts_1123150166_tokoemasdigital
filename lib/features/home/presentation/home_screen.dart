@@ -71,6 +71,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _navigateToAdmin() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      final userData = await _firestoreService.getUserById(user.uid);
+      if (userData != null && userData['role'] == 'admin') {
+        Navigator.of(context).pushNamed('/admin');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Anda tidak memiliki akses admin'),
+            backgroundColor: Color(0xFFF44336),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,6 +144,24 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(width: AppSpacing.spacingMedium),
+        // Admin Button
+        GestureDetector(
+          onTap: _navigateToAdmin,
+          child: Container(
+            width: AppDimensions.profileIconSize,
+            height: AppDimensions.profileIconSize,
+            decoration: BoxDecoration(
+              color: const Color(0xFF2196F3),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(
+              Icons.admin_panel_settings,
+              size: 20,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.spacingSmall),
         // Profile Icon (32 px)
         GestureDetector(
           onTap: _handleLogout,
