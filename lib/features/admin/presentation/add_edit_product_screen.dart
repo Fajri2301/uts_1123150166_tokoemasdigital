@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
+import '../../../common/widgets/image_upload_widget.dart';
 import '../services/admin_service.dart';
 
 class AddEditProductScreen extends StatefulWidget {
@@ -247,13 +248,22 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
               ),
               const SizedBox(height: 16),
 
-              // URL Gambar
+              // URL Gambar (dengan upload widget)
+              ImageUploadWidget(
+                onImageUploaded: (imageUrl) {
+                  setState(() {
+                    _imageUrlController.text = imageUrl;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Manual URL Input (fallback)
               const Text(
-                'URL Gambar (Supabase)',
+                'Atau masukkan URL gambar manual',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  fontSize: 12,
+                  color: Color(0xFFB0B0B0),
                 ),
               ),
               const SizedBox(height: 8),
