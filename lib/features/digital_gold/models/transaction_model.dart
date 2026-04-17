@@ -1,76 +1,50 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ProductModel {
+/// Transaction Model for Digital Gold
+class TransactionModel {
   final String id;
-  final String name;
-  final int price;
-  final String description;
-  final String imageUrl;
-  final String category;
-  final int karat;
-  final int weight;
-  final bool isAvailable;
+  final String userId;
+  final String type; // 'digital' or 'fisik'
+  final double goldAmount;
+  final double pricePerGram;
+  final double totalPrice;
+  final String status;
   final DateTime? createdAt;
 
-  ProductModel({
+  TransactionModel({
     required this.id,
-    required this.name,
-    required this.price,
-    required this.description,
-    required this.imageUrl,
-    required this.category,
-    required this.karat,
-    required this.weight,
-    required this.isAvailable,
+    required this.userId,
+    required this.type,
+    required this.goldAmount,
+    required this.pricePerGram,
+    required this.totalPrice,
+    required this.status,
     this.createdAt,
   });
 
-  factory ProductModel.fromFirestore(DocumentSnapshot doc) {
+  factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return ProductModel(
+    return TransactionModel(
       id: doc.id,
-      name: data['name'] ?? '',
-      price: (data['price'] ?? 0).toInt(),
-      description: data['description'] ?? '',
-      imageUrl: data['image_url'] ?? '',
-      category: data['category'] ?? 'Lainnya',
-      karat: (data['karat'] ?? 24).toInt(),
-      weight: (data['weight'] ?? 0).toInt(),
-      isAvailable: data['is_available'] ?? true,
+      userId: data['user_id'] ?? '',
+      type: data['type'] ?? 'digital',
+      goldAmount: (data['gold_amount'] ?? 0.0).toDouble(),
+      pricePerGram: (data['price_per_gram'] ?? 0.0).toDouble(),
+      totalPrice: (data['total_price'] ?? 0.0).toDouble(),
+      status: data['status'] ?? 'pending',
       createdAt: (data['created_at'] as Timestamp?)?.toDate(),
     );
   }
-}
 
-class UserModel {
-  final String uid;
-  final String name;
-  final String email;
-  final String role;
-  final int goldBalance;
-  final String phoneNumber;
-  final String address;
-
-  UserModel({
-    required this.uid,
-    required this.name,
-    required this.email,
-    required this.role,
-    required this.goldBalance,
-    required this.phoneNumber,
-    required this.address,
-  });
-
-  factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return UserModel(
-      uid: doc.id,
-      name: data['name'] ?? '',
-      email: data['email'] ?? '',
-      role: data['role'] ?? 'user',
-      goldBalance: (data['gold_balance'] ?? 0).toInt(),
-      phoneNumber: data['phoneNumber'] ?? '',
-      address: data['address'] ?? '',
-    );
+  Map<String, dynamic> toFirestore() {
+    return {
+      'user_id': userId,
+      'type': type,
+      'gold_amount': goldAmount,
+      'price_per_gram': pricePerGram,
+      'total_price': totalPrice,
+      'status': status,
+      'created_at': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
+    };
   }
 }

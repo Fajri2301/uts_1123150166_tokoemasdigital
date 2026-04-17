@@ -1,41 +1,48 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/services/firestore_service.dart';
+import '../../../core/services/firestore_service.dart';
 
 class DigitalGoldService {
   final FirestoreService _firestoreService = FirestoreService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Buy digital gold
+  // Buy digital gold with Transaction for safety
   Future<bool> buyGold({
     required String userId,
     required double gramAmount,
     required double pricePerGram,
   }) async {
     try {
-      // Get current balance
-      final userData = await _firestoreService.getUserById(userId);
-      if (userData == null) return false;
+      return await _firestore.runTransaction((transaction) async {
+        DocumentReference userRef = _firestore.collection('users').doc(userId);
+        DocumentSnapshot userSnapshot = await transaction.get(userRef);
 
-      double currentBalance = (userData['gold_balance'] ?? 0.0).toDouble();
-      double newBalance = currentBalance + gramAmount;
-      double totalPrice = gramAmount * pricePerGram;
+        if (!userSnapshot.exists) {
+          throw Exception('User tidak ditemukan');
+        }
 
-      // Update balance
-      await _firestoreService.updateUserGoldBalance(userId, newBalance);
+        double currentBalance = (userSnapshot.get('gold_balance') ?? 0.0).toDouble();
+        double newBalance = currentBalance + gramAmount;
+        double totalPrice = gramAmount * pricePerGram;
 
-      // Create transaction record
-      await _firestoreService.addTransaction({
-        'user_id': userId,
-        'type': 'digital',
-        'gold_amount': gramAmount,
-        'price_per_gram': pricePerGram,
-        'total_price': totalPrice,
-        'status': 'selesai',
-        'created_at': FieldValue.serverTimestamp(),
+        // 1. Update User Balance
+        transaction.update(userRef, {'gold_balance': newBalance});
+
+        // 2. Create Transaction Record
+        DocumentReference transRef = _firestore.collection('transactions').doc();
+        transaction.set(transRef, {
+          'user_id': userId,
+          'type': 'digital',
+          'gold_amount': gramAmount,
+          'price_per_gram': pricePerGram,
+          'total_price': totalPrice,
+          'status': 'selesai',
+          'created_at': FieldValue.serverTimestamp(),
+        });
+
+        return true;
       });
-
-      return true;
     } catch (e) {
-      throw Exception('Failed to buy gold: $e');
+      throw Exception('Gagal membeli emas: $e');
     }
   }
 
@@ -46,35 +53,39 @@ class DigitalGoldService {
     required String address,
   }) async {
     try {
-      // Get current balance
-      final userData = await _firestoreService.getUserById(userId);
-      if (userData == null) return false;
+      return await _firestore.runTransaction((transaction) async {
+        DocumentReference userRef = _firestore.collection('users').doc(userId);
+        DocumentSnapshot userSnapshot = await transaction.get(userRef);
 
-      double currentBalance = (userData['gold_balance'] ?? 0.0).toDouble();
-      
-      if (currentBalance < gramAmount) {
-        throw Exception('Saldo emas tidak mencukupi');
-      }
+        if (!userSnapshot.exists) throw Exception('User tidak ditemukan');
 
-      double newBalance = currentBalance - gramAmount;
+        double currentBalance = (userSnapshot.get('gold_balance') ?? 0.0).toDouble();
+        
+        if (currentBalance < gramAmount) {
+          throw Exception('Saldo emas tidak mencukupi. Saldo Anda: $currentBalance gr');
+        }
 
-      // Update balance
-      await _firestoreService.updateUserGoldBalance(userId, newBalance);
+        double newBalance = currentBalance - gramAmount;
 
-      // Create physical transaction
-      await _firestoreService.addDocument('transactions', {
-        'user_id': userId,
-        'type': 'fisik',
-        'gold_amount': gramAmount,
-        'product_id': 'batangan',
-        'status': 'diproses',
-        'address': address,
-        'created_at': FieldValue.serverTimestamp(),
+        // 1. Update Balance
+        transaction.update(userRef, {'gold_balance': newBalance});
+
+        // 2. Create physical transaction
+        DocumentReference transRef = _firestore.collection('transactions').doc();
+        transaction.set(transRef, {
+          'user_id': userId,
+          'type': 'fisik',
+          'gold_amount': gramAmount,
+          'product_id': 'batangan',
+          'status': 'diproses',
+          'address': address,
+          'created_at': FieldValue.serverTimestamp(),
+        });
+
+        return true;
       });
-
-      return true;
     } catch (e) {
-      throw Exception('Failed to convert gold: $e');
+      throw Exception('Gagal konversi emas: $e');
     }
   }
 

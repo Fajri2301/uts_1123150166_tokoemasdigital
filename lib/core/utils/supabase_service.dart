@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/supabase_config.dart';
 
@@ -19,17 +20,17 @@ class SupabaseService {
   SupabaseClient get client => _client;
 
   // Upload image to Supabase Storage
-  Future<String> uploadImage(String filePath, String fileName) async {
+  Future<String> uploadImage(File file, String fileName) async {
     try {
       await _client.storage
           .from(SupabaseConfig.bucketName)
-          .upload('products/$fileName', filePath);
+          .upload('products/$fileName', file);
 
-      final response = _client.storage
+      final publicUrl = _client.storage
           .from(SupabaseConfig.bucketName)
           .getPublicUrl('products/$fileName');
 
-      return response;
+      return publicUrl;
     } catch (e) {
       throw Exception('Failed to upload image: $e');
     }

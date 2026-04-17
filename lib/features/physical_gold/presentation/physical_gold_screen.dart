@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -68,6 +67,11 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
               child: TextField(
                 controller: _searchController,
                 style: const TextStyle(color: Colors.white),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value.toLowerCase();
+                  });
+                },
                 decoration: InputDecoration(
                   hintText: 'Cari produk...',
                   hintStyle: const TextStyle(color: Color(0xFF666666)),
@@ -77,11 +81,6 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
                     horizontal: AppSpacing.padding,
                     vertical: 12,
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      _searchQuery = value.toLowerCase();
-                    });
-                  },
                 ),
               ),
             ),

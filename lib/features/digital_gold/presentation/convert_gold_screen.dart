@@ -4,7 +4,6 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/services/firestore_service.dart';
-import '../../../common/widgets/custom_input_field.dart';
 import '../../../common/widgets/gold_button.dart';
 import '../services/digital_gold_service.dart';
 

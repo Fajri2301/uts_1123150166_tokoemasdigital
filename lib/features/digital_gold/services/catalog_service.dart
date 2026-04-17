@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/transaction_model.dart';
+import '../../physical_gold/models/product_model.dart';
 
 class CatalogService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

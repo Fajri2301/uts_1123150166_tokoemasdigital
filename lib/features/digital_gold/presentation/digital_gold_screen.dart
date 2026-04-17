@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/services/firestore_service.dart';
 import '../services/digital_gold_service.dart';
-import '../../../common/widgets/custom_input_field.dart';
 import '../../../common/widgets/gold_button.dart';
 import 'buy_gold_screen.dart';
 import 'convert_gold_screen.dart';

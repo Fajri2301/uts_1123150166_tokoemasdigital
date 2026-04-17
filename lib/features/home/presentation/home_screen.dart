@@ -4,7 +4,7 @@ import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
 import 'package:toko_emas_digital/core/utils/color_extension.dart';
 import 'package:toko_emas_digital/common/widgets/product_card.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/catalog_service.dart';
-import 'package:toko_emas_digital/features/digital_gold/models/transaction_model.dart';
+import 'package:toko_emas_digital/features/physical_gold/models/product_model.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {

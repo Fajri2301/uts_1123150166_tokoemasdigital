@@ -102,7 +102,18 @@ class AuthService {
 
   // Sign out
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    try {
+      // Hanya coba logout Google jika user memang terdeteksi login dengan Google
+      // dan bungkus dalam try-catch agar tidak crash di Web jika Client ID belum diset
+      if (await _googleSignIn.isSignedIn()) {
+        await _googleSignIn.signOut();
+      }
+    } catch (e) {
+      // Log error tapi jangan biarkan menghalangi logout utama
+      print('Info: Google Sign Out dilewati atau error: $e');
+    }
+    
+    // Logout utama dari Firebase
     await _auth.signOut();
   }
 
@@ -127,6 +138,42 @@ class AuthService {
       return 'user';
     } catch (e) {
       return 'user';
+    }
+  }
+
+  // Update Profile
+  Future<void> updateProfile({
+    String? name,
+    String? email,
+    String? password,
+  }) async {
+    User? user = _auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    try {
+      // Update Name
+      if (name != null && name.isNotEmpty) {
+        await user.updateDisplayName(name);
+        await _firestore.collection('users').doc(user.uid).update({'name': name});
+      }
+
+      // Update Email
+      if (email != null && email.isNotEmpty && email != user.email) {
+        await user.verifyBeforeUpdateEmail(email);
+        await _firestore.collection('users').doc(user.uid).update({'email': email});
+      }
+
+      // Update Password
+      if (password != null && password.isNotEmpty) {
+        await user.updatePassword(password);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        throw Exception('Sesi telah berakhir. Silakan logout dan login kembali untuk mengubah email atau password.');
+      }
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception('Gagal update profil: $e');
     }
   }
 }

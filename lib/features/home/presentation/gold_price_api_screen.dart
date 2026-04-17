@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_dimensions.dart';
-import '../../../core/utils/currency_formatter.dart';
-import '../services/gold_price_api_service.dart';
-import '../services/firestore_service.dart';
+import 'package:toko_emas_digital/core/constants/app_spacing.dart';
+import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
+import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
+import 'package:toko_emas_digital/core/services/gold_price_api_service.dart';
+import 'package:toko_emas_digital/core/services/firestore_service.dart';
 
 class GoldPriceApiScreen extends StatefulWidget {
   const GoldPriceApiScreen({Key? key}) : super(key: key);

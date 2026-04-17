@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
-import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/supabase_service.dart';
 
@@ -85,8 +84,9 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
       String fileName = 'product_${uuid.v4().substring(0, 8)}.$extension';
 
       // Upload to Supabase Storage
+      File imageFileObj = File(imageFile.path);
       String publicUrl = await _supabaseService.uploadImage(
-        imageFile.path,
+        imageFileObj,
         fileName,
       );
 

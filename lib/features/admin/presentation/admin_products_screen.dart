@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_dimensions.dart';
-import '../../../core/utils/currency_formatter.dart';
+import 'dart:convert';
+import 'package:toko_emas_digital/core/constants/app_colors.dart';
+import 'package:toko_emas_digital/core/utils/color_extension.dart';
+import 'package:toko_emas_digital/common/widgets/custom_app_bar.dart';
+import 'package:toko_emas_digital/features/physical_gold/models/product_model.dart';
 import '../services/admin_service.dart';
 import 'add_edit_product_screen.dart';
 
@@ -19,61 +21,35 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Kelola Produk',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
+      backgroundColor: AppColors.background.toColor(),
+      appBar: const CustomAppBar(title: 'Kelola Produk', showBackButton: true),
       body: StreamBuilder<QuerySnapshot>(
         stream: _adminService.getAllProducts(),
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Terjadi kesalahan',
-                style: const TextStyle(color: Color(0xFFF44336)),
-              ),
-            );
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
           }
 
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
-              ),
-            );
-          }
-
-          final products = snapshot.data!.docs;
-
-          if (products.isEmpty) {
-            return const Center(
-              child: Text(
-                'Belum ada produk',
-                style: TextStyle(color: Color(0xFFB0B0B0)),
-              ),
+              child: Text('Tidak ada produk.', style: TextStyle(color: Colors.white70)),
             );
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(AppSpacing.padding),
-            itemCount: products.length,
+            padding: const EdgeInsets.all(16),
+            itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
-              final product = products[index].data() as Map<String, dynamic>;
-              final productId = products[index].id;
-              return _buildProductCard(product, productId);
+              final doc = snapshot.data!.docs[index];
+              final product = ProductModel.fromFirestore(doc);
+              
+              return _buildProductItem(context, product);
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.goldAccent.toColor(),
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -81,102 +57,84 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
             ),
           );
         },
-        backgroundColor: const Color(0xFFFFD700),
-        child: const Icon(Icons.add, color: Color(0xFF0D0D0D)),
+        child: const Icon(Icons.add, color: Colors.black),
       ),
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product, String productId) {
+  Widget _buildProductItem(BuildContext context, ProductModel product) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.spacingMedium),
-      padding: const EdgeInsets.all(AppSpacing.spacingMedium),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+        color: AppColors.divider.toColor(),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          // Product Image
+          // Image
           Container(
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white10,
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: product['image_url'] != null && product['image_url'].isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      product['image_url'],
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.image, color: Color(0xFF666666));
-                      },
-                    ),
-                  )
-                : const Icon(Icons.image, color: Color(0xFF666666)),
+            child: product.imageUrl.isNotEmpty 
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: product.imageUrl.startsWith('data:image')
+                    ? Image.memory(
+                        base64Decode(product.imageUrl.split(',').last),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Icon(Icons.broken_image, color: AppColors.goldAccent.toColor()),
+                      )
+                    : Image.network(
+                        product.imageUrl, 
+                        fit: BoxFit.cover, 
+                        errorBuilder: (_, __, ___) => Icon(Icons.image_outlined, color: AppColors.goldAccent.toColor())
+                      ),
+                )
+              : Icon(Icons.image_outlined, color: AppColors.goldAccent.toColor()),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
+          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  product['name'] ?? 'Produk',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                  product.name,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Text(
+                  '${product.category} • ${product.weight}g',
+                  style: TextStyle(color: AppColors.goldAccent.toColor(), fontSize: 12),
                 ),
                 const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFD700).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    (product['category'] ?? '').toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFFFD700),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
                 Text(
-                  CurrencyFormatter.formatRupiah((product['price'] ?? 0.0).toDouble()),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFFFD700),
-                  ),
+                  'Rp ${product.price}',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
             ),
           ),
-          // Edit & Delete Buttons
-          Column(
+          // Actions
+          Row(
             children: [
               IconButton(
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => AddEditProductScreen(
-                        product: product,
-                      ),
+                      builder: (_) => AddEditProductScreen(product: product),
                     ),
                   );
                 },
-                icon: const Icon(Icons.edit, color: Color(0xFFFFD700)),
+                icon: Icon(Icons.edit, color: AppColors.goldAccent.toColor()),
               ),
               IconButton(
-                onPressed: () => _confirmDelete(productId),
-                icon: const Icon(Icons.delete, color: Color(0xFFF44336)),
+                onPressed: () => _confirmDelete(context, product),
+                icon: const Icon(Icons.delete, color: Colors.redAccent),
               ),
             ],
           ),
@@ -185,56 +143,40 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
     );
   }
 
-  Future<void> _confirmDelete(String productId) async {
-    final confirmed = await showDialog<bool>(
+  void _confirmDelete(BuildContext context, ProductModel product) {
+    showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
-          'Hapus Produk',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: const Text(
-          'Apakah Anda yakin ingin menghapus produk ini?',
-          style: TextStyle(color: Color(0xFFB0B0B0)),
-        ),
+        title: const Text('Hapus Produk', style: TextStyle(color: Colors.white)),
+        content: Text('Apakah Anda yakin ingin menghapus "${product.name}"?', style: const TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Batal'),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal', style: TextStyle(color: Colors.white70)),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Hapus',
-              style: TextStyle(color: Color(0xFFF44336)),
-            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await _adminService.deleteProduct(product.id);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Produk berhasil dihapus')),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Gagal menghapus: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text('Hapus', style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
     );
-
-    if (confirmed == true) {
-      try {
-        await _adminService.deleteProduct(productId);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Produk berhasil dihapus'),
-              backgroundColor: Color(0xFF4CAF50),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Gagal hapus produk: $e'),
-              backgroundColor: const Color(0xFFF44336),
-            ),
-          );
-        }
-      }
-    }
   }
 }

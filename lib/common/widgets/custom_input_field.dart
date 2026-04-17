@@ -10,6 +10,7 @@ class CustomInputField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
+  final int maxLines;
 
   const CustomInputField({
     super.key,
@@ -18,6 +19,7 @@ class CustomInputField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.validator,
+    this.maxLines = 1,
   });
 
   @override
@@ -26,7 +28,6 @@ class CustomInputField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          height: AppDimensions.inputHeight,
           decoration: BoxDecoration(
             color: AppColors.divider.toColor(),
             borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
@@ -36,6 +37,7 @@ class CustomInputField extends StatelessWidget {
             obscureText: obscureText,
             keyboardType: keyboardType,
             validator: validator,
+            maxLines: maxLines,
             style: TextStyle(color: AppColors.textPrimary.toColor()),
             decoration: InputDecoration(
               hintText: hintText,
@@ -43,7 +45,7 @@ class CustomInputField extends StatelessWidget {
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.padding,
-                vertical: AppSpacing.spacingSmall,
+                vertical: 12,
               ),
             ),
           ),

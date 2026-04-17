@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../core/services/firestore_service.dart';
-import '../../../common/widgets/custom_input_field.dart';
 import '../../../common/widgets/gold_button.dart';
 import '../services/digital_gold_service.dart';
 
@@ -19,7 +17,6 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
   final _formKey = GlobalKey<FormState>();
   final _gramController = TextEditingController();
   final _digitalGoldService = DigitalGoldService();
-  final _firestoreService = FirestoreService();
   bool _isLoading = false;
   String? _errorMessage;
   double _currentGoldPrice = 0.0;
