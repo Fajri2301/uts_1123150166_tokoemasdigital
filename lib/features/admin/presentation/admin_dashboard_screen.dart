@@ -5,6 +5,7 @@ import 'package:toko_emas_digital/features/auth/services/auth_service.dart';
 import 'package:toko_emas_digital/features/auth/presentation/login_screen.dart';
 import 'package:toko_emas_digital/common/widgets/custom_app_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:toko_emas_digital/common/widgets/admin_scaffold.dart';
 import '../services/admin_service.dart';
 
 // Import sub-screens
@@ -34,8 +35,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+    return AdminScaffold(
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
@@ -117,13 +117,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
-      appBar: const CustomAppBar(title: 'Panel Admin', showBackButton: false),
-      body: RefreshIndicator(
-        onRefresh: _loadDashboardData,
-        color: AppColors.goldAccent.toColor(),
-        child: SingleChildScrollView(
+    return RefreshIndicator(
+      onRefresh: _loadDashboardData,
+      color: AppColors.goldAccent.toColor(),
+      child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,12 +247,9 @@ class AdminProfileScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     final authService = AuthService();
 
-    return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
-      appBar: const CustomAppBar(title: 'Profil Admin', showBackButton: false),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
           children: [
             const SizedBox(height: 20),
             // Header Profil

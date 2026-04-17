@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/utils/color_extension.dart';
-import 'package:toko_emas_digital/common/widgets/custom_app_bar.dart';
+import 'package:toko_emas_digital/common/widgets/admin_scaffold.dart';
 import '../services/admin_service.dart';
 
 class AdminUsersScreen extends StatefulWidget {
@@ -17,9 +17,9 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
-      appBar: const CustomAppBar(title: 'Kelola User', showBackButton: true),
+    return AdminScaffold(
+      title: 'Kelola User',
+      showBackButton: true,
       body: StreamBuilder<QuerySnapshot>(
         stream: _adminService.getAllUsers(),
         builder: (context, snapshot) {

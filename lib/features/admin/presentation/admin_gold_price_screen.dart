@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
+import 'package:toko_emas_digital/common/widgets/admin_scaffold.dart';
 import '../services/admin_service.dart';
 
 class AdminGoldPriceScreen extends StatefulWidget {
@@ -90,19 +91,9 @@ class _AdminGoldPriceScreenState extends State<AdminGoldPriceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Update Harga Emas',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
+    return AdminScaffold(
+      title: 'Update Harga Emas',
+      showBackButton: true,
       body: Padding(
         padding: const EdgeInsets.all(AppSpacing.padding),
         child: Column(

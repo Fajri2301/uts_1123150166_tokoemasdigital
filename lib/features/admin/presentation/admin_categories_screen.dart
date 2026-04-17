@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/utils/color_extension.dart';
-import 'package:toko_emas_digital/common/widgets/custom_app_bar.dart';
+import 'package:toko_emas_digital/common/widgets/admin_scaffold.dart';
 import 'package:toko_emas_digital/features/physical_gold/models/category_model.dart';
 import '../services/admin_service.dart';
 
@@ -18,9 +18,9 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
-      appBar: const CustomAppBar(title: 'Kelola Kategori', showBackButton: true),
+    return AdminScaffold(
+      title: 'Kelola Kategori',
+      showBackButton: true,
       body: StreamBuilder<QuerySnapshot>(
         stream: _adminService.getAllCategories(),
         builder: (context, snapshot) {
