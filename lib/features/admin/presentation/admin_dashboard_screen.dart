@@ -174,7 +174,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -335,7 +334,6 @@ class AdminProfileScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 

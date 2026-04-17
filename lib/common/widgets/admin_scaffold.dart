@@ -12,6 +12,8 @@ class AdminScaffold extends StatelessWidget {
   final String title;
   final List<Widget>? actions;
   final bool showBackButton;
+  final Widget? floatingActionButton;
+  final Widget? bottomNavigationBar;
 
   const AdminScaffold({
     Key? key,
@@ -19,6 +21,8 @@ class AdminScaffold extends StatelessWidget {
     this.title = 'Admin Panel',
     this.actions,
     this.showBackButton = false,
+    this.floatingActionButton,
+    this.bottomNavigationBar,
   }) : super(key: key);
 
   @override
@@ -80,6 +84,8 @@ class AdminScaffold extends StatelessWidget {
       // Drawer (Sidebar)
       endDrawer: _buildSidebar(context),
       body: body,
+      floatingActionButton: floatingActionButton,
+      bottomNavigationBar: bottomNavigationBar,
     );
   }
 
