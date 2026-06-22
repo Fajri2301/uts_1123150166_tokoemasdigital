@@ -29,6 +29,9 @@ dependencies:
   # HTTP Client untuk API
   http: ^1.2.0
   
+  # URL Launcher
+  url_launcher: ^6.2.6
+  
   # Image Picker
   image_picker: ^1.0.7
   

@@ -5,6 +5,7 @@ import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../common/widgets/gold_button.dart';
 import '../services/physical_gold_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final String productId;
@@ -35,6 +36,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     'Transfer Bank',
     'E-Wallet (OVO/Gopay)',
     'Saldo Emas Digital',
+    'Dompet Kampus (E-Money)',
   ];
 
   @override
@@ -64,6 +66,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
 
       if (success && mounted) {
+        if (_selectedPaymentMethod == 'Dompet Kampus (E-Money)') {
+          final Uri uri = Uri.parse(
+              'dompetkampus://pay?merchant_id=TE01&merchant_name=Toko%20Emas%20Digital&amount=${widget.price}');
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          } else {
+            throw Exception('Gagal membuka Dompet Kampus. Pastikan aplikasi E-Money sudah terinstall.');
+          }
+        }
+
         showDialog(
           context: context,
           barrierDismissible: false,
