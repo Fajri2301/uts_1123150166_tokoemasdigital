@@ -12,12 +12,12 @@ dependencies:
   cupertino_icons: ^1.0.2
   
   # Firebase
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.16.0
-  firebase_messaging: ^14.7.10
+  firebase_core: ^4.11.0
+  firebase_auth: ^6.5.3
+  firebase_messaging: ^16.4.0
   
   # Google Sign In
-  google_sign_in: ^6.1.6
+  google_sign_in: ^6.3.0
   
   # Supabase
   # State Management
@@ -36,20 +36,20 @@ dependencies:
   shared_preferences: ^2.2.2
   
   # Intl untuk format tanggal dan currency
-  intl: ^0.19.0
+  intl: ^0.20.2
   
   # UUID Generator
   uuid: ^4.3.3
   
   # Google Fonts untuk tipografi premium (Kompatibel dengan Flutter 3.16.x)
-  google_fonts: ^5.1.0
+  google_fonts: ^8.1.0
   dio: ^5.9.2
-  cloud_firestore: ^4.17.5
+  cloud_firestore: ^6.6.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true

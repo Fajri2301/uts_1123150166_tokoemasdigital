@@ -12,7 +12,20 @@
           "package_name": "com.dev.tokoemasdigital"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "480514908516-99tee57s8uco24phgrpluvo5r2rju8gi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dev.tokoemasdigital",
+            "certificate_hash": "20f2c161592fbb2875d699e9b21983bbf6578028"
+          }
+        },
+        {
+          "client_id": "480514908516-9nusv5t17dp8vhag8vfde8qcgtd1gksf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD0w8wJtOQRM2gxFTAfNwyn9srHeoMKu34"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "480514908516-9nusv5t17dp8vhag8vfde8qcgtd1gksf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
