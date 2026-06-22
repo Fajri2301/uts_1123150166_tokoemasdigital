@@ -1,28 +1,25 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:toko_emas_digital/core/network/api_client.dart';
 import '../../physical_gold/models/product_model.dart';
 
 class CatalogService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ApiClient _apiClient = ApiClient();
 
-  // Stream of products for real-time updates
-  Stream<List<ProductModel>> getProducts() {
-    return _firestore
-        .collection('products')
-        .where('is_available', isEqualTo: true)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) => ProductModel.fromFirestore(doc)).toList();
-    });
+  // Mempertahankan signature Stream agar tidak memecah UI yang sudah ada,
+  // tapi sebenarnya memanggil REST API sekali.
+  Stream<List<ProductModel>> getProducts() async* {
+    yield await getProductsOnce();
   }
 
-  // Get products once (Future)
+  // Get products via REST API
   Future<List<ProductModel>> getProductsOnce() async {
     try {
-      QuerySnapshot snapshot = await _firestore
-          .collection('products')
-          .where('is_available', isEqualTo: true)
-          .get();
-      return snapshot.docs.map((doc) => ProductModel.fromFirestore(doc)).toList();
+      final response = await _apiClient.dio.get('/products');
+      
+      if (response.data['success'] == true) {
+        List<dynamic> data = response.data['data'];
+        return data.map((json) => ProductModel.fromJson(json)).toList();
+      }
+      return [];
     } catch (e) {
       throw Exception('Gagal mengambil data katalog: $e');
     }

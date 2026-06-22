@@ -1,17 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-/// Product Model for Physical Gold
 class ProductModel {
   final String id;
   final String name;
   final String category;
-  final int price;
+  final double price;
   final String description;
   final String imageUrl;
-  final int karat;
-  final int weight;
+  final int stock;
   final bool isAvailable;
-  final String sellerId;
   final DateTime? createdAt;
 
   ProductModel({
@@ -21,69 +16,36 @@ class ProductModel {
     required this.price,
     required this.description,
     required this.imageUrl,
-    required this.karat,
-    required this.weight,
+    this.stock = 0,
     required this.isAvailable,
-    required this.sellerId,
     this.createdAt,
   });
 
-  factory ProductModel.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: doc.id,
-      name: data['name'] ?? '',
-      category: data['category'] ?? 'Lainnya',
-      price: (data['price'] ?? 0).toInt(),
-      description: data['description'] ?? '',
-      imageUrl: data['image_url'] ?? '',
-      karat: (data['karat'] ?? 24).toInt(),
-      weight: (data['weight'] ?? 0).toInt(),
-      isAvailable: data['is_available'] ?? true,
-      sellerId: data['seller_id'] ?? '',
-      createdAt: (data['created_at'] as Timestamp?)?.toDate(),
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? '',
+      category: json['category'] ?? 'Lainnya',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      description: json['description'] ?? '',
+      imageUrl: json['image_url'] ?? '',
+      stock: (json['stock'] as num?)?.toInt() ?? 0,
+      isAvailable: (json['stock'] != null && json['stock'] > 0),
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'category': category,
       'price': price,
       'description': description,
       'image_url': imageUrl,
-      'karat': karat,
-      'weight': weight,
+      'stock': stock,
       'is_available': isAvailable,
-      'seller_id': sellerId,
-      'created_at': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
+      'created_at': createdAt?.toIso8601String(),
     };
-  }
-
-  ProductModel copyWith({
-    String? name,
-    String? category,
-    int? price,
-    String? description,
-    String? imageUrl,
-    int? karat,
-    int? weight,
-    bool? isAvailable,
-    String? sellerId,
-    DateTime? createdAt,
-  }) {
-    return ProductModel(
-      id: id,
-      name: name ?? this.name,
-      category: category ?? this.category,
-      price: price ?? this.price,
-      description: description ?? this.description,
-      imageUrl: imageUrl ?? this.imageUrl,
-      karat: karat ?? this.karat,
-      weight: weight ?? this.weight,
-      isAvailable: isAvailable ?? this.isAvailable,
-      sellerId: sellerId ?? this.sellerId,
-      createdAt: createdAt ?? this.createdAt,
-    );
   }
 }

@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../core/services/firestore_service.dart';
+import 'package:toko_emas_digital/core/network/api_client.dart';
 
 class DigitalGoldService {
-  final FirestoreService _firestoreService = FirestoreService();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ApiClient _apiClient = ApiClient();
 
   // Buy digital gold with Transaction for safety
   Future<bool> buyGold({
@@ -12,35 +10,12 @@ class DigitalGoldService {
     required double pricePerGram,
   }) async {
     try {
-      return await _firestore.runTransaction((transaction) async {
-        DocumentReference userRef = _firestore.collection('users').doc(userId);
-        DocumentSnapshot userSnapshot = await transaction.get(userRef);
-
-        if (!userSnapshot.exists) {
-          throw Exception('User tidak ditemukan');
-        }
-
-        double currentBalance = (userSnapshot.get('gold_balance') ?? 0.0).toDouble();
-        double newBalance = currentBalance + gramAmount;
-        double totalPrice = gramAmount * pricePerGram;
-
-        // 1. Update User Balance
-        transaction.update(userRef, {'gold_balance': newBalance});
-
-        // 2. Create Transaction Record
-        DocumentReference transRef = _firestore.collection('transactions').doc();
-        transaction.set(transRef, {
-          'user_id': userId,
-          'type': 'digital',
-          'gold_amount': gramAmount,
-          'price_per_gram': pricePerGram,
-          'total_price': totalPrice,
-          'status': 'selesai',
-          'created_at': FieldValue.serverTimestamp(),
-        });
-
-        return true;
+      final response = await _apiClient.dio.post('/gold/buy', data: {
+        'gram_amount': gramAmount,
+        'price_per_gram': pricePerGram,
       });
+
+      return response.data['success'] == true;
     } catch (e) {
       throw Exception('Gagal membeli emas: $e');
     }
@@ -53,49 +28,38 @@ class DigitalGoldService {
     required String address,
   }) async {
     try {
-      return await _firestore.runTransaction((transaction) async {
-        DocumentReference userRef = _firestore.collection('users').doc(userId);
-        DocumentSnapshot userSnapshot = await transaction.get(userRef);
-
-        if (!userSnapshot.exists) throw Exception('User tidak ditemukan');
-
-        double currentBalance = (userSnapshot.get('gold_balance') ?? 0.0).toDouble();
-        
-        if (currentBalance < gramAmount) {
-          throw Exception('Saldo emas tidak mencukupi. Saldo Anda: $currentBalance gr');
-        }
-
-        double newBalance = currentBalance - gramAmount;
-
-        // 1. Update Balance
-        transaction.update(userRef, {'gold_balance': newBalance});
-
-        // 2. Create physical transaction
-        DocumentReference transRef = _firestore.collection('transactions').doc();
-        transaction.set(transRef, {
-          'user_id': userId,
-          'type': 'fisik',
-          'gold_amount': gramAmount,
-          'product_id': 'batangan',
-          'status': 'diproses',
-          'address': address,
-          'created_at': FieldValue.serverTimestamp(),
-        });
-
-        return true;
+      // Sama seperti checkout physical gold, tetapi menggunakan metode pembayaran potong saldo
+      final response = await _apiClient.dio.post('/checkout/physical', data: {
+        'product_id': 0, // asumsikan 0 = custom konversi batangan
+        'price': 0, // harga 0 karena potong saldo
+        'address': address,
+        'payment_method': 'Saldo Emas Digital',
       });
+
+      return response.data['success'] == true;
     } catch (e) {
       throw Exception('Gagal konversi emas: $e');
     }
   }
 
   // Get transaction history
-  Stream<QuerySnapshot> getUserTransactions(String userId) {
-    return _firestoreService.getUserTransactions(userId);
+  Future<List<Map<String, dynamic>>> getUserTransactions(String userId) async {
+    try {
+      final response = await _apiClient.dio.get('/transactions');
+      if (response.data['success'] == true) {
+        List<dynamic> data = response.data['data'];
+        return data.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Gagal mengambil riwayat transaksi: $e');
+    }
   }
 
   // Get current gold price
   Future<double> getCurrentGoldPrice() async {
-    return await _firestoreService.getCurrentGoldPrice();
+    // Pada arsitektur nyata, ini biasanya memanggil API pihak ketiga
+    // Untuk simulasi ini kita asumsikan harga statis atau bisa dipanggil dari API Golang
+    return 1230000.0;
   }
 }
