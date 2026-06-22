@@ -1,17 +1,30 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:toko_emas_digital/core/network/api_client.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final ApiClient _apiClient = ApiClient();
 
   // Get current user
   User? get currentUser => _auth.currentUser;
 
   // Auth state stream
   Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Sync user with backend
+  Future<void> _syncUserWithBackend(User user, String? name) async {
+    try {
+      await _apiClient.dio.post('/auth/sync', data: {
+        'name': name ?? user.displayName ?? 'User Toko Emas',
+        'email': user.email ?? '',
+      });
+    } catch (e) {
+      print('Failed to sync user to backend: $e');
+      // Tidak di throw agar user tetap bisa login meski backend bermasalah sementara
+    }
+  }
 
   // Sign up with email and password
   Future<User?> signUp({
@@ -28,14 +41,8 @@ class AuthService {
       User? user = result.user;
 
       if (user != null) {
-        // Create user document in Firestore
-        await _firestore.collection('users').doc(user.uid).set({
-          'name': name,
-          'email': email,
-          'role': 'user',
-          'gold_balance': 0.0,
-          'created_at': FieldValue.serverTimestamp(),
-        });
+        await user.updateDisplayName(name);
+        await _syncUserWithBackend(user, name);
       }
 
       return user;
@@ -54,6 +61,11 @@ class AuthService {
         email: email,
         password: password,
       );
+      
+      if (result.user != null) {
+        await _syncUserWithBackend(result.user!, null);
+      }
+
       return result.user;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message);
@@ -63,35 +75,20 @@ class AuthService {
   // Google Sign In
   Future<User?> signInWithGoogle() async {
     try {
-      // Trigger the Google Authentication flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null; // User cancelled the sign-in
+      if (googleUser == null) return null;
 
-      // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      // Create a new credential
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Once signed in, return the UserCredential
       final UserCredential result = await _auth.signInWithCredential(credential);
       final User? user = result.user;
 
       if (user != null) {
-        // Check if user already exists in Firestore, if not create new
-        final doc = await _firestore.collection('users').doc(user.uid).get();
-        if (!doc.exists) {
-          await _firestore.collection('users').doc(user.uid).set({
-            'name': user.displayName ?? 'Google User',
-            'email': user.email,
-            'role': 'user',
-            'gold_balance': 0.0,
-            'created_at': FieldValue.serverTimestamp(),
-          });
-        }
+        await _syncUserWithBackend(user, null);
       }
 
       return user;
@@ -103,36 +100,39 @@ class AuthService {
   // Sign out
   Future<void> signOut() async {
     try {
-      // Hanya coba logout Google jika user memang terdeteksi login dengan Google
-      // dan bungkus dalam try-catch agar tidak crash di Web jika Client ID belum diset
       if (await _googleSignIn.isSignedIn()) {
         await _googleSignIn.signOut();
       }
     } catch (e) {
-      // Log error tapi jangan biarkan menghalangi logout utama
       print('Info: Google Sign Out dilewati atau error: $e');
     }
     
-    // Logout utama dari Firebase
     await _auth.signOut();
   }
 
-  // Get user data from Firestore
+  // Get user data from backend
   Future<Map<String, dynamic>?> getUserData(String userId) async {
     try {
-      DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
-      return doc.data() as Map<String, dynamic>?;
+      // Kita panggil /auth/sync lagi (sebagai get data) karena backend mengembalikan data user lengkap
+      final user = _auth.currentUser;
+      if (user != null) {
+        final response = await _apiClient.dio.post('/auth/sync', data: {
+          'name': user.displayName ?? 'User',
+          'email': user.email ?? '',
+        });
+        return response.data['data'] as Map<String, dynamic>;
+      }
+      return null;
     } catch (e) {
-      throw Exception('Failed to get user data: $e');
+      return null;
     }
   }
 
   // Get user role specifically
   Future<String> getUserRole(String userId) async {
     try {
-      DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
-      if (doc.exists) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      final data = await getUserData(userId);
+      if (data != null) {
         return data['role'] ?? 'user';
       }
       return 'user';
@@ -151,22 +151,21 @@ class AuthService {
     if (user == null) throw Exception('User not logged in');
 
     try {
-      // Update Name
       if (name != null && name.isNotEmpty) {
         await user.updateDisplayName(name);
-        await _firestore.collection('users').doc(user.uid).update({'name': name});
       }
 
-      // Update Email
       if (email != null && email.isNotEmpty && email != user.email) {
         await user.verifyBeforeUpdateEmail(email);
-        await _firestore.collection('users').doc(user.uid).update({'email': email});
       }
 
-      // Update Password
       if (password != null && password.isNotEmpty) {
         await user.updatePassword(password);
       }
+
+      // Sync updated data
+      await _syncUserWithBackend(user, name);
+
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
         throw Exception('Sesi telah berakhir. Silakan logout dan login kembali untuk mengubah email atau password.');

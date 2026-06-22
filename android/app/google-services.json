@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "894889686222",
-    "project_id": "tokoemas-d3746",
-    "storage_bucket": "tokoemas-d3746.firebasestorage.app"
+    "project_number": "480514908516",
+    "project_id": "tokoemasdigital-c3a7d",
+    "storage_bucket": "tokoemasdigital-c3a7d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:894889686222:android:bdc57067a4b5f519938c9f",
+        "mobilesdk_app_id": "1:480514908516:android:99215f0913669a3b359a71",
         "android_client_info": {
-          "package_name": "com.uts1123150166.tokoemas"
+          "package_name": "com.dev.tokoemasdigital"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBXKxUddPpzB3Ye6vLJq9jAubgPGU3ibL8"
+          "current_key": "AIzaSyD0w8wJtOQRM2gxFTAfNwyn9srHeoMKu34"
         }
       ],
       "services": {
