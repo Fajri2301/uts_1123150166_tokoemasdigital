@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/constants/app_colors.dart';
 
 enum AppButtonVariant { primary, dark, soft, ghost, outline, outlineWhite, white, danger, success }
 enum AppButtonSize { lg, md, sm }

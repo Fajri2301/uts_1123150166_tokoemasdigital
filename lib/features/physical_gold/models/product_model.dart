@@ -8,6 +8,8 @@ class ProductModel {
   final int stock;
   final bool isAvailable;
   final DateTime? createdAt;
+  final double weight;
+  final int karat;
 
   ProductModel({
     required this.id,
@@ -19,6 +21,8 @@ class ProductModel {
     this.stock = 0,
     required this.isAvailable,
     this.createdAt,
+    this.weight = 1.0,
+    this.karat = 24,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,24 @@ class ProductModel {
       stock: (json['stock'] as num?)?.toInt() ?? 0,
       isAvailable: (json['stock'] != null && json['stock'] > 0),
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      weight: (json['weight'] as num?)?.toDouble() ?? 1.0,
+      karat: (json['karat'] as num?)?.toInt() ?? 24,
+    );
+  }
+
+  factory ProductModel.fromFirestore(dynamic doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return ProductModel(
+      id: doc.id,
+      name: data['name'] ?? '',
+      category: data['category'] ?? 'Lainnya',
+      price: (data['price'] as num?)?.toDouble() ?? 0.0,
+      description: data['description'] ?? '',
+      imageUrl: data['image_url'] ?? '',
+      stock: (data['stock'] as num?)?.toInt() ?? 0,
+      isAvailable: data['is_available'] ?? true,
+      weight: (data['weight'] as num?)?.toDouble() ?? 1.0,
+      karat: (data['karat'] as num?)?.toInt() ?? 24,
     );
   }
 
@@ -45,6 +67,8 @@ class ProductModel {
       'image_url': imageUrl,
       'stock': stock,
       'is_available': isAvailable,
+      'weight': weight,
+      'karat': karat,
       'created_at': createdAt?.toIso8601String(),
     };
   }

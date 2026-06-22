@@ -34,15 +34,7 @@ class AppTheme {
         ),
       ),
 
-      // Konfigurasi Card
-      cardTheme: CardTheme(
-        color: Colors.white,
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-      ),
+
 
       // Konfigurasi Button (ElevatedButton)
       elevatedButtonTheme: ElevatedButtonThemeData(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/constants/app_colors.dart';
 
 class AppLogo extends StatelessWidget {
   final double size;
@@ -12,11 +12,10 @@ class AppLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     const fontFamily = 'PlusJakartaSans';
 
-    Widget icon = Image.asset(
-      'assets/images/logo-dompet.png',
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
+    Widget icon = Icon(
+      Icons.diamond,
+      size: size,
+      color: light ? Colors.white : AppColors.primary,
     );
 
     if (!withText) return icon;
@@ -31,7 +30,7 @@ class AppLogo extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Dompet Kampus',
+              'Toko Emas',
               style: TextStyle(
                 fontFamily: fontFamily,
                 fontSize: size * 0.3,
@@ -42,7 +41,7 @@ class AppLogo extends StatelessWidget {
               ),
             ),
             Text(
-              'GLOBAL',
+              'DIGITAL',
               style: TextStyle(
                 fontFamily: fontFamily,
                 fontSize: size * 0.205,

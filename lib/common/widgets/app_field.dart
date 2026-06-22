@@ -1,35 +1,41 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../core/constants/app_colors.dart';
 
 class AppField extends StatefulWidget {
   final String? label;
   final String? placeholder;
-  final String value;
+  final String? value;
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final bool isPassword;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final bool autoFocus;
   final int? maxLength;
   final TextInputAction? textInputAction;
   final VoidCallback? onEditingComplete;
+  final TextEditingController? controller;
+  final FormFieldValidator<String>? validator;
 
   const AppField({
     super.key,
     this.label,
     this.placeholder,
-    required this.value,
+    this.value,
     this.onChanged,
     this.keyboardType,
     this.obscureText = false,
+    this.isPassword = false,
     this.prefixIcon,
     this.suffixIcon,
     this.autoFocus = false,
     this.maxLength,
     this.textInputAction,
     this.onEditingComplete,
+    this.controller,
+    this.validator,
   });
 
   @override
@@ -43,25 +49,29 @@ class _AppFieldState extends State<AppField> {
   @override
   void initState() {
     super.initState();
-    _ctrl = TextEditingController(text: widget.value);
+    _ctrl = widget.controller ?? TextEditingController(text: widget.value ?? '');
   }
 
   @override
   void didUpdateWidget(AppField old) {
     super.didUpdateWidget(old);
-    if (old.value != widget.value && _ctrl.text != widget.value) {
-      _ctrl.value = _ctrl.value.copyWith(text: widget.value);
+    if (widget.controller == null && old.value != widget.value && _ctrl.text != widget.value) {
+      _ctrl.value = _ctrl.value.copyWith(text: widget.value ?? '');
     }
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    if (widget.controller == null) {
+      _ctrl.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final obscure = widget.isPassword || widget.obscureText;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -80,7 +90,6 @@ class _AppFieldState extends State<AppField> {
         ],
         AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          height: 54,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
@@ -112,15 +121,16 @@ class _AppFieldState extends State<AppField> {
               Expanded(
                 child: Focus(
                   onFocusChange: (f) => setState(() => _focused = f),
-                  child: TextField(
+                  child: TextFormField(
                     controller: _ctrl,
                     onChanged: widget.onChanged,
                     keyboardType: widget.keyboardType,
-                    obscureText: widget.obscureText,
+                    obscureText: obscure,
                     autofocus: widget.autoFocus,
                     maxLength: widget.maxLength,
                     textInputAction: widget.textInputAction,
                     onEditingComplete: widget.onEditingComplete,
+                    validator: widget.validator,
                     style: const TextStyle(
                       fontFamily: 'PlusJakartaSans',
                       fontSize: 15.5,
@@ -138,7 +148,8 @@ class _AppFieldState extends State<AppField> {
                       border: InputBorder.none,
                       isDense: true,
                       counterText: '',
-                      contentPadding: EdgeInsets.zero,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                      errorStyle: const TextStyle(height: 0, color: Colors.transparent),
                     ),
                   ),
                 ),

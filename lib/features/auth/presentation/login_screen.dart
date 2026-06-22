@@ -116,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                const AppLogo(size: 80, isLight: true),
+                const AppLogo(size: 80, light: true),
                 const SizedBox(height: 32),
                 const Text(
                   'Selamat Datang',
@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 AppField(
                   label: 'Email',
-                  hint: 'Masukkan email',
+                  placeholder: 'Masukkan email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -169,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 AppField(
                   label: 'Password',
-                  hint: 'Masukkan password',
+                  placeholder: 'Masukkan password',
                   controller: _passwordController,
                   isPassword: true,
                   validator: (value) {
@@ -181,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32),
 
                 AppButton(
-                  text: 'Masuk',
+                  label: 'Masuk',
                   onPressed: _handleLogin,
                   isLoading: _isLoading,
                 ),
@@ -204,10 +204,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 24),
 
                 AppButton(
-                  text: 'Google',
+                  label: 'Google',
                   onPressed: _isLoading ? () {} : _handleGoogleLogin,
                   variant: AppButtonVariant.outline,
-                  icon: Icons.g_mobiledata,
+                  icon: const Icon(Icons.g_mobiledata),
                 ),
                 
                 const SizedBox(height: 32),

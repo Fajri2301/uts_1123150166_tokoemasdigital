@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Input Fields
                 AppField(
                   label: 'Nama Lengkap',
-                  hint: 'Contoh: John Doe',
+                  placeholder: 'Contoh: John Doe',
                   controller: _nameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Nama wajib diisi';
@@ -134,7 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 
                 AppField(
                   label: 'Email',
-                  hint: 'Masukkan email aktif',
+                  placeholder: 'Masukkan email aktif',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -147,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 
                 AppField(
                   label: 'Password',
-                  hint: 'Minimal 6 karakter',
+                  placeholder: 'Minimal 6 karakter',
                   controller: _passwordController,
                   isPassword: true,
                   validator: (value) {
@@ -160,7 +160,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 
                 AppField(
                   label: 'Konfirmasi Password',
-                  hint: 'Ketik ulang password',
+                  placeholder: 'Ketik ulang password',
                   controller: _confirmPasswordController,
                   isPassword: true,
                   validator: (value) {
@@ -173,7 +173,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Register Button
                 AppButton(
-                  text: 'Daftar Sekarang',
+                  label: 'Daftar Sekarang',
                   onPressed: _handleRegister,
                   isLoading: _isLoading,
                 ),
