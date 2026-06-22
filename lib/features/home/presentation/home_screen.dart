@@ -8,6 +8,7 @@ import 'package:toko_emas_digital/common/widgets/app_logo.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/catalog_service.dart';
 import 'package:toko_emas_digital/features/physical_gold/models/product_model.dart';
 import 'package:intl/intl.dart';
+import 'package:toko_emas_digital/features/physical_gold/presentation/product_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -150,7 +151,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const AppLogo(size: 26, isLight: false),
+                  const AppLogo(size: 26, light: false),
                   const SizedBox(width: 7),
                   const Text('Saldo Emas',
                       style: TextStyle(
@@ -243,29 +244,31 @@ class HomeScreen extends StatelessWidget {
                 const FeatureIcon(
                     icon: Icons.trending_up_rounded, tone: 'green', size: 38, iconSize: 19),
                 const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Harga Beli',
-                        style: TextStyle(
-                            fontSize: 11.5,
-                            color: AppColors.slate500,
-                            fontWeight: FontWeight.w600)),
-                    Text('Rp 1.230.000',
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.ink)),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('Harga Beli',
+                          style: TextStyle(
+                              fontSize: 10.5,
+                              color: AppColors.slate500,
+                              fontWeight: FontWeight.w600)),
+                      Text('Rp 1.230.000',
+                          style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.ink)),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -274,22 +277,24 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               children: [
                 const FeatureIcon(
-                    icon: Icons.trending_down_rounded, tone: 'red', size: 38, iconSize: 19),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Harga Jual',
-                        style: TextStyle(
-                            fontSize: 11.5,
-                            color: AppColors.slate500,
-                            fontWeight: FontWeight.w600)),
-                    Text('Rp 1.150.000',
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.ink)),
-                  ],
+                    icon: Icons.trending_down_rounded, tone: 'red', size: 36, iconSize: 18),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('Harga Jual',
+                          style: TextStyle(
+                              fontSize: 10.5,
+                              color: AppColors.slate500,
+                              fontWeight: FontWeight.w600)),
+                      Text('Rp 1.150.000',
+                          style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.ink)),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -407,7 +412,23 @@ class HomeScreen extends StatelessWidget {
               price: currencyFormat.format(product.price),
               description: product.description,
               imageUrl: product.imageUrl,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductDetailScreen(
+                      productId: product.id,
+                      product: {
+                        'name': product.name,
+                        'description': product.description,
+                        'price': product.price,
+                        'image_url': product.imageUrl,
+                        'category': 'Emas Fisik',
+                      },
+                    ),
+                  ),
+                );
+              },
             );
           },
         );
