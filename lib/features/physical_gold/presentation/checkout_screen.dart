@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../common/widgets/gold_button.dart';
+import '../../../common/widgets/app_button.dart';
+import '../../../common/widgets/feature_icon.dart';
+import '../../../common/widgets/app_field.dart';
 import '../services/physical_gold_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,11 +14,11 @@ class CheckoutScreen extends StatefulWidget {
   final double price;
 
   const CheckoutScreen({
-    Key? key,
+    super.key,
     required this.productId,
     required this.productName,
     required this.price,
-  }) : super(key: key);
+  });
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -80,21 +81,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1A1A1A),
-            title: const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 60),
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Center(
+              child: FeatureIcon(
+                icon: Icons.check_rounded,
+                tone: 'green',
+                size: 70,
+                iconSize: 40,
+              ),
+            ),
             content: const Text(
-              'Pesanan berhasil dibuat! Admin akan segera memproses pengiriman Anda.',
+              'Pesanan berhasil dibuat!\nAdmin akan segera memproses pengiriman Anda.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.w500),
             ),
             actions: [
-              Center(
-                child: GoldButton(
-                  text: 'Kembali ke Beranda',
-                  onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
-                ),
+              AppButton(
+                text: 'Kembali ke Beranda',
+                onPressed: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
               ),
             ],
           ),
@@ -106,9 +113,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       });
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -116,21 +121,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.ink, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Checkout Pesanan',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 17),
         ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.padding),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
@@ -160,12 +166,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               if (_errorMessage != null) _buildErrorMessage(),
 
               // Action Button
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
-                  : GoldButton(
-                      text: 'Konfirmasi & Bayar Sekarang',
-                      onPressed: _handleCheckout,
-                    ),
+              AppButton(
+                text: 'Konfirmasi & Bayar',
+                onPressed: _handleCheckout,
+                isLoading: _isLoading,
+              ),
               const SizedBox(height: 20),
             ],
           ),
@@ -179,7 +184,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       padding: const EdgeInsets.only(bottom: 12, left: 4),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.slate600),
       ),
     );
   }
@@ -188,28 +193,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.2)),
+        boxShadow: AppColors.shadowSoft,
+        border: Border.all(color: AppColors.line2),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD700).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.diamond, color: Color(0xFFFFD700), size: 30),
-          ),
+          const FeatureIcon(icon: Icons.diamond_outlined, tone: 'gold', size: 48, iconSize: 24),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.productName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(widget.productName, style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 15)),
                 const SizedBox(height: 4),
-                Text(CurrencyFormatter.formatRupiah(widget.price), style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.w600)),
+                Text(CurrencyFormatter.formatRupiah(widget.price), style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14)),
               ],
             ),
           ),
@@ -219,18 +218,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildAddressInput() {
-    return TextFormField(
+    return AppField(
+      label: '',
+      hint: 'Masukkan alamat pengiriman lengkap...',
       controller: _addressController,
       maxLines: 3,
-      style: const TextStyle(color: Colors.white),
       validator: (value) => (value == null || value.isEmpty) ? 'Alamat wajib diisi' : null,
-      decoration: InputDecoration(
-        hintText: 'Masukkan alamat pengiriman lengkap...',
-        hintStyle: const TextStyle(color: Color(0xFF666666)),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-      ),
     );
   }
 
@@ -238,15 +231,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.line, width: 1.5),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedPaymentMethod,
-          dropdownColor: const Color(0xFF1A1A1A),
+          dropdownColor: Colors.white,
           isExpanded: true,
-          style: const TextStyle(color: Colors.white),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.slate400),
+          style: const TextStyle(color: AppColors.ink, fontSize: 14, fontWeight: FontWeight.w600),
           items: _paymentMethods.map((method) {
             return DropdownMenuItem(value: method, child: Text(method));
           }).toList(),
@@ -260,15 +255,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: AppColors.shadowSoft,
+        border: Border.all(color: AppColors.line2),
       ),
       child: Column(
         children: [
           _summaryRow('Harga Produk', CurrencyFormatter.formatRupiah(widget.price)),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _summaryRow('Biaya Pengiriman', 'Gratis', isGold: true),
-          const Divider(color: Colors.white12, height: 24),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Divider(color: AppColors.line),
+          ),
           _summaryRow('Total Pembayaran', CurrencyFormatter.formatRupiah(widget.price), isTotal: true),
         ],
       ),
@@ -279,8 +279,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(color: isTotal ? Colors.white : const Color(0xFFB0B0B0), fontSize: isTotal ? 16 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
-        Text(value, style: TextStyle(color: isGold || isTotal ? const Color(0xFFFFD700) : Colors.white, fontSize: isTotal ? 18 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.w600)),
+        Text(label, style: TextStyle(color: isTotal ? AppColors.ink : AppColors.slate500, fontSize: isTotal ? 14 : 13, fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500)),
+        Text(value, style: TextStyle(color: isGold || isTotal ? AppColors.primary : AppColors.ink, fontSize: isTotal ? 16 : 13, fontWeight: isTotal ? FontWeight.w800 : FontWeight.w700)),
       ],
     );
   }
@@ -289,8 +289,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.redAccent)),
-      child: Text(_errorMessage!, style: const TextStyle(color: Colors.redAccent), textAlign: TextAlign.center),
+      decoration: BoxDecoration(
+        color: AppColors.redSurface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
+      ),
+      child: Text(_errorMessage!, style: const TextStyle(color: AppColors.red, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
     );
   }
 }
