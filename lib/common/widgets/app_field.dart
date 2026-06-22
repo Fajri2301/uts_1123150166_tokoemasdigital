@@ -14,6 +14,7 @@ class AppField extends StatefulWidget {
   final Widget? suffixIcon;
   final bool autoFocus;
   final int? maxLength;
+  final int maxLines;
   final TextInputAction? textInputAction;
   final VoidCallback? onEditingComplete;
   final TextEditingController? controller;
@@ -32,6 +33,7 @@ class AppField extends StatefulWidget {
     this.suffixIcon,
     this.autoFocus = false,
     this.maxLength,
+    this.maxLines = 1,
     this.textInputAction,
     this.onEditingComplete,
     this.controller,
@@ -128,6 +130,7 @@ class _AppFieldState extends State<AppField> {
                     obscureText: obscure,
                     autofocus: widget.autoFocus,
                     maxLength: widget.maxLength,
+                    maxLines: widget.maxLines,
                     textInputAction: widget.textInputAction,
                     onEditingComplete: widget.onEditingComplete,
                     validator: widget.validator,
