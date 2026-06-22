@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
-import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
-import 'package:toko_emas_digital/core/utils/color_extension.dart';
 
 class ProductCard extends StatelessWidget {
   final String name;
@@ -13,13 +11,13 @@ class ProductCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const ProductCard({
-    Key? key,
+    super.key,
     required this.name,
     required this.price,
     required this.description,
     required this.imageUrl,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +25,9 @@ class ProductCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.divider,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: AppColors.shadowSoft,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,10 +36,10 @@ class ProductCard extends StatelessWidget {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white10,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(AppDimensions.radiusCard),
+                decoration: const BoxDecoration(
+                  color: AppColors.bg,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16),
                   ),
                 ),
                 child: _buildImage(),
@@ -53,31 +52,31 @@ class ProductCard extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 14,
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     description,
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 12,
+                    style: const TextStyle(
+                      color: AppColors.slate500,
+                      fontSize: 11,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
                     price,
-                    style: TextStyle(
-                      color: AppColors.goldAccent,
+                    style: const TextStyle(
+                      color: AppColors.primary,
                       fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
@@ -91,7 +90,7 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildImage() {
     if (imageUrl.isEmpty || imageUrl == 'placeholder') {
-      return Icon(Icons.image_outlined, color: AppColors.goldAccent, size: 40);
+      return const Icon(Icons.image_outlined, color: AppColors.slate300, size: 40);
     }
 
     // Handle Base64
@@ -100,22 +99,22 @@ class ProductCard extends StatelessWidget {
         final base64String = imageUrl.split(',').last;
         final Uint8List bytes = base64Decode(base64String);
         return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusCard)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           child: Image.memory(bytes, fit: BoxFit.cover),
         );
       } catch (e) {
-        return Icon(Icons.error_outline, color: AppColors.error);
+        return const Icon(Icons.error_outline, color: AppColors.red);
       }
     }
 
     // Handle Network Image
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusCard)),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       child: Image.network(
         imageUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) =>
-            Icon(Icons.image_outlined, color: AppColors.goldAccent, size: 40),
+            const Icon(Icons.image_outlined, color: AppColors.slate300, size: 40),
       ),
     );
   }

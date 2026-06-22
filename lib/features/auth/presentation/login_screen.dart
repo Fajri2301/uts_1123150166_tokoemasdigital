@@ -4,16 +4,14 @@ import 'package:toko_emas_digital/features/auth/services/auth_service.dart';
 import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
 import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_screen.dart';
 import 'package:toko_emas_digital/features/auth/presentation/register_screen.dart';
-import 'package:toko_emas_digital/common/widgets/custom_input_field.dart';
-import 'package:toko_emas_digital/common/widgets/gold_button.dart';
+import 'package:toko_emas_digital/common/widgets/app_field.dart';
+import 'package:toko_emas_digital/common/widgets/app_button.dart';
+import 'package:toko_emas_digital/common/widgets/app_logo.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
-import 'package:toko_emas_digital/core/constants/app_spacing.dart';
-import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
 import 'package:toko_emas_digital/core/utils/app_validator.dart';
-import 'package:toko_emas_digital/core/utils/color_extension.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -36,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -49,9 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (user != null && mounted) {
-        // Cek Role setelah login berhasil
         String role = await _authService.getUserRole(user.uid);
-        
         if (mounted) {
           if (role == 'admin') {
             Navigator.of(context).pushReplacement(
@@ -70,9 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -86,9 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       User? user = await _authService.signInWithGoogle();
       if (user != null && mounted) {
-        // Cek Role setelah Google Login berhasil
         String role = await _authService.getUserRole(user.uid);
-        
         if (mounted) {
           if (role == 'admin') {
             Navigator.of(context).pushReplacement(
@@ -107,9 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -117,71 +106,58 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.padding),
+          padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 60),
-                Center(
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    margin: const EdgeInsets.only(bottom: AppSpacing.spacingXLarge),
-                    decoration: BoxDecoration(
-                      color: AppColors.goldAccent,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                    ),
-                    child: Icon(
-                      Icons.monetization_on,
-                      size: 50,
-                      color: AppColors.background,
-                    ),
-                  ),
-                ),
-                Text(
+                const SizedBox(height: 40),
+                const AppLogo(size: 80, isLight: true),
+                const SizedBox(height: 32),
+                const Text(
                   'Selamat Datang',
                   style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: -0.5,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Masuk ke akun Anda untuk melanjutkan',
+                const Text(
+                  'Masuk ke akun Toko Emas Anda untuk melanjutkan',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: AppColors.slate500,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
                 if (_errorMessage != null)
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.spacingMedium),
-                    margin: const EdgeInsets.only(bottom: AppSpacing.spacingLarge),
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                      border: Border.all(color: AppColors.error),
+                      color: AppColors.redSurface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       _errorMessage!,
-                      style: TextStyle(color: AppColors.error),
+                      style: const TextStyle(color: AppColors.red, fontWeight: FontWeight.w600),
                       textAlign: TextAlign.center,
                     ),
                   ),
 
-                CustomInputField(
-                  hintText: 'Email',
+                AppField(
+                  label: 'Email',
+                  hint: 'Masukkan email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -190,11 +166,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: AppSpacing.spacingLarge),
-                CustomInputField(
-                  hintText: 'Password',
+                const SizedBox(height: 20),
+                AppField(
+                  label: 'Password',
+                  hint: 'Masukkan password',
                   controller: _passwordController,
-                  obscureText: true,
+                  isPassword: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Password wajib diisi';
                     if (!AppValidator.isValidPassword(value)) return 'Password minimal 6 karakter';
@@ -203,66 +180,56 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
-                        ),
-                      )
-                    : GoldButton(
-                        text: 'Masuk',
-                        onPressed: _handleLogin,
-                      ),
-                const SizedBox(height: AppSpacing.spacingLarge),
+                AppButton(
+                  text: 'Masuk',
+                  onPressed: _handleLogin,
+                  isLoading: _isLoading,
+                ),
+                
+                const SizedBox(height: 24),
 
                 Row(
                   children: [
-                    Expanded(child: Divider(color: AppColors.divider)),
+                    const Expanded(child: Divider(color: AppColors.line)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
+                      child: const Text(
                         'Atau masuk dengan',
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        style: TextStyle(color: AppColors.slate500, fontSize: 13),
                       ),
                     ),
-                    Expanded(child: Divider(color: AppColors.divider)),
+                    const Expanded(child: Divider(color: AppColors.line)),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.spacingLarge),
+                const SizedBox(height: 24),
 
-                OutlinedButton.icon(
-                  onPressed: _isLoading ? null : _handleGoogleLogin,
-                  icon: const Icon(Icons.g_mobiledata, size: 30),
-                  label: const Text('Masuk dengan Google'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textPrimary,
-                    side: BorderSide(color: AppColors.divider),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                    ),
-                  ),
+                AppButton(
+                  text: 'Google',
+                  onPressed: _isLoading ? () {} : _handleGoogleLogin,
+                  variant: AppButtonVariant.outline,
+                  icon: Icons.g_mobiledata,
                 ),
-                const SizedBox(height: AppSpacing.spacingLarge),
+                
+                const SizedBox(height: 32),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Belum punya akun?',
-                      style: TextStyle(color: AppColors.textSecondary),
+                    const Text(
+                      'Belum punya akun? ',
+                      style: TextStyle(color: AppColors.slate500),
                     ),
-                    TextButton(
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const RegisterScreen()),
                         );
                       },
-                      child: Text(
+                      child: const Text(
                         'Daftar',
                         style: TextStyle(
-                          color: AppColors.goldAccent,
-                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

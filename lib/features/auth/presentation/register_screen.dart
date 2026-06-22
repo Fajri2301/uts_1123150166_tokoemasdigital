@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../../home/presentation/home_screen.dart';
-import '../../../common/widgets/custom_input_field.dart';
-import '../../../common/widgets/gold_button.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_dimensions.dart';
+import '../../../common/widgets/app_field.dart';
+import '../../../common/widgets/app_button.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/app_validator.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -60,9 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -70,17 +67,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.ink, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.padding),
+          padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(
@@ -89,17 +87,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const Text(
                   'Buat Akun Baru',
                   style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Isi data di bawah untuk membuat akun',
+                  'Lengkapi data di bawah ini untuk mendaftar di Toko Emas',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFFB0B0B0),
+                    color: AppColors.slate500,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -107,89 +106,77 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Error Message
                 if (_errorMessage != null)
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.spacingMedium),
-                    margin: const EdgeInsets.only(bottom: AppSpacing.spacingLarge),
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF44336).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                      border: Border.all(color: const Color(0xFFF44336)),
+                      color: AppColors.redSurface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(color: Color(0xFFF44336)),
+                      style: const TextStyle(color: AppColors.red, fontWeight: FontWeight.w600),
                       textAlign: TextAlign.center,
                     ),
                   ),
 
                 // Input Fields
-                CustomInputField(
-                  hintText: 'Nama Lengkap',
+                AppField(
+                  label: 'Nama Lengkap',
+                  hint: 'Contoh: John Doe',
                   controller: _nameController,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Nama wajib diisi';
-                    }
+                    if (value == null || value.isEmpty) return 'Nama wajib diisi';
                     return null;
                   },
                 ),
-                const SizedBox(height: AppSpacing.spacingLarge),
-                CustomInputField(
-                  hintText: 'Email',
+                const SizedBox(height: 20),
+                
+                AppField(
+                  label: 'Email',
+                  hint: 'Masukkan email aktif',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Email wajib diisi';
-                    }
-                    if (!AppValidator.isValidEmail(value)) {
-                      return 'Email tidak valid';
-                    }
+                    if (value == null || value.isEmpty) return 'Email wajib diisi';
+                    if (!AppValidator.isValidEmail(value)) return 'Email tidak valid';
                     return null;
                   },
                 ),
-                const SizedBox(height: AppSpacing.spacingLarge),
-                CustomInputField(
-                  hintText: 'Password',
+                const SizedBox(height: 20),
+                
+                AppField(
+                  label: 'Password',
+                  hint: 'Minimal 6 karakter',
                   controller: _passwordController,
-                  obscureText: true,
+                  isPassword: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Password wajib diisi';
-                    }
-                    if (!AppValidator.isValidPassword(value)) {
-                      return 'Password minimal 6 karakter';
-                    }
+                    if (value == null || value.isEmpty) return 'Password wajib diisi';
+                    if (!AppValidator.isValidPassword(value)) return 'Password minimal 6 karakter';
                     return null;
                   },
                 ),
-                const SizedBox(height: AppSpacing.spacingLarge),
-                CustomInputField(
-                  hintText: 'Konfirmasi Password',
+                const SizedBox(height: 20),
+                
+                AppField(
+                  label: 'Konfirmasi Password',
+                  hint: 'Ketik ulang password',
                   controller: _confirmPasswordController,
-                  obscureText: true,
+                  isPassword: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Konfirmasi password wajib diisi';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Password tidak sama';
-                    }
+                    if (value == null || value.isEmpty) return 'Konfirmasi password wajib diisi';
+                    if (value != _passwordController.text) return 'Password tidak sama';
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 40),
 
                 // Register Button
-                _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
-                        ),
-                      )
-                    : GoldButton(
-                        text: 'Daftar',
-                        onPressed: _handleRegister,
-                      ),
+                AppButton(
+                  text: 'Daftar Sekarang',
+                  onPressed: _handleRegister,
+                  isLoading: _isLoading,
+                ),
               ],
             ),
           ),
