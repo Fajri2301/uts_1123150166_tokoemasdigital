@@ -50,8 +50,9 @@ class TokoEmasApp extends StatelessWidget {
     return MaterialApp(
       title: 'Toko Emas Digital',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       home: const SplashScreen(),
     );
   }
 }
+

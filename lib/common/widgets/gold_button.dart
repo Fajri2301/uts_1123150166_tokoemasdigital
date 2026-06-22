@@ -24,8 +24,8 @@ class GoldButton extends StatelessWidget {
           ? OutlinedButton(
               onPressed: onPressed,
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.goldAccent.toColor(),
-                side: BorderSide(color: AppColors.goldAccent.toColor()),
+                foregroundColor: AppColors.goldAccent,
+                side: BorderSide(color: AppColors.goldAccent),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
                 ),
@@ -41,7 +41,7 @@ class GoldButton extends StatelessWidget {
           : ElevatedButton(
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.goldAccent.toColor(),
+                backgroundColor: AppColors.goldAccent,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusButton),

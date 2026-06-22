@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.padding),
@@ -134,13 +134,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 80,
                     margin: const EdgeInsets.only(bottom: AppSpacing.spacingXLarge),
                     decoration: BoxDecoration(
-                      color: AppColors.goldAccent.toColor(),
+                      color: AppColors.goldAccent,
                       borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
                     ),
                     child: Icon(
                       Icons.monetization_on,
                       size: 50,
-                      color: AppColors.background.toColor(),
+                      color: AppColors.background,
                     ),
                   ),
                 ),
@@ -149,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary.toColor(),
+                    color: AppColors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   'Masuk ke akun Anda untuk melanjutkan',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary.toColor(),
+                    color: AppColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -169,13 +169,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.all(AppSpacing.spacingMedium),
                     margin: const EdgeInsets.only(bottom: AppSpacing.spacingLarge),
                     decoration: BoxDecoration(
-                      color: AppColors.error.toColor().withOpacity(0.1),
+                      color: AppColors.error.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                      border: Border.all(color: AppColors.error.toColor()),
+                      border: Border.all(color: AppColors.error),
                     ),
                     child: Text(
                       _errorMessage!,
-                      style: TextStyle(color: AppColors.error.toColor()),
+                      style: TextStyle(color: AppColors.error),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -217,15 +217,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 Row(
                   children: [
-                    Expanded(child: Divider(color: AppColors.divider.toColor())),
+                    Expanded(child: Divider(color: AppColors.divider)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Atau masuk dengan',
-                        style: TextStyle(color: AppColors.textSecondary.toColor(), fontSize: 12),
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
                       ),
                     ),
-                    Expanded(child: Divider(color: AppColors.divider.toColor())),
+                    Expanded(child: Divider(color: AppColors.divider)),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.spacingLarge),
@@ -235,8 +235,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   icon: const Icon(Icons.g_mobiledata, size: 30),
                   label: const Text('Masuk dengan Google'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textPrimary.toColor(),
-                    side: BorderSide(color: AppColors.divider.toColor()),
+                    foregroundColor: AppColors.textPrimary,
+                    side: BorderSide(color: AppColors.divider),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
@@ -250,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       'Belum punya akun?',
-                      style: TextStyle(color: AppColors.textSecondary.toColor()),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                     TextButton(
                       onPressed: () {
@@ -261,7 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         'Daftar',
                         style: TextStyle(
-                          color: AppColors.goldAccent.toColor(),
+                          color: AppColors.goldAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

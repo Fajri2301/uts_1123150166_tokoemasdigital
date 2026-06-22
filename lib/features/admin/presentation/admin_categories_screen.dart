@@ -47,7 +47,7 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.goldAccent.toColor(),
+        backgroundColor: AppColors.goldAccent,
         onPressed: () => _showCategoryDialog(context),
         child: const Icon(Icons.add, color: Colors.black),
       ),
@@ -59,14 +59,14 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.divider.toColor(),
+        color: AppColors.divider,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: AppColors.goldAccent.toColor().withOpacity(0.1),
-            child: Icon(Icons.category_outlined, color: AppColors.goldAccent.toColor()),
+            backgroundColor: AppColors.goldAccent.withOpacity(0.1),
+            child: Icon(Icons.category_outlined, color: AppColors.goldAccent),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -79,7 +79,7 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
             children: [
               IconButton(
                 onPressed: () => _showCategoryDialog(context, category: category),
-                icon: Icon(Icons.edit, color: AppColors.goldAccent.toColor()),
+                icon: Icon(Icons.edit, color: AppColors.goldAccent),
               ),
               IconButton(
                 onPressed: () => _confirmDeleteCategory(context, category),
@@ -106,8 +106,8 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: 'Nama Kategori',
-            hintStyle: TextStyle(color: AppColors.textSecondary.toColor()),
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.goldAccent.toColor())),
+            hintStyle: TextStyle(color: AppColors.textSecondary),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.goldAccent)),
           ),
           autofocus: true,
         ),
@@ -139,7 +139,7 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
                 }
               }
             },
-            child: Text('Simpan', style: TextStyle(color: AppColors.goldAccent.toColor())),
+            child: Text('Simpan', style: TextStyle(color: AppColors.goldAccent)),
           ),
         ],
       ),

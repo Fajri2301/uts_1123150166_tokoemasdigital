@@ -58,14 +58,14 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.divider.toColor(),
+        color: AppColors.divider,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: AppColors.goldAccent.toColor().withOpacity(0.1),
-            child: Icon(Icons.person, color: AppColors.goldAccent.toColor()),
+            backgroundColor: AppColors.goldAccent.withOpacity(0.1),
+            child: Icon(Icons.person, color: AppColors.goldAccent),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -78,7 +78,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 ),
                 Text(
                   email,
-                  style: TextStyle(color: AppColors.textSecondary.toColor(), fontSize: 13),
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 4),
@@ -103,7 +103,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             children: [
               IconButton(
                 onPressed: () => _showChangePasswordDialog(context, userId, name),
-                icon: Icon(Icons.lock_reset, color: AppColors.goldAccent.toColor()),
+                icon: Icon(Icons.lock_reset, color: AppColors.goldAccent),
                 tooltip: 'Ganti Password',
               ),
               IconButton(
@@ -130,8 +130,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: 'Password Baru',
-            hintStyle: TextStyle(color: AppColors.textSecondary.toColor()),
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.goldAccent.toColor())),
+            hintStyle: TextStyle(color: AppColors.textSecondary),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.goldAccent)),
           ),
         ),
         actions: [
@@ -158,7 +158,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 }
               }
             },
-            child: Text('Simpan', style: TextStyle(color: AppColors.goldAccent.toColor())),
+            child: Text('Simpan', style: TextStyle(color: AppColors.goldAccent)),
           ),
         ],
       ),

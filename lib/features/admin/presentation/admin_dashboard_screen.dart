@@ -47,9 +47,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             _currentIndex = index;
           });
         },
-        backgroundColor: AppColors.divider.toColor(),
-        selectedItemColor: AppColors.goldAccent.toColor(),
-        unselectedItemColor: AppColors.textSecondary.toColor(),
+        backgroundColor: AppColors.divider,
+        selectedItemColor: AppColors.goldAccent,
+        unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
@@ -119,7 +119,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: _loadDashboardData,
-      color: AppColors.goldAccent.toColor(),
+      color: AppColors.goldAccent,
       child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -127,7 +127,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             children: [
               Text(
                 'Selamat Datang, Admin',
-                style: TextStyle(color: AppColors.textPrimary.toColor(), fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
               
@@ -184,13 +184,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
           decoration: BoxDecoration(
-            color: AppColors.divider.toColor(),
+            color: AppColors.divider,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.goldAccent.toColor().withOpacity(0.3)),
+            border: Border.all(color: AppColors.goldAccent.withOpacity(0.3)),
           ),
           child: Column(
             children: [
-              Icon(icon, color: AppColors.goldAccent.toColor()),
+              Icon(icon, color: AppColors.goldAccent),
               const SizedBox(height: 8),
               Text(
                 title, 
@@ -210,7 +210,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.divider.toColor(),
+        color: AppColors.divider,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -227,8 +227,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(color: AppColors.textSecondary.toColor(), fontSize: 14)),
-              Text(value, style: TextStyle(color: AppColors.textPrimary.toColor(), fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(title, style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+              Text(value, style: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold)),
             ],
           ),
         ],
@@ -257,17 +257,17 @@ class AdminProfileScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundColor: AppColors.goldAccent.toColor(),
+                    backgroundColor: AppColors.goldAccent,
                     child: const Icon(Icons.person, size: 50, color: Colors.black),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     user?.displayName ?? 'Administrator',
-                    style: TextStyle(color: AppColors.textPrimary.toColor(), fontSize: 22, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     user?.email ?? 'admin@tokoemas.com',
-                    style: TextStyle(color: AppColors.textSecondary.toColor(), fontSize: 14),
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                   ),
                 ],
               ),
@@ -342,11 +342,11 @@ class AdminProfileScreen extends StatelessWidget {
       children: [
         ListTile(
           onTap: onTap,
-          leading: Icon(icon, color: AppColors.goldAccent.toColor()),
-          title: Text(title, style: TextStyle(color: AppColors.textPrimary.toColor())),
-          trailing: Icon(Icons.arrow_forward_ios, color: AppColors.textSecondary.toColor(), size: 16),
+          leading: Icon(icon, color: AppColors.goldAccent),
+          title: Text(title, style: TextStyle(color: AppColors.textPrimary)),
+          trailing: Icon(Icons.arrow_forward_ios, color: AppColors.textSecondary, size: 16),
         ),
-        Divider(color: AppColors.divider.toColor(), height: 1),
+        Divider(color: AppColors.divider, height: 1),
       ],
     );
   }

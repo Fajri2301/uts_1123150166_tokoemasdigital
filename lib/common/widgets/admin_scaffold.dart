@@ -28,10 +28,10 @@ class AdminScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       // Persistent AppBar (Navbar)
       appBar: AppBar(
-        backgroundColor: AppColors.divider.toColor(),
+        backgroundColor: AppColors.divider,
         elevation: 0,
         centerTitle: false,
         title: Row(
@@ -40,7 +40,7 @@ class AdminScaffold extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: AppColors.goldAccent.toColor(),
+                color: AppColors.goldAccent,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Icon(Icons.stars, color: Colors.black, size: 20),
@@ -49,7 +49,7 @@ class AdminScaffold extends StatelessWidget {
             Text(
               'TokoEmas',
               style: TextStyle(
-                color: AppColors.goldAccent.toColor(),
+                color: AppColors.goldAccent,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -96,7 +96,7 @@ class AdminScaffold extends StatelessWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: AppColors.divider.toColor(),
+              color: AppColors.divider,
             ),
             child: Center(
               child: Column(
@@ -104,7 +104,7 @@ class AdminScaffold extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 35,
-                    backgroundColor: AppColors.goldAccent.toColor(),
+                    backgroundColor: AppColors.goldAccent,
                     child: const Icon(Icons.admin_panel_settings, size: 40, color: Colors.black),
                   ),
                   const SizedBox(height: 10),
@@ -164,7 +164,7 @@ class AdminScaffold extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               'v1.0.0',
-              style: TextStyle(color: AppColors.textSecondary.toColor(), fontSize: 12),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
             ),
           ),
         ],
@@ -174,7 +174,7 @@ class AdminScaffold extends StatelessWidget {
 
   Widget _buildDrawerItem(BuildContext context, IconData icon, String title, Widget? screen) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.goldAccent.toColor()),
+      leading: Icon(icon, color: AppColors.goldAccent),
       title: Text(title, style: const TextStyle(color: Colors.white)),
       onTap: () {
         Navigator.pop(context); // Close drawer

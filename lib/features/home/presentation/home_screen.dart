@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -49,7 +49,7 @@ class HomeScreen extends StatelessWidget {
             Text(
               'Halo, Fajri!',
               style: TextStyle(
-                color: AppColors.textPrimary.toColor(),
+                color: AppColors.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -57,7 +57,7 @@ class HomeScreen extends StatelessWidget {
             Text(
               'Investasi emas hari ini?',
               style: TextStyle(
-                color: AppColors.textSecondary.toColor(),
+                color: AppColors.textSecondary,
                 fontSize: 14,
               ),
             ),
@@ -66,12 +66,12 @@ class HomeScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.divider.toColor(),
+            color: AppColors.divider,
             shape: BoxShape.circle,
           ),
           child: Icon(
             Icons.notifications_outlined,
-            color: AppColors.goldAccent.toColor(),
+            color: AppColors.goldAccent,
           ),
         ),
       ],
@@ -84,10 +84,10 @@ class HomeScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.divider.toColor(),
+        color: AppColors.divider,
         borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
         border: Border.all(
-          color: AppColors.goldAccent.toColor().withOpacity(0.3),
+          color: AppColors.goldAccent.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -98,14 +98,14 @@ class HomeScreen extends StatelessWidget {
             children: [
               Icon(
                 Icons.account_balance_wallet_outlined,
-                color: AppColors.goldAccent.toColor(),
+                color: AppColors.goldAccent,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'Saldo Emas Digital',
                 style: TextStyle(
-                  color: AppColors.textPrimary.toColor(),
+                  color: AppColors.textPrimary,
                   fontSize: 14,
                 ),
               ),
@@ -115,7 +115,7 @@ class HomeScreen extends StatelessWidget {
           Text(
             '1.245 gram',
             style: TextStyle(
-              color: AppColors.goldAccent.toColor(),
+              color: AppColors.goldAccent,
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
@@ -124,7 +124,7 @@ class HomeScreen extends StatelessWidget {
           Text(
             '≈ Rp 1.543.000',
             style: TextStyle(
-              color: AppColors.textSecondary.toColor(),
+              color: AppColors.textSecondary,
               fontSize: 16,
             ),
           ),
@@ -158,12 +158,12 @@ class HomeScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.divider.toColor(),
+                color: AppColors.divider,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 actions[index]['icon'] as IconData,
-                color: AppColors.goldAccent.toColor(),
+                color: AppColors.goldAccent,
               ),
             ),
             const SizedBox(height: 8),
@@ -171,7 +171,7 @@ class HomeScreen extends StatelessWidget {
               actions[index]['label'] as String,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.textPrimary.toColor(),
+                color: AppColors.textPrimary,
                 fontSize: 12,
               ),
             ),
@@ -203,7 +203,7 @@ class HomeScreen extends StatelessWidget {
               Text(
                 'Rp 1.230.000/gr',
                 style: TextStyle(
-                  color: AppColors.goldAccent.toColor(),
+                  color: AppColors.goldAccent,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -226,7 +226,7 @@ class HomeScreen extends StatelessWidget {
               Text(
                 'Rp 1.150.000/gr',
                 style: TextStyle(
-                  color: AppColors.textPrimary.toColor(),
+                  color: AppColors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -300,7 +300,7 @@ class HomeScreen extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            color: AppColors.textPrimary.toColor(),
+            color: AppColors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -308,7 +308,7 @@ class HomeScreen extends StatelessWidget {
         Text(
           'Lihat Semua',
           style: TextStyle(
-            color: AppColors.goldAccent.toColor(),
+            color: AppColors.goldAccent,
             fontSize: 12,
           ),
         ),

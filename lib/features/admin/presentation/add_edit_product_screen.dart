@@ -165,7 +165,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
     final bool isEdit = widget.product != null;
 
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       appBar: CustomAppBar(
         title: isEdit ? 'Edit Produk' : 'Tambah Produk Baru',
         showBackButton: true,
@@ -309,11 +309,11 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: AppColors.textSecondary.toColor().withOpacity(0.3)),
+                                      borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.3)),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: AppColors.textSecondary.toColor().withOpacity(0.3)),
+                                      borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.3)),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -377,7 +377,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
       padding: const EdgeInsets.only(bottom: 8, left: 4),
       child: Text(
         label,
-        style: TextStyle(color: AppColors.textPrimary.toColor(), fontWeight: FontWeight.bold),
+        style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
       ),
     );
   }

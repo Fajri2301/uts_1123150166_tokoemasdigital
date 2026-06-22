@@ -77,7 +77,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     final user = _auth.currentUser;
 
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       appBar: const CustomAppBar(title: 'Profil Admin', showBackButton: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -134,10 +134,10 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.divider.toColor(),
+        color: AppColors.divider,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.goldAccent.toColor().withOpacity(0.3),
+          color: AppColors.goldAccent.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -145,14 +145,14 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundColor: AppColors.goldAccent.toColor(),
+            backgroundColor: AppColors.goldAccent,
             child: const Icon(Icons.person, size: 50, color: Colors.black),
           ),
           const SizedBox(height: 16),
           Text(
             _userData?['name'] ?? user?.displayName ?? 'Administrator',
             style: TextStyle(
-              color: AppColors.textPrimary.toColor(),
+              color: AppColors.textPrimary,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
@@ -161,7 +161,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
           Text(
             user?.email ?? 'admin@tokoemas.com',
             style: TextStyle(
-              color: AppColors.textSecondary.toColor(),
+              color: AppColors.textSecondary,
               fontSize: 14,
             ),
           ),
@@ -169,13 +169,13 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.goldAccent.toColor().withOpacity(0.15),
+              color: AppColors.goldAccent.withOpacity(0.15),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               'Role: ${_userData?['role'] ?? 'admin'}',
               style: TextStyle(
-                color: AppColors.goldAccent.toColor(),
+                color: AppColors.goldAccent,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -191,28 +191,28 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
       children: [
         ListTile(
           onTap: onTap,
-          leading: Icon(icon, color: AppColors.goldAccent.toColor()),
+          leading: Icon(icon, color: AppColors.goldAccent),
           title: Text(
             title,
             style: TextStyle(
-              color: AppColors.textPrimary.toColor(),
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w500,
             ),
           ),
           subtitle: Text(
             subtitle,
             style: TextStyle(
-              color: AppColors.textSecondary.toColor(),
+              color: AppColors.textSecondary,
               fontSize: 12,
             ),
           ),
           trailing: Icon(
             Icons.arrow_forward_ios,
-            color: AppColors.textSecondary.toColor(),
+            color: AppColors.textSecondary,
             size: 16,
           ),
         ),
-        Divider(color: AppColors.divider.toColor(), height: 1),
+        Divider(color: AppColors.divider, height: 1),
       ],
     );
   }
@@ -258,7 +258,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.divider.toColor(),
+        backgroundColor: AppColors.divider,
         title: const Text('Pengaturan Notifikasi'),
         content: const Text('Fitur ini akan segera hadir'),
         actions: [
@@ -275,7 +275,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.divider.toColor(),
+        backgroundColor: AppColors.divider,
         title: const Text('Tentang Aplikasi'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
@@ -304,7 +304,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.divider.toColor(),
+        backgroundColor: AppColors.divider,
         title: const Text('Keluar Akun'),
         content: const Text('Apakah Anda yakin ingin keluar?'),
         actions: [
@@ -424,7 +424,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       appBar: const CustomAppBar(title: 'Edit Profil', showBackButton: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -584,7 +584,7 @@ class _EditEmailScreenState extends State<EditEmailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       appBar: const CustomAppBar(title: 'Edit Email', showBackButton: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -746,7 +746,7 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       appBar: const CustomAppBar(title: 'Ubah Password', showBackButton: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

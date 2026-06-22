@@ -73,7 +73,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       appBar: const CustomAppBar(title: 'Edit Profil Admin', showBackButton: true),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
@@ -123,7 +123,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       padding: const EdgeInsets.only(bottom: 8, left: 4),
       child: Text(
         label,
-        style: TextStyle(color: AppColors.textPrimary.toColor(), fontWeight: FontWeight.bold),
+        style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
       ),
     );
   }

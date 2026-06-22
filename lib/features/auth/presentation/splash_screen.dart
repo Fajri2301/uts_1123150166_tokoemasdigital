@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -63,13 +63,13 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.goldAccent.toColor(),
+                color: AppColors.goldAccent,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
                 Icons.monetization_on,
                 size: 60,
-                color: AppColors.background.toColor(),
+                color: AppColors.background,
               ),
             ),
             const SizedBox(height: 24),
@@ -78,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: AppColors.goldAccent.toColor(),
+                color: AppColors.goldAccent,
               ),
             ),
             const SizedBox(height: 8),
@@ -86,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen> {
               'Investasi Emas Mudah & Aman',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary.toColor(),
+                color: AppColors.textSecondary,
               ),
             ),
           ],

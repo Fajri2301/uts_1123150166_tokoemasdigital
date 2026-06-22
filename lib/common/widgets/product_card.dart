@@ -27,7 +27,7 @@ class ProductCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.divider.toColor(),
+          color: AppColors.divider,
           borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
         ),
         child: Column(
@@ -54,7 +54,7 @@ class ProductCard extends StatelessWidget {
                   Text(
                     name,
                     style: TextStyle(
-                      color: AppColors.textPrimary.toColor(),
+                      color: AppColors.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
@@ -65,7 +65,7 @@ class ProductCard extends StatelessWidget {
                   Text(
                     description,
                     style: TextStyle(
-                      color: AppColors.textSecondary.toColor(),
+                      color: AppColors.textSecondary,
                       fontSize: 12,
                     ),
                     maxLines: 2,
@@ -75,7 +75,7 @@ class ProductCard extends StatelessWidget {
                   Text(
                     price,
                     style: TextStyle(
-                      color: AppColors.goldAccent.toColor(),
+                      color: AppColors.goldAccent,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
@@ -91,7 +91,7 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildImage() {
     if (imageUrl.isEmpty || imageUrl == 'placeholder') {
-      return Icon(Icons.image_outlined, color: AppColors.goldAccent.toColor(), size: 40);
+      return Icon(Icons.image_outlined, color: AppColors.goldAccent, size: 40);
     }
 
     // Handle Base64
@@ -104,7 +104,7 @@ class ProductCard extends StatelessWidget {
           child: Image.memory(bytes, fit: BoxFit.cover),
         );
       } catch (e) {
-        return Icon(Icons.error_outline, color: AppColors.error.toColor());
+        return Icon(Icons.error_outline, color: AppColors.error);
       }
     }
 
@@ -115,7 +115,7 @@ class ProductCard extends StatelessWidget {
         imageUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) =>
-            Icon(Icons.image_outlined, color: AppColors.goldAccent.toColor(), size: 40),
+            Icon(Icons.image_outlined, color: AppColors.goldAccent, size: 40),
       ),
     );
   }

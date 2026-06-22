@@ -18,7 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.background.toColor(),
+      backgroundColor: AppColors.background,
       elevation: 0,
       centerTitle: true,
       toolbarHeight: AppDimensions.appBarHeight,
@@ -26,7 +26,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? IconButton(
               icon: Icon(
                 Icons.arrow_back_ios_new,
-                color: AppColors.goldAccent.toColor(),
+                color: AppColors.goldAccent,
                 size: 20,
               ),
               onPressed: () => Navigator.of(context).pop(),
@@ -35,7 +35,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         title,
         style: TextStyle(
-          color: AppColors.textPrimary.toColor(),
+          color: AppColors.textPrimary,
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),

@@ -29,7 +29,7 @@ class CustomInputField extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: AppColors.divider.toColor(),
+            color: AppColors.divider,
             borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
           ),
           child: TextFormField(
@@ -38,10 +38,10 @@ class CustomInputField extends StatelessWidget {
             keyboardType: keyboardType,
             validator: validator,
             maxLines: maxLines,
-            style: TextStyle(color: AppColors.textPrimary.toColor()),
+            style: TextStyle(color: AppColors.textPrimary),
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: TextStyle(color: AppColors.textSecondary.toColor()),
+              hintStyle: TextStyle(color: AppColors.textSecondary),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.padding,

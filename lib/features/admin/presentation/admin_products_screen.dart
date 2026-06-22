@@ -49,7 +49,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.goldAccent.toColor(),
+        backgroundColor: AppColors.goldAccent,
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -67,7 +67,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.divider.toColor(),
+        color: AppColors.divider,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -87,15 +87,15 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                     ? Image.memory(
                         base64Decode(product.imageUrl.split(',').last),
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Icon(Icons.broken_image, color: AppColors.goldAccent.toColor()),
+                        errorBuilder: (_, __, ___) => Icon(Icons.broken_image, color: AppColors.goldAccent),
                       )
                     : Image.network(
                         product.imageUrl, 
                         fit: BoxFit.cover, 
-                        errorBuilder: (_, __, ___) => Icon(Icons.image_outlined, color: AppColors.goldAccent.toColor())
+                        errorBuilder: (_, __, ___) => Icon(Icons.image_outlined, color: AppColors.goldAccent)
                       ),
                 )
-              : Icon(Icons.image_outlined, color: AppColors.goldAccent.toColor()),
+              : Icon(Icons.image_outlined, color: AppColors.goldAccent),
           ),
           const SizedBox(width: 16),
           // Info
@@ -109,7 +109,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                 ),
                 Text(
                   '${product.category} • ${product.weight}g',
-                  style: TextStyle(color: AppColors.goldAccent.toColor(), fontSize: 12),
+                  style: TextStyle(color: AppColors.goldAccent, fontSize: 12),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -130,7 +130,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                     ),
                   );
                 },
-                icon: Icon(Icons.edit, color: AppColors.goldAccent.toColor()),
+                icon: Icon(Icons.edit, color: AppColors.goldAccent),
               ),
               IconButton(
                 onPressed: () => _confirmDelete(context, product),
