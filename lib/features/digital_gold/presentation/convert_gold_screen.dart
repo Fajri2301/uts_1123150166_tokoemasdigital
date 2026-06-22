@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_dimensions.dart';
-import '../../../core/utils/currency_formatter.dart';
-import '../../../core/services/firestore_service.dart';
-import '../../../common/widgets/gold_button.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../common/widgets/app_button.dart';
+import '../../../common/widgets/app_field.dart';
 import '../services/digital_gold_service.dart';
 
 class ConvertGoldScreen extends StatefulWidget {
-  const ConvertGoldScreen({Key? key}) : super(key: key);
+  const ConvertGoldScreen({super.key});
 
   @override
   State<ConvertGoldScreen> createState() => _ConvertGoldScreenState();
@@ -19,30 +17,11 @@ class _ConvertGoldScreenState extends State<ConvertGoldScreen> {
   final _gramController = TextEditingController();
   final _addressController = TextEditingController();
   final _digitalGoldService = DigitalGoldService();
-  final _firestoreService = FirestoreService();
+
   bool _isLoading = false;
   String? _errorMessage;
-  double _userGoldBalance = 0.0;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUserBalance();
-  }
-
-  Future<void> _loadUserBalance() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userData = await _firestoreService.getUserById(user.uid);
-      if (userData != null && mounted) {
-        setState(() {
-          _userGoldBalance = (userData['gold_balance'] ?? 0.0).toDouble();
-        });
-      }
-    }
-  }
-
-  Future<void> _handleConvert() async {
+  Future<void> _handleConvertGold() async {
     if (!_formKey.currentState!.validate()) return;
 
     User? user = FirebaseAuth.instance.currentUser;
@@ -55,17 +34,19 @@ class _ConvertGoldScreenState extends State<ConvertGoldScreen> {
 
     try {
       double grams = double.parse(_gramController.text);
+      String address = _addressController.text;
+
       bool success = await _digitalGoldService.convertToPhysical(
         userId: user.uid,
         gramAmount: grams,
-        address: _addressController.text.trim(),
+        address: address,
       );
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Berhasil mengkonversi emas!'),
-            backgroundColor: Color(0xFF4CAF50),
+            content: Text('Berhasil mengajukan konversi emas!'),
+            backgroundColor: AppColors.green,
           ),
         );
         Navigator.of(context).pop(true);
@@ -86,181 +67,108 @@ class _ConvertGoldScreenState extends State<ConvertGoldScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.ink, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Cetak Emas (Batangan)',
-          style: TextStyle(color: Colors.white),
+          'Konversi Emas Fisik',
+          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 17),
         ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.padding),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Info Card
               Container(
-                padding: const EdgeInsets.all(AppSpacing.spacingMedium),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                  border: Border.all(
-                    color: const Color(0xFFFFD700).withOpacity(0.3),
-                  ),
+                  color: AppColors.blueSurface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.blue.withOpacity(0.3)),
                 ),
-                child: Column(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Konversi Emas Digital ke Fisik',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Saldo Anda: ${CurrencyFormatter.formatGram(_userGoldBalance)}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFFFFD700),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      '⚠️ Emas akan dikonversi menjadi batangan fisik dan dikirim ke alamat Anda.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFFB0B0B0),
+                    const Icon(Icons.info_outline_rounded, color: AppColors.blue, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: const Text(
+                        'Konversi minimal 1 gram. Emas fisik akan dikirimkan ke alamat Anda. Pastikan alamat lengkap.',
+                        style: TextStyle(color: AppColors.blue, fontSize: 13, height: 1.4),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-
-              // Gram Input (50 px height)
-              const Text(
-                'Jumlah Emas yang Dikonversi (gram)',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                height: AppDimensions.inputHeight,
-                child: TextFormField(
-                  controller: _gramController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Jumlah wajib diisi';
-                    }
-                    double? grams = double.tryParse(value);
-                    if (grams == null || grams <= 0) {
-                      return 'Jumlah harus lebih dari 0';
-                    }
-                    if (grams > _userGoldBalance) {
-                      return 'Saldo tidak mencukupi';
-                    }
-                    return null;
-                  },
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan jumlah gram',
-                    hintStyle: const TextStyle(color: Color(0xFF666666)),
-                    suffixText: 'gram',
-                    suffixStyle: const TextStyle(color: Color(0xFFB0B0B0)),
-                    filled: true,
-                    fillColor: const Color(0xFF1A1A1A),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.padding,
-                      vertical: 12,
-                    ),
-                  ),
-                ),
-              ),
               const SizedBox(height: 24),
 
-              // Address Input
-              const Text(
-                'Alamat Pengiriman',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
+              // Gram Input
+              AppField(
+                label: 'Jumlah Emas (gram)',
+                hint: 'Minimal 1',
+                controller: _gramController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Jumlah wajib diisi';
+                  }
+                  double? grams = double.tryParse(value);
+                  if (grams == null || grams < 1) {
+                    return 'Minimal konversi adalah 1 gram';
+                  }
+                  return null;
+                },
               ),
-              const SizedBox(height: 8),
-              Container(
-                constraints: const BoxConstraints(minHeight: 100),
-                child: TextFormField(
-                  controller: _addressController,
-                  maxLines: 4,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Alamat wajib diisi';
-                    }
-                    return null;
-                  },
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan alamat lengkap',
-                    hintStyle: const TextStyle(color: Color(0xFF666666)),
-                    filled: true,
-                    fillColor: const Color(0xFF1A1A1A),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.all(AppSpacing.padding),
-                  ),
-                ),
+              const SizedBox(height: 16),
+
+              // Address Input
+              AppField(
+                label: 'Alamat Pengiriman Lengkap',
+                hint: 'Masukkan alamat lengkap beserta kode pos',
+                controller: _addressController,
+                maxLines: 4,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Alamat wajib diisi';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 24),
 
               // Error Message
               if (_errorMessage != null)
                 Container(
-                  padding: const EdgeInsets.all(AppSpacing.spacingMedium),
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF44336).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                    border: Border.all(color: const Color(0xFFF44336)),
+                    color: AppColors.redSurface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.red.withOpacity(0.3)),
                   ),
                   child: Text(
                     _errorMessage!,
-                    style: const TextStyle(color: Color(0xFFF44336)),
+                    style: const TextStyle(color: AppColors.red, fontSize: 13),
                     textAlign: TextAlign.center,
                   ),
                 ),
-              const SizedBox(height: 24),
 
-              // Convert Button (48 px)
-              _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
-                      ),
-                    )
-                  : GoldButton(
-                      text: 'Konversi ke Emas Fisik',
-                      onPressed: _handleConvert,
-                    ),
+              // Convert Button
+              AppButton(
+                text: 'Proses Konversi',
+                icon: Icons.print_rounded,
+                isLoading: _isLoading,
+                onPressed: _isLoading ? () {} : _handleConvertGold,
+              ),
             ],
           ),
         ),

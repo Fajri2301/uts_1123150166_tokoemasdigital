@@ -13,4 +13,16 @@ class CurrencyFormatter {
   }
 
   static String maskBalance() => 'Rp • • • • • •';
+
+  static String formatRupiah(double amount) {
+    return 'Rp${_formatter.format(amount)}';
+  }
+
+  static String formatGram(double amount) {
+    return '${amount.toStringAsFixed(amount.truncateToDouble() == amount ? 0 : 2)} gr';
+  }
+
+  static String formatDate(DateTime date) {
+    return DateFormat('dd MMM yyyy, HH:mm').format(date);
+  }
 }

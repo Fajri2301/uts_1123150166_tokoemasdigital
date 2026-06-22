@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../core/services/firestore_service.dart';
 import '../services/digital_gold_service.dart';
-import '../../../common/widgets/gold_button.dart';
+import '../../../common/widgets/app_button.dart';
+import '../../../common/widgets/feature_icon.dart';
 import 'buy_gold_screen.dart';
 import 'convert_gold_screen.dart';
 import 'transaction_history_screen.dart';
 
 class DigitalGoldScreen extends StatefulWidget {
-  const DigitalGoldScreen({Key? key}) : super(key: key);
+  const DigitalGoldScreen({super.key});
 
   @override
   State<DigitalGoldScreen> createState() => _DigitalGoldScreenState();
@@ -21,7 +19,6 @@ class DigitalGoldScreen extends StatefulWidget {
 class _DigitalGoldScreenState extends State<DigitalGoldScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DigitalGoldService _digitalGoldService = DigitalGoldService();
-  final FirestoreService _firestoreService = FirestoreService();
 
   double goldBalance = 0.0;
   double goldPrice = 0.0;
@@ -36,19 +33,19 @@ class _DigitalGoldScreenState extends State<DigitalGoldScreen> {
   Future<void> _loadData() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      final userData = await _firestoreService.getUserById(user.uid);
-      if (userData != null && mounted) {
-        setState(() {
-          goldBalance = (userData['gold_balance'] ?? 0.0).toDouble();
-        });
-      }
-
+      final balance = await _digitalGoldService.getBalance();
       final price = await _digitalGoldService.getCurrentGoldPrice();
+
       if (mounted) {
         setState(() {
+          goldBalance = balance;
           goldPrice = price;
           isLoading = false;
         });
+      }
+    } else {
+      if (mounted) {
+        setState(() => isLoading = false);
       }
     }
   }
@@ -56,37 +53,37 @@ class _DigitalGoldScreenState extends State<DigitalGoldScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.ink, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Emas Digital',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 17),
         ),
+        centerTitle: true,
       ),
       body: isLoading
           ? const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
-              ),
+              child: CircularProgressIndicator(color: AppColors.primary),
             )
           : RefreshIndicator(
               onRefresh: _loadData,
-              color: const Color(0xFFFFD700),
+              color: AppColors.primary,
               child: ListView(
-                padding: const EdgeInsets.all(AppSpacing.padding),
+                padding: const EdgeInsets.all(20),
                 children: [
                   // Saldo Card
                   _buildBalanceCard(),
-                  const SizedBox(height: AppSpacing.spacingXLarge),
+                  const SizedBox(height: 24),
 
                   // Action Buttons
                   _buildActionButtons(),
-                  const SizedBox(height: AppSpacing.spacingXLarge),
+                  const SizedBox(height: 32),
 
                   // Transaction History
                   _buildTransactionHistory(),
@@ -100,68 +97,69 @@ class _DigitalGoldScreenState extends State<DigitalGoldScreen> {
     double portfolioValue = goldBalance * goldPrice;
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.padding),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        border: Border.all(
-          color: const Color(0xFFFFD700).withOpacity(0.3),
-        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.shadowCard,
       ),
       child: Column(
         children: [
           const Text(
-            'Saldo Emas Digital',
+            'Saldo Emas Digital Anda',
             style: TextStyle(
               fontSize: 14,
-              color: Color(0xFFB0B0B0),
+              fontWeight: FontWeight.w600,
+              color: AppColors.slate500,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             CurrencyFormatter.formatGram(goldBalance),
             style: const TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFFFFD700),
+              fontSize: 38,
+              fontWeight: FontWeight.w800,
+              color: AppColors.ink,
+              letterSpacing: -1,
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            '≈ ${CurrencyFormatter.formatRupiah(portfolioValue)}',
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color(0xFFB0B0B0),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.greenSurface,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '≈ ${CurrencyFormatter.formatRupiah(portfolioValue)}',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColors.green,
+              ),
             ),
           ),
+          const SizedBox(height: 20),
+          const Divider(color: AppColors.line2),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.spacingMedium,
-              vertical: AppSpacing.spacingSmall,
-            ),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD700).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.show_chart,
-                  size: 16,
-                  color: Color(0xFFFFD700),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.trending_up_rounded,
+                size: 20,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Harga Beli: ${CurrencyFormatter.formatRupiah(goldPrice)}/gr',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  'Harga: ${CurrencyFormatter.formatRupiah(goldPrice)}/gr',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFFFFD700),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -171,39 +169,38 @@ class _DigitalGoldScreenState extends State<DigitalGoldScreen> {
   Widget _buildActionButtons() {
     return Column(
       children: [
-        GoldButton(
-          text: 'Beli Emas',
+        AppButton(
+          text: 'Beli Emas Digital',
+          icon: Icons.add_circle_outline_rounded,
           onPressed: () async {
             final result = await Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const BuyGoldScreen()),
             );
-            if (result == true) {
-              _loadData();
-            }
+            if (result == true) _loadData();
           },
         ),
-        const SizedBox(height: AppSpacing.spacingMedium),
-        GoldButton(
+        const SizedBox(height: 12),
+        AppButton(
           text: 'Cetak Emas (Konversi ke Fisik)',
+          icon: Icons.print_rounded,
+          variant: AppButtonVariant.outline,
           onPressed: () async {
             final result = await Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const ConvertGoldScreen()),
             );
-            if (result == true) {
-              _loadData();
-            }
+            if (result == true) _loadData();
           },
-          isSecondary: true,
         ),
-        const SizedBox(height: AppSpacing.spacingMedium),
-        GoldButton(
-          text: 'Riwayat Transaksi',
+        const SizedBox(height: 12),
+        AppButton(
+          text: 'Riwayat Transaksi Lengkap',
+          icon: Icons.history_rounded,
+          variant: AppButtonVariant.ghost,
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const TransactionHistoryScreen()),
             );
           },
-          isSecondary: true,
         ),
       ],
     );
@@ -219,51 +216,52 @@ class _DigitalGoldScreenState extends State<DigitalGoldScreen> {
         const Text(
           'Transaksi Terakhir',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.ink,
           ),
         ),
-        const SizedBox(height: AppSpacing.spacingMedium),
-        StreamBuilder<QuerySnapshot>(
-          stream: _digitalGoldService.getUserTransactions(user.uid),
+        const SizedBox(height: 16),
+        FutureBuilder<List<Map<String, dynamic>>>(
+          future: _digitalGoldService.getUserTransactions(user.uid),
           builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
+            }
+
             if (snapshot.hasError) {
               return const Center(
-                child: Text(
-                  'Terjadi kesalahan',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: Text('Terjadi kesalahan', style: TextStyle(color: AppColors.red)),
               );
             }
 
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
-                ),
-              );
-            }
-
-            final transactions = snapshot.data!.docs;
-
-            if (transactions.isEmpty) {
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Container(
-                padding: const EdgeInsets.all(AppSpacing.padding),
+                padding: const EdgeInsets.all(20),
                 alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.line2),
+                ),
                 child: const Text(
                   'Belum ada transaksi',
-                  style: TextStyle(color: Color(0xFFB0B0B0)),
+                  style: TextStyle(color: AppColors.slate500, fontWeight: FontWeight.w500),
                 ),
               );
             }
+
+            final transactions = snapshot.data!;
+            final displayCount = transactions.length > 5 ? 5 : transactions.length;
 
             return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: transactions.length > 5 ? 5 : transactions.length,
+              itemCount: displayCount,
               itemBuilder: (context, index) {
-                final transaction = transactions[index].data() as Map<String, dynamic>;
+                final transaction = transactions[index];
                 return _buildTransactionItem(transaction);
               },
             );
@@ -275,67 +273,80 @@ class _DigitalGoldScreenState extends State<DigitalGoldScreen> {
 
   Widget _buildTransactionItem(Map<String, dynamic> transaction) {
     String type = transaction['type'] ?? 'digital';
-    double amount = (transaction['gold_amount'] ?? 0.0).toDouble();
+    double amount = (transaction['grams'] as num?)?.toDouble() ?? 0.0;
     String status = transaction['status'] ?? 'pending';
-    DateTime createdAt = (transaction['created_at'] as Timestamp?)?.toDate() ?? DateTime.now();
-
-    Color statusColor;
-    switch (status) {
-      case 'selesai':
-        statusColor = const Color(0xFF4CAF50);
-        break;
-      case 'diproses':
-        statusColor = const Color(0xFFFFD700);
-        break;
-      case 'dikirim':
-        statusColor = const Color(0xFF2196F3);
-        break;
-      default:
-        statusColor = const Color(0xFFB0B0B0);
+    
+    DateTime createdAt;
+    if (transaction['created_at'] != null) {
+      createdAt = DateTime.parse(transaction['created_at']);
+    } else {
+      createdAt = DateTime.now();
     }
 
+    String statusTone;
+    String statusLabel = status.toUpperCase();
+    switch (status) {
+      case 'success':
+      case 'selesai':
+        statusTone = 'green';
+        statusLabel = 'BERHASIL';
+        break;
+      case 'pending':
+      case 'diproses':
+        statusTone = 'gold';
+        statusLabel = 'DIPROSES';
+        break;
+      case 'failed':
+      case 'batal':
+        statusTone = 'red';
+        statusLabel = 'GAGAL';
+        break;
+      default:
+        statusTone = 'slate';
+    }
+
+    String iconTone = type == 'buy_digital' ? 'gold' : 'blue';
+    IconData icon = type == 'buy_digital' ? Icons.account_balance_wallet_rounded : Icons.diamond_rounded;
+    String title = type == 'buy_digital' ? 'Beli Emas Digital' : 
+                   type == 'physical_checkout' ? 'Pembelian Emas Fisik' : 'Konversi ke Emas Fisik';
+
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.spacingMedium),
-      padding: const EdgeInsets.all(AppSpacing.spacingMedium),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppColors.shadowSoft,
+        border: Border.all(color: AppColors.line2),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: type == 'digital'
-                  ? const Color(0xFFFFD700).withOpacity(0.15)
-                  : const Color(0xFF2196F3).withOpacity(0.15),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              type == 'digital' ? Icons.account_balance_wallet : Icons.diamond,
-              size: 20,
-              color: type == 'digital' ? const Color(0xFFFFD700) : const Color(0xFF2196F3),
-            ),
+          FeatureIcon(
+            icon: icon,
+            tone: iconTone,
+            size: 40,
+            iconSize: 20,
           ),
-          const SizedBox(width: AppSpacing.spacingMedium),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  type == 'digital' ? 'Beli Emas Digital' : 'Konversi ke Emas Fisik',
+                  title,
                   style: const TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   CurrencyFormatter.formatDate(createdAt),
                   style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFFB0B0B0),
+                    fontSize: 11,
+                    color: AppColors.slate400,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -348,25 +359,23 @@ class _DigitalGoldScreenState extends State<DigitalGoldScreen> {
                 CurrencyFormatter.formatGram(amount),
                 style: const TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFFFFD700),
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(4),
+                  color: AppColors.tone(statusTone, 100),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  status,
+                  statusLabel,
                   style: TextStyle(
-                    fontSize: 10,
-                    color: statusColor,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.tone(statusTone, 600),
                   ),
                 ),
               ),

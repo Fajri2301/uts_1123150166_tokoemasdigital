@@ -3,6 +3,20 @@ import 'package:toko_emas_digital/core/network/api_client.dart';
 class DigitalGoldService {
   final ApiClient _apiClient = ApiClient();
 
+  // Get Digital Gold Balance
+  Future<double> getBalance() async {
+    try {
+      final response = await _apiClient.dio.get('/gold/balance');
+      if (response.data['success'] == true) {
+        return (response.data['data']['grams'] as num).toDouble();
+      }
+      return 0.0;
+    } catch (e) {
+      return 0.0;
+    }
+  }
+  final ApiClient _apiClient = ApiClient();
+
   // Buy digital gold with Transaction for safety
   Future<bool> buyGold({
     required String userId,

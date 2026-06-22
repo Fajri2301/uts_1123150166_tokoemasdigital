@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../core/constants/app_spacing.dart';
-import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../common/widgets/feature_icon.dart';
 import '../services/digital_gold_service.dart';
 
 class TransactionHistoryScreen extends StatefulWidget {
-  const TransactionHistoryScreen({Key? key}) : super(key: key);
+  const TransactionHistoryScreen({super.key});
 
   @override
   State<TransactionHistoryScreen> createState() => _TransactionHistoryScreenState();
@@ -21,61 +20,61 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     User? user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFFFD700)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.ink, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Riwayat Transaksi',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 17),
         ),
+        centerTitle: true,
       ),
       body: user == null
           ? const Center(
               child: Text(
                 'Silakan login terlebih dahulu',
-                style: TextStyle(color: Color(0xFFB0B0B0)),
+                style: TextStyle(color: AppColors.slate500),
               ),
             )
-          : StreamBuilder<QuerySnapshot>(
-              stream: _digitalGoldService.getUserTransactions(user.uid),
+          : FutureBuilder<List<Map<String, dynamic>>>(
+              future: _digitalGoldService.getUserTransactions(user.uid),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
+                }
+
                 if (snapshot.hasError) {
                   return Center(
                     child: Text(
                       'Terjadi kesalahan: ${snapshot.error}',
-                      style: const TextStyle(color: Color(0xFFF44336)),
+                      style: const TextStyle(color: AppColors.red),
                     ),
                   );
                 }
 
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
-                    ),
-                  );
-                }
-
-                final transactions = snapshot.data!.docs;
-
-                if (transactions.isEmpty) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
                     child: Text(
                       'Belum ada transaksi',
-                      style: TextStyle(color: Color(0xFFB0B0B0)),
+                      style: TextStyle(color: AppColors.slate500),
                     ),
                   );
                 }
 
+                final transactions = snapshot.data!;
+
                 return ListView.builder(
-                  padding: const EdgeInsets.all(AppSpacing.padding),
+                  padding: const EdgeInsets.all(20),
                   itemCount: transactions.length,
                   itemBuilder: (context, index) {
-                    final transaction = transactions[index].data() as Map<String, dynamic>;
+                    final transaction = transactions[index];
                     return _buildTransactionCard(transaction);
                   },
                 );
@@ -86,84 +85,96 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   Widget _buildTransactionCard(Map<String, dynamic> transaction) {
     String type = transaction['type'] ?? 'digital';
-    double amount = (transaction['gold_amount'] ?? 0.0).toDouble();
+    double amount = (transaction['grams'] as num?)?.toDouble() ?? 0.0;
     String status = transaction['status'] ?? 'pending';
-    double? totalPrice = transaction['total_price'];
-    DateTime createdAt = (transaction['created_at'] as Timestamp?)?.toDate() ?? DateTime.now();
-
-    Color statusColor;
-    switch (status) {
-      case 'selesai':
-        statusColor = const Color(0xFF4CAF50);
-        break;
-      case 'diproses':
-        statusColor = const Color(0xFFFFD700);
-        break;
-      case 'dikirim':
-        statusColor = const Color(0xFF2196F3);
-        break;
-      default:
-        statusColor = const Color(0xFFB0B0B0);
+    double? totalPrice = (transaction['total_price'] as num?)?.toDouble();
+    
+    DateTime createdAt;
+    if (transaction['created_at'] != null) {
+      createdAt = DateTime.parse(transaction['created_at']);
+    } else {
+      createdAt = DateTime.now();
     }
 
+    String statusTone;
+    String statusLabel = status.toUpperCase();
+    switch (status) {
+      case 'success':
+      case 'selesai':
+        statusTone = 'green';
+        statusLabel = 'BERHASIL';
+        break;
+      case 'pending':
+      case 'diproses':
+        statusTone = 'gold';
+        statusLabel = 'DIPROSES';
+        break;
+      case 'failed':
+      case 'batal':
+        statusTone = 'red';
+        statusLabel = 'GAGAL';
+        break;
+      default:
+        statusTone = 'slate';
+    }
+
+    String iconTone = type == 'buy_digital' ? 'gold' : 'blue';
+    IconData icon = type == 'buy_digital' ? Icons.account_balance_wallet_rounded : Icons.diamond_rounded;
+    String title = type == 'buy_digital' ? 'Beli Emas Digital' : 
+                   type == 'physical_checkout' ? 'Pembelian Emas Fisik' : 'Konversi ke Emas Fisik';
+
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.spacingMedium),
-      padding: const EdgeInsets.all(AppSpacing.spacingMedium),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppColors.shadowSoft,
+        border: Border.all(color: AppColors.line2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: type == 'digital'
-                      ? const Color(0xFFFFD700).withOpacity(0.15)
-                      : const Color(0xFF2196F3).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  type == 'digital' ? Icons.account_balance_wallet : Icons.diamond,
-                  size: 20,
-                  color: type == 'digital' ? const Color(0xFFFFD700) : const Color(0xFF2196F3),
-                ),
+              FeatureIcon(
+                icon: icon,
+                tone: iconTone,
+                size: 40,
+                iconSize: 20,
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  type == 'digital' ? 'Beli Emas Digital' : 'Konversi ke Emas Fisik',
+                  title,
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
                   ),
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(4),
+                  color: AppColors.tone(statusTone, 100),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  status.toUpperCase(),
+                  statusLabel,
                   style: TextStyle(
                     fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.tone(statusTone, 600),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Divider(color: AppColors.line2, height: 1),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -173,17 +184,18 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   const Text(
                     'Jumlah',
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFFB0B0B0),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.slate500,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     CurrencyFormatter.formatGram(amount),
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFFFD700),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary,
                     ),
                   ),
                 ],
@@ -193,31 +205,33 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     const Text(
-                      'Total',
+                      'Total Harga',
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFFB0B0B0),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.slate500,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       CurrencyFormatter.formatRupiah(totalPrice),
                       style: const TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.ink,
                       ),
                     ),
                   ],
                 ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             CurrencyFormatter.formatDate(createdAt),
             style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFFB0B0B0),
+              fontSize: 11,
+              color: AppColors.slate400,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
