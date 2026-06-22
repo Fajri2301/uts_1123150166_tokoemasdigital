@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/features/auth/services/auth_service.dart';
 import 'package:toko_emas_digital/features/auth/presentation/login_screen.dart';
-import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
+import 'package:toko_emas_digital/features/home/presentation/main_screen.dart';
 import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_screen.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/utils/color_extension.dart';
@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
             );
           } else {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              MaterialPageRoute(builder: (_) => const MainScreen()),
             );
           }
         }

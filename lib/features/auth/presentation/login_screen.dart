@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/features/auth/services/auth_service.dart';
-import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
+import 'package:toko_emas_digital/features/home/presentation/main_screen.dart';
 import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_screen.dart';
 import 'package:toko_emas_digital/features/auth/presentation/register_screen.dart';
 import 'package:toko_emas_digital/common/widgets/app_field.dart';
@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           } else {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              MaterialPageRoute(builder: (_) => const MainScreen()),
             );
           }
         }
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           } else {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              MaterialPageRoute(builder: (_) => const MainScreen()),
             );
           }
         }

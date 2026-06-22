@@ -1,4 +1,5 @@
 import 'package:toko_emas_digital/core/network/api_client.dart';
+import 'package:dio/dio.dart';
 import '../models/product_model.dart';
 
 class PhysicalGoldService {
@@ -50,6 +51,15 @@ class PhysicalGoldService {
 
       return response.data['success'] == true;
     } catch (e) {
+      if (e is DioException && e.response != null) {
+        final data = e.response?.data;
+        if (data is Map) {
+          final message = data['message'] ?? data['error'] ?? data.toString();
+          throw Exception('Gagal membuat pesanan: $message');
+        } else {
+          throw Exception('Gagal membuat pesanan: ${e.response?.data}');
+        }
+      }
       throw Exception('Gagal membuat pesanan: $e');
     }
   }

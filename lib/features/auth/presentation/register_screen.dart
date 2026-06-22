@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
-import '../../home/presentation/home_screen.dart';
+import 'package:toko_emas_digital/features/home/presentation/main_screen.dart';
 import '../../../common/widgets/app_field.dart';
 import '../../../common/widgets/app_button.dart';
 import '../../../core/constants/app_colors.dart';
@@ -50,7 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (user != null && mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          MaterialPageRoute(builder: (_) => const MainScreen()),
         );
       }
     } catch (e) {
