@@ -37,7 +37,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     'Transfer Bank',
     'E-Wallet (OVO/Gopay)',
     'Saldo Emas Digital',
-    'Dompet Kampus (E-Money)',
+    'Dompet Nusantara (E-Money)',
   ];
 
   @override
@@ -67,13 +67,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
 
       if (success && mounted) {
-        if (_selectedPaymentMethod == 'Dompet Kampus (E-Money)') {
+        if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {
           final Uri uri = Uri.parse(
-              'dompetkampus://pay?merchant_id=TE01&merchant_name=Toko%20Emas%20Digital&amount=${widget.price}');
+              'dompetnusantara://pay?merchant_id=TE01&merchant_name=Toko%20Emas%20Digital&amount=${widget.price}');
           if (await canLaunchUrl(uri)) {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           } else {
-            throw Exception('Gagal membuka Dompet Kampus. Pastikan aplikasi E-Money sudah terinstall.');
+            throw Exception('Gagal membuka Dompet Nusantara. Pastikan aplikasi E-Money sudah terinstall.');
           }
         }
 
@@ -98,7 +98,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             actions: [
               AppButton(
-                text: 'Kembali ke Beranda',
+                label: 'Kembali ke Beranda',
                 onPressed: () {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
@@ -167,7 +167,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
               // Action Button
               AppButton(
-                text: 'Konfirmasi & Bayar',
+                label: 'Konfirmasi & Bayar',
                 onPressed: _handleCheckout,
                 isLoading: _isLoading,
               ),
@@ -220,7 +220,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget _buildAddressInput() {
     return AppField(
       label: '',
-      hint: 'Masukkan alamat pengiriman lengkap...',
+      placeholder: 'Masukkan alamat pengiriman lengkap...',
       controller: _addressController,
       maxLines: 3,
       validator: (value) => (value == null || value.isEmpty) ? 'Alamat wajib diisi' : null,
