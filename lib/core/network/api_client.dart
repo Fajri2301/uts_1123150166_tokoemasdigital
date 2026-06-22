@@ -12,7 +12,8 @@ class ApiClient {
   ApiClient._internal() {
     // Sesuaikan URL jika dites di perangkat fisik vs emulator
     // Emulator Android: 10.0.2.2, Fisik/Web: IP Local (misal 192.168.x.x)
-    const String baseUrl = 'http://127.0.0.1:8081/v1';
+    // Ganti 127.0.0.1 dengan IP address laptop Anda agar bisa diakses dari HP fisik
+    const String baseUrl = 'http://192.168.115.10:8081/v1';
 
     dio = Dio(BaseOptions(
       baseUrl: baseUrl,
