@@ -17,6 +17,10 @@ class AppColors {
   static const Color redSurface = Color(0xFFFDECED);
   static const Color violet = Color(0xFF7A5AF8);
   static const Color violetSurface = Color(0xFFF0EEFF);
+  static const Color blue = Color(0xFF0B63E5);
+  static const Color blueSurface = Color(0xFFE8F1FD);
+  static const Color gold = primary;
+  static const Color goldSurface = primarySurface;
 
   // Neutral
   static const Color ink = Color(0xFF0E1726);
