@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
+import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
 import 'package:toko_emas_digital/features/orders/presentation/orders_screen.dart';
 import 'package:toko_emas_digital/features/profile/presentation/profile_screen.dart';
 
@@ -16,6 +17,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = const [
     HomeScreen(),
+    TransactionsScreen(),
     OrdersScreen(),
     ProfileScreen(),
   ];
@@ -50,6 +52,10 @@ class _MainScreenState extends State<MainScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.home_rounded),
               label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.swap_horiz_rounded),
+              label: 'Transaksi',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.receipt_long_rounded),

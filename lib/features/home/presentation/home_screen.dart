@@ -9,6 +9,8 @@ import 'package:toko_emas_digital/features/digital_gold/services/catalog_service
 import 'package:toko_emas_digital/features/physical_gold/models/product_model.dart';
 import 'package:intl/intl.dart';
 import 'package:toko_emas_digital/features/physical_gold/presentation/product_detail_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -49,8 +51,8 @@ class HomeScreen extends StatelessWidget {
                               fontSize: 13,
                               color: Colors.white70,
                             )),
-                        const Text('Fajri ',
-                            style: TextStyle(
+                        Text(FirebaseAuth.instance.currentUser?.displayName ?? 'Pengguna',
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
@@ -164,29 +166,45 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              const Text(
-                '1.245 gr',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.ink,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.greenSurface,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text('≈ Rp 1.543.000',
-                  style: TextStyle(color: AppColors.green, fontSize: 12, fontWeight: FontWeight.bold)
-                ),
-              )
-            ],
+          FutureBuilder<double>(
+            future: TransactionService().getDigitalGoldBalance(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                );
+              }
+              final grams = snapshot.data ?? 0.0;
+              final pricePerGram = 1230000.0; // Harga asumsi sementara
+              final totalPrice = grams * pricePerGram;
+              final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+              
+              return Row(
+                children: [
+                  Text(
+                    '${grams.toStringAsFixed(3)} gr',
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.greenSurface,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('≈ ${currencyFormat.format(totalPrice)}',
+                      style: const TextStyle(color: AppColors.green, fontSize: 12, fontWeight: FontWeight.bold)
+                    ),
+                  )
+                ],
+              );
+            }
           ),
           Container(
             margin: const EdgeInsets.only(top: 16),

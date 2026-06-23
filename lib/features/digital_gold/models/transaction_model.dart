@@ -1,50 +1,43 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-/// Transaction Model for Digital Gold
 class TransactionModel {
-  final String id;
-  final String userId;
-  final String type; // 'digital' or 'fisik'
-  final double goldAmount;
-  final double pricePerGram;
+  final int id;
+  final int userId;
+  final int? productId;
+  final String type; // 'buy_digital', 'sell_digital', 'physical_checkout'
+  final double grams;
   final double totalPrice;
-  final String status;
-  final DateTime? createdAt;
+  final String status; // 'pending', 'success', 'failed'
+  final String paymentMethod;
+  final String? address;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   TransactionModel({
     required this.id,
     required this.userId,
+    this.productId,
     required this.type,
-    required this.goldAmount,
-    required this.pricePerGram,
+    required this.grams,
     required this.totalPrice,
     required this.status,
-    this.createdAt,
+    required this.paymentMethod,
+    this.address,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  factory TransactionModel.fromJson(Map<String, dynamic> json) {
     return TransactionModel(
-      id: doc.id,
-      userId: data['user_id'] ?? '',
-      type: data['type'] ?? 'digital',
-      goldAmount: (data['gold_amount'] ?? 0.0).toDouble(),
-      pricePerGram: (data['price_per_gram'] ?? 0.0).toDouble(),
-      totalPrice: (data['total_price'] ?? 0.0).toDouble(),
-      status: data['status'] ?? 'pending',
-      createdAt: (data['created_at'] as Timestamp?)?.toDate(),
+      id: json['id'] ?? 0,
+      userId: json['user_id'] ?? 0,
+      productId: json['product_id'],
+      type: json['type'] ?? '',
+      grams: (json['grams'] ?? 0.0).toDouble(),
+      totalPrice: (json['total_price'] ?? 0.0).toDouble(),
+      status: json['status'] ?? '',
+      paymentMethod: json['payment_method'] ?? '',
+      address: json['address'],
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at'] ?? '') ?? DateTime.now(),
     );
-  }
-
-  Map<String, dynamic> toFirestore() {
-    return {
-      'user_id': userId,
-      'type': type,
-      'gold_amount': goldAmount,
-      'price_per_gram': pricePerGram,
-      'total_price': totalPrice,
-      'status': status,
-      'created_at': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
-    };
   }
 }
