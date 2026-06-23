@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -61,24 +61,26 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
 
   Future<void> _fetchCategories() async {
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('categories').get();
-      if (snapshot.docs.isNotEmpty) {
-        final List<String> fetchedCategories = snapshot.docs
-            .map((doc) => CategoryModel.fromFirestore(doc).name)
+      final categories = await _adminService.getAllCategories();
+      if (categories.isNotEmpty) {
+        final List<String> fetchedCategories = categories
+            .map((cat) => cat['name'].toString())
             .toList();
         
-        setState(() {
-          _categories = fetchedCategories;
-          if (!_categories.contains(_selectedCategory)) {
-            _categories.add(_selectedCategory);
-          }
-          _isLoadingCategories = false;
-        });
+        if (mounted) {
+          setState(() {
+            _categories = fetchedCategories;
+            if (!_categories.contains(_selectedCategory)) {
+              _categories.add(_selectedCategory);
+            }
+            _isLoadingCategories = false;
+          });
+        }
       } else {
-        setState(() => _isLoadingCategories = false);
+        if (mounted) setState(() => _isLoadingCategories = false);
       }
     } catch (e) {
-      setState(() => _isLoadingCategories = false);
+      if (mounted) setState(() => _isLoadingCategories = false);
     }
   }
 
@@ -132,14 +134,12 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
       'image_url': _imageUrlController.text,
       'is_available': true,
       'seller_id': 'admin', // Default admin id
-      'updated_at': FieldValue.serverTimestamp(),
     };
 
     try {
       if (widget.product != null) {
         await _adminService.updateProduct(widget.product!.id, productData);
       } else {
-        productData['created_at'] = FieldValue.serverTimestamp();
         await _adminService.addProduct(productData);
       }
 

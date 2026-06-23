@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/utils/color_extension.dart';
 import 'package:toko_emas_digital/common/widgets/admin_scaffold.dart';
@@ -20,14 +19,18 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     return AdminScaffold(
       title: 'Kelola User',
       showBackButton: true,
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _adminService.getAllUsers(),
+      body: FutureBuilder<List<dynamic>>(
+        future: _adminService.getAllUsers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Terjadi kesalahan: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text('Tidak ada user.', style: TextStyle(color: Colors.white70)),
             );
@@ -35,11 +38,10 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: snapshot.data!.docs.length,
+            itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              final userData = doc.data() as Map<String, dynamic>;
-              final userId = doc.id;
+              final userData = snapshot.data![index] as Map<String, dynamic>;
+              final userId = userData['id'].toString();
               
               return _buildUserItem(context, userId, userData);
             },
@@ -143,19 +145,12 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             onPressed: () async {
               if (controller.text.isEmpty) return;
               Navigator.pop(context);
-              try {
-                await _adminService.updateUserPassword(userId, controller.text);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Password berhasil diperbarui')),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Gagal update password: $e')),
-                  );
-                }
+              // Not applicable anymore without Firebase Auth backend changes
+              Navigator.pop(context);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Ubah password di-disable pada Golang migration sementara')),
+                );
               }
             },
             child: Text('Simpan', style: TextStyle(color: AppColors.goldAccent)),

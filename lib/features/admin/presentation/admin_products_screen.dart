@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/utils/color_extension.dart';
@@ -23,14 +22,18 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
     return AdminScaffold(
       title: 'Kelola Produk',
       showBackButton: true,
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _adminService.getAllProducts(),
+      body: FutureBuilder<List<dynamic>>(
+        future: _adminService.getAllProducts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (snapshot.hasError) {
+             return Center(child: Text('Terjadi kesalahan: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text('Tidak ada produk.', style: TextStyle(color: Colors.white70)),
             );
@@ -38,10 +41,19 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: snapshot.data!.docs.length,
+            itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              final product = ProductModel.fromFirestore(doc);
+              final item = snapshot.data![index] as Map<String, dynamic>;
+              final product = ProductModel(
+                id: item['id'].toString(),
+                name: item['name'] ?? '',
+                description: item['description'] ?? '',
+                price: (item['price'] ?? 0).toDouble(),
+                imageUrl: item['image_url'] ?? '',
+                weight: (item['weight'] ?? 1.0).toDouble(),
+                category: item['category'] ?? '',
+                stock: item['stock'] ?? 0,
+              );
               
               return _buildProductItem(context, product);
             },

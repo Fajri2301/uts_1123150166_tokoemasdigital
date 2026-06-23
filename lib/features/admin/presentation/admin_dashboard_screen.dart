@@ -135,11 +135,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
                     children: [
-                      _buildStatCard('Total Produk', _stats['products'].toString(), Icons.inventory_2_outlined, Colors.blue),
+                      _buildStatCard('Total Produk', _stats['products'].toString(), Icons.inventory_2_outlined, AppColors.goldAccent),
                       const SizedBox(height: 16),
-                      _buildStatCard('Total Transaksi', _stats['transactions'].toString(), Icons.receipt_long, Colors.green),
+                      _buildStatCard('Total Transaksi', _stats['transactions'].toString(), Icons.receipt_long, AppColors.goldAccent),
                       const SizedBox(height: 16),
-                      _buildStatCard('Harga Emas / gr', 'Rp ${_currentGoldPrice.toInt()}', Icons.trending_up, Colors.orange),
+                      _buildStatCard('Harga Emas / gr', 'Rp ${_currentGoldPrice.toInt()}', Icons.trending_up, AppColors.goldAccent),
                       const SizedBox(height: 24),
                       
                       // Quick Actions
@@ -184,7 +184,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
           decoration: BoxDecoration(
-            color: AppColors.divider,
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.goldAccent.withOpacity(0.3)),
           ),
@@ -210,7 +210,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.divider,
+        color: AppColors.background,
+        border: Border.all(color: AppColors.divider),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(

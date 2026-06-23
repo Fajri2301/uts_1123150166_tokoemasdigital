@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -21,19 +20,10 @@ class _AdminTransactionsScreenState extends State<AdminTransactionsScreen> {
     return AdminScaffold(
       title: 'Kelola Transaksi',
       showBackButton: true,
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _adminService.getAllTransactions(),
+      body: FutureBuilder<List<dynamic>>(
+        future: _adminService.getAllTransactions(),
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Terjadi kesalahan',
-                style: const TextStyle(color: Color(0xFFF44336)),
-              ),
-            );
-          }
-
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
@@ -41,7 +31,16 @@ class _AdminTransactionsScreenState extends State<AdminTransactionsScreen> {
             );
           }
 
-          final transactions = snapshot.data!.docs;
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Terjadi kesalahan: ${snapshot.error}',
+                style: const TextStyle(color: Color(0xFFF44336)),
+              ),
+            );
+          }
+
+          final transactions = snapshot.data ?? [];
 
           if (transactions.isEmpty) {
             return const Center(
@@ -56,8 +55,8 @@ class _AdminTransactionsScreenState extends State<AdminTransactionsScreen> {
             padding: const EdgeInsets.all(AppSpacing.padding),
             itemCount: transactions.length,
             itemBuilder: (context, index) {
-              final transaction = transactions[index].data() as Map<String, dynamic>;
-              final transactionId = transactions[index].id;
+              final transaction = transactions[index] as Map<String, dynamic>;
+              final transactionId = transaction['id'].toString();
               return _buildTransactionCard(transaction, transactionId);
             },
           );
@@ -69,10 +68,12 @@ class _AdminTransactionsScreenState extends State<AdminTransactionsScreen> {
   Widget _buildTransactionCard(Map<String, dynamic> transaction, String transactionId) {
     String type = transaction['type'] ?? 'digital';
     String status = transaction['status'] ?? 'pending';
-    double goldAmount = (transaction['gold_amount'] ?? 0.0).toDouble();
-    double? totalPrice = transaction['total_price'];
+    double goldAmount = (transaction['grams'] ?? 0.0).toDouble();
+    double? totalPrice = (transaction['total_price'] as num?)?.toDouble();
     String? address = transaction['address'];
-    DateTime createdAt = (transaction['created_at'] as Timestamp?)?.toDate() ?? DateTime.now();
+    DateTime createdAt = transaction['created_at'] != null 
+        ? DateTime.parse(transaction['created_at']) 
+        : DateTime.now();
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.spacingMedium),
