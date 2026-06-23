@@ -35,8 +35,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   final List<String> _paymentMethods = [
     'Saldo Tunai Aplikasi',
-    'Transfer Bank',
-    'E-Wallet (OVO/Gopay)',
     'Saldo Emas Digital',
     'Dompet Nusantara (E-Money)',
   ];

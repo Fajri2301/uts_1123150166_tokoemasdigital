@@ -24,8 +24,6 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
 
   final List<String> _paymentMethods = [
     'Saldo Tunai Aplikasi',
-    'Transfer Bank',
-    'E-Wallet (OVO/Gopay)',
     'Dompet Nusantara (E-Money)',
   ];
 
@@ -48,7 +46,7 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await _transactionService.buyDigitalGold(grams, _pricePerGram, _selectedPaymentMethod);
+      final success = await _transactionService.buyDigitalGold(grams, _selectedPaymentMethod);
       
       if (success && mounted) {
         if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {

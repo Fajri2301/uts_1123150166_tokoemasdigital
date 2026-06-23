@@ -18,11 +18,10 @@ class TransactionService {
     }
   }
 
-  Future<bool> buyDigitalGold(double grams, double pricePerGram, String paymentMethod) async {
+  Future<bool> buyDigitalGold(double grams, String paymentMethod) async {
     try {
       final response = await _apiClient.dio.post('/gold/buy', data: {
         'gram_amount': grams,
-        'price_per_gram': pricePerGram,
         'payment_method': paymentMethod,
       });
       return response.data['success'] == true;
@@ -37,11 +36,10 @@ class TransactionService {
     }
   }
 
-  Future<bool> sellDigitalGold(double grams, double pricePerGram) async {
+  Future<bool> sellDigitalGold(double grams) async {
     try {
       final response = await _apiClient.dio.post('/gold/sell', data: {
         'gram_amount': grams,
-        'price_per_gram': pricePerGram,
       });
       return response.data['success'] == true;
     } catch (e) {

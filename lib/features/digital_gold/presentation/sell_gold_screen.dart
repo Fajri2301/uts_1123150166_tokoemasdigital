@@ -60,7 +60,7 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await _transactionService.sellDigitalGold(grams, _pricePerGram);
+      final success = await _transactionService.sellDigitalGold(grams);
       
       if (success && mounted) {
         showDialog(
