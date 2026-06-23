@@ -5,25 +5,25 @@ import 'package:toko_emas_digital/features/digital_gold/models/transaction_model
 class TransactionService {
   final ApiClient _apiClient = ApiClient();
 
-  Future<double> getDigitalGoldBalance() async {
+  Future<Map<String, double>> getWalletBalance() async {
     try {
       final response = await _apiClient.dio.get('/gold/balance');
-      if (response.data['success'] == true) {
-        final data = response.data['data'];
-        return (data['grams'] ?? 0.0).toDouble();
-      }
-      return 0.0;
+      final data = response.data['data'];
+      return {
+        'grams': (data['grams'] ?? 0.0).toDouble(),
+        'rupiah': (data['rupiah_balance'] ?? 0.0).toDouble(),
+      };
     } catch (e) {
-      // Return 0.0 if balance not found or error
-      return 0.0;
+      return {'grams': 0.0, 'rupiah': 0.0};
     }
   }
 
-  Future<bool> buyDigitalGold(double grams, double pricePerGram) async {
+  Future<bool> buyDigitalGold(double grams, double pricePerGram, String paymentMethod) async {
     try {
       final response = await _apiClient.dio.post('/gold/buy', data: {
         'gram_amount': grams,
         'price_per_gram': pricePerGram,
+        'payment_method': paymentMethod,
       });
       return response.data['success'] == true;
     } catch (e) {
@@ -52,6 +52,23 @@ class TransactionService {
         }
       }
       throw Exception('Gagal menjual emas digital: $e');
+    }
+  }
+
+  Future<bool> withdrawCash(double amount) async {
+    try {
+      final response = await _apiClient.dio.post('/wallet/withdraw', data: {
+        'amount': amount,
+      });
+      return response.data['success'] == true;
+    } catch (e) {
+      if (e is DioException && e.response != null) {
+        final data = e.response?.data;
+        if (data is Map) {
+          throw Exception(data['message'] ?? data['error'] ?? data.toString());
+        }
+      }
+      throw Exception('Gagal menarik dana: $e');
     }
   }
 

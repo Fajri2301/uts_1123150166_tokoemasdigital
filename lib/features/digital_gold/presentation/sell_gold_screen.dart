@@ -28,10 +28,10 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
   }
 
   Future<void> _loadBalance() async {
-    final balance = await _transactionService.getDigitalGoldBalance();
+    final balances = await _transactionService.getWalletBalance();
     if (mounted) {
       setState(() {
-        _currentBalance = balance;
+        _currentBalance = balances['grams'] ?? 0.0;
       });
     }
   }

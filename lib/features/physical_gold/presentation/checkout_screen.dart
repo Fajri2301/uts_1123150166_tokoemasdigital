@@ -31,9 +31,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   
   bool _isLoading = false;
   String? _errorMessage;
-  String _selectedPaymentMethod = 'Transfer Bank';
+  String _selectedPaymentMethod = 'Saldo Tunai Aplikasi';
 
   final List<String> _paymentMethods = [
+    'Saldo Tunai Aplikasi',
     'Transfer Bank',
     'E-Wallet (OVO/Gopay)',
     'Saldo Emas Digital',

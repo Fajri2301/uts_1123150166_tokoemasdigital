@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
 import 'package:toko_emas_digital/features/digital_gold/presentation/buy_gold_screen.dart';
 import 'package:toko_emas_digital/features/digital_gold/presentation/sell_gold_screen.dart';
+import 'package:toko_emas_digital/features/digital_gold/presentation/withdraw_screen.dart';
 import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -193,8 +194,8 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          FutureBuilder<double>(
-            future: TransactionService().getDigitalGoldBalance(),
+          FutureBuilder<Map<String, double>>(
+            future: TransactionService().getWalletBalance(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Padding(
@@ -202,33 +203,59 @@ class HomeScreen extends StatelessWidget {
                   child: CircularProgressIndicator(color: AppColors.primary),
                 );
               }
-              final grams = snapshot.data ?? 0.0;
-              final pricePerGram = 1230000.0; // Harga asumsi sementara
-              final totalPrice = grams * pricePerGram;
+              final balances = snapshot.data ?? {'grams': 0.0, 'rupiah': 0.0};
+              final grams = balances['grams']!;
+              final rupiah = balances['rupiah']!;
               final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
               
               return Row(
                 children: [
-                  Text(
-                    '${grams.toStringAsFixed(3)} gr',
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.ink,
-                      letterSpacing: -0.5,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${grams.toStringAsFixed(3)} gr',
+                          style: const TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.ink,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text('Total Gram', style: TextStyle(color: AppColors.slate500, fontSize: 11, fontWeight: FontWeight.w600)),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.greenSurface,
-                      borderRadius: BorderRadius.circular(8),
+                  Container(width: 1, height: 40, color: AppColors.line2, margin: const EdgeInsets.symmetric(horizontal: 12)),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          currencyFormat.format(rupiah),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.green,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Saldo Tunai', style: TextStyle(color: AppColors.slate500, fontSize: 11, fontWeight: FontWeight.w600)),
+                            GestureDetector(
+                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WithdrawScreen())),
+                              child: const Text('Tarik', style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold)),
+                            )
+                          ],
+                        ),
+                      ],
                     ),
-                    child: Text('≈ ${currencyFormat.format(totalPrice)}',
-                      style: const TextStyle(color: AppColors.green, fontSize: 12, fontWeight: FontWeight.bold)
-                    ),
-                  )
+                  ),
                 ],
               );
             }
