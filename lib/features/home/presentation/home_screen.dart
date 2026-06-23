@@ -11,6 +11,9 @@ import 'package:intl/intl.dart';
 import 'package:toko_emas_digital/features/physical_gold/presentation/product_detail_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
+import 'package:toko_emas_digital/features/digital_gold/presentation/buy_gold_screen.dart';
+import 'package:toko_emas_digital/features/digital_gold/presentation/sell_gold_screen.dart';
+import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -96,7 +99,7 @@ class HomeScreen extends StatelessWidget {
               offset: const Offset(0, -46),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildGoldBalanceCard(),
+                child: _buildGoldBalanceCard(context),
               ),
             ),
             Transform.translate(
@@ -132,12 +135,36 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGoldBalanceCard() {
+  Widget _buildGoldBalanceCard(BuildContext context) {
     final actions = [
-      {'icon': Icons.add_circle_outline_rounded, 'label': 'Beli', 'tone': 'gold'},
-      {'icon': Icons.sell_outlined, 'label': 'Jual', 'tone': 'red'},
-      {'icon': Icons.swap_horiz_rounded, 'label': 'Tukar', 'tone': 'violet'},
-      {'icon': Icons.history_rounded, 'label': 'Riwayat', 'tone': 'slate'},
+      {
+        'icon': Icons.add_circle_outline_rounded,
+        'label': 'Beli',
+        'tone': 'gold',
+        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BuyGoldScreen()))
+      },
+      {
+        'icon': Icons.sell_outlined,
+        'label': 'Jual',
+        'tone': 'red',
+        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SellGoldScreen()))
+      },
+      {
+        'icon': Icons.swap_horiz_rounded,
+        'label': 'Tukar',
+        'tone': 'violet',
+        'onTap': () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Pilih emas fisik di bawah lalu bayar dengan Saldo Emas Digital'))
+          );
+        }
+      },
+      {
+        'icon': Icons.history_rounded,
+        'label': 'Riwayat',
+        'tone': 'slate',
+        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TransactionsScreen()))
+      },
     ];
 
     return Container(
@@ -215,7 +242,7 @@ class HomeScreen extends StatelessWidget {
               children: actions.map((a) {
                 return Expanded(
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: a['onTap'] as VoidCallback,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Column(

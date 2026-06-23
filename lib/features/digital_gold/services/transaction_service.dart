@@ -19,6 +19,42 @@ class TransactionService {
     }
   }
 
+  Future<bool> buyDigitalGold(double grams, double pricePerGram) async {
+    try {
+      final response = await _apiClient.dio.post('/gold/buy', data: {
+        'gram_amount': grams,
+        'price_per_gram': pricePerGram,
+      });
+      return response.data['success'] == true;
+    } catch (e) {
+      if (e is DioException && e.response != null) {
+        final data = e.response?.data;
+        if (data is Map) {
+          throw Exception(data['message'] ?? data['error'] ?? data.toString());
+        }
+      }
+      throw Exception('Gagal membeli emas digital: $e');
+    }
+  }
+
+  Future<bool> sellDigitalGold(double grams, double pricePerGram) async {
+    try {
+      final response = await _apiClient.dio.post('/gold/sell', data: {
+        'gram_amount': grams,
+        'price_per_gram': pricePerGram,
+      });
+      return response.data['success'] == true;
+    } catch (e) {
+      if (e is DioException && e.response != null) {
+        final data = e.response?.data;
+        if (data is Map) {
+          throw Exception(data['message'] ?? data['error'] ?? data.toString());
+        }
+      }
+      throw Exception('Gagal menjual emas digital: $e');
+    }
+  }
+
   Future<List<TransactionModel>> getTransactions() async {
     try {
       final response = await _apiClient.dio.get('/transactions');
