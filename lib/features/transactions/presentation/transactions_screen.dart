@@ -14,6 +14,11 @@ class TransactionsScreen extends StatefulWidget {
 class _TransactionsScreenState extends State<TransactionsScreen> {
   final TransactionService _transactionService = TransactionService();
 
+  Future<void> _handleRefresh() async {
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
@@ -59,8 +64,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
+          return RefreshIndicator(
+            onRefresh: _handleRefresh,
+            color: AppColors.primary,
+            child: ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
             itemCount: digitalTrx.length,
             separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
@@ -137,6 +146,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 ),
               );
             },
+          ),
           );
         },
       ),

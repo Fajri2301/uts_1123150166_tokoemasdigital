@@ -11,8 +11,9 @@ void main() async {
   
   // Inisialisasi Firebase secara eksplisit
   try {
-    if (kIsWeb) {
-      // Wajib menggunakan options untuk platform Web
+    // Wajib menggunakan options untuk platform Web dan sangat disarankan untuk Mobile
+    // agar terhindar dari error 'No Firebase App [DEFAULT]'
+    try {
       await Firebase.initializeApp(
         options: const FirebaseOptions(
           apiKey: FirebaseConfig.apiKey,
@@ -24,12 +25,12 @@ void main() async {
           measurementId: FirebaseConfig.measurementId,
         ),
       );
-      debugPrint("Firebase initialized for Web");
-    } else {
-      // Android/iOS otomatis membaca dari google-services.json / GoogleService-Info.plist
-      await Firebase.initializeApp();
-      debugPrint("Firebase initialized for Mobile");
+    } catch (e) {
+      if (!e.toString().contains('duplicate-app')) {
+        debugPrint("Firebase initialization error: $e");
+      }
     }
+    debugPrint("Firebase initialized successfully");
 
     // Inisialisasi Notifikasi hanya jika Firebase berhasil
     await NotificationService().initialize();

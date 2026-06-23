@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -36,6 +36,12 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
       default:
         return category;
     }
+  }
+
+  Future<void> _handleRefresh() async {
+    // Delay for refresh animation
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) setState(() {});
   }
 
   @override
@@ -129,16 +135,19 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
   }
 
   Widget _buildProductGrid() {
-    Stream<QuerySnapshot> productsStream;
+    Future<List<ProductModel>> productsFuture;
     
     if (_selectedCategory == 'all') {
-      productsStream = _physicalGoldService.getAllProducts();
+      productsFuture = _physicalGoldService.getAllProducts();
     } else {
-      productsStream = _physicalGoldService.getProductsByCategory(_selectedCategory);
+      productsFuture = _physicalGoldService.getProductsByCategory(_selectedCategory);
     }
 
-    return StreamBuilder<QuerySnapshot>(
-      stream: productsStream,
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      color: const Color(0xFFFFD700),
+      child: FutureBuilder<List<ProductModel>>(
+        future: productsFuture,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(
@@ -157,13 +166,12 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
           );
         }
 
-        var products = snapshot.data!.docs;
+        var products = snapshot.data ?? [];
 
         // Filter by search query
         if (_searchQuery.isNotEmpty) {
-          products = products.where((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            final name = (data['name'] ?? '').toLowerCase();
+          products = products.where((product) {
+            final name = product.name.toLowerCase();
             return name.contains(_searchQuery);
           }).toList();
         }
@@ -178,6 +186,7 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
         }
 
         return GridView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(AppSpacing.padding),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: AppDimensions.gridColumns,
@@ -187,23 +196,28 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
           ),
           itemCount: products.length,
           itemBuilder: (context, index) {
-            final product = products[index].data() as Map<String, dynamic>;
-            final productId = products[index].id;
-            return _buildProductCard(product, productId);
+            final product = products[index];
+            return _buildProductCard(product);
           },
         );
       },
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product, String productId) {
+  Widget _buildProductCard(ProductModel product) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => ProductDetailScreen(
-              product: product,
-              productId: productId,
+              product: {
+                'name': product.name,
+                'description': product.description,
+                'price': product.price,
+                'image_url': product.imageUrl,
+                'category': product.category,
+              },
+              productId: product.id,
             ),
           ),
         );
@@ -221,9 +235,9 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(AppDimensions.radiusCard),
                 ),
-                child: product['image_url'] != null && product['image_url'].isNotEmpty
+                child: product.imageUrl.isNotEmpty
                     ? Image.network(
-                        product['image_url'],
+                        product.imageUrl,
                         fit: BoxFit.cover,
                         width: double.infinity,
                         errorBuilder: (context, error, stackTrace) {
@@ -253,7 +267,7 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product['name'] ?? 'Produk',
+                    product.name,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -264,7 +278,7 @@ class _PhysicalGoldScreenState extends State<PhysicalGoldScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    CurrencyFormatter.formatRupiah((product['price'] ?? 0.0).toDouble()),
+                    CurrencyFormatter.formatRupiah(product.price),
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFFFFD700),

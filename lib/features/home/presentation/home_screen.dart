@@ -16,14 +16,29 @@ import 'package:toko_emas_digital/features/digital_gold/presentation/sell_gold_s
 import 'package:toko_emas_digital/features/digital_gold/presentation/withdraw_screen.dart';
 import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Future<void> _handleRefresh() async {
+    // Delay to let the refresh animation play
+    await Future.delayed(const Duration(milliseconds: 800));
+    // Trigger rebuild to re-fetch FutureBuilder data
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
-      body: SingleChildScrollView(
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        color: AppColors.primary,
+        child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
@@ -132,6 +147,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

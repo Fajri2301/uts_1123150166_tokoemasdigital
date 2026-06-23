@@ -53,6 +53,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                 weight: (item['weight'] ?? 1.0).toDouble(),
                 category: item['category'] ?? '',
                 stock: item['stock'] ?? 0,
+                isAvailable: item['is_available'] ?? true,
               );
               
               return _buildProductItem(context, product);

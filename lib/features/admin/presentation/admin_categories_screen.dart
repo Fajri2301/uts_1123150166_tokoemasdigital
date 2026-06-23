@@ -20,14 +20,18 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
     return AdminScaffold(
       title: 'Kelola Kategori',
       showBackButton: true,
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _adminService.getAllCategories(),
+      body: FutureBuilder<List<dynamic>>(
+        future: _adminService.getAllCategories(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (snapshot.hasError) {
+             return Center(child: Text('Terjadi kesalahan: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text('Tidak ada kategori.', style: TextStyle(color: Colors.white70)),
             );
@@ -35,10 +39,13 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: snapshot.data!.docs.length,
+            itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              final category = CategoryModel.fromFirestore(doc);
+              final cat = snapshot.data![index] as Map<String, dynamic>;
+              final category = CategoryModel(
+                id: cat['id'].toString(),
+                name: cat['name'] ?? 'No Name',
+              );
               
               return _buildCategoryItem(context, category);
             },
