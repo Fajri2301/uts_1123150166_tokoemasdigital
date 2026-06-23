@@ -5,6 +5,7 @@ import 'package:toko_emas_digital/common/widgets/app_button.dart';
 import 'package:toko_emas_digital/common/widgets/app_field.dart';
 import 'package:toko_emas_digital/common/widgets/feature_icon.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WithdrawScreen extends StatefulWidget {
   const WithdrawScreen({super.key});
@@ -62,6 +63,13 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
       final success = await _transactionService.withdrawCash(amount);
       
       if (success && mounted) {
+        final Uri uri = Uri.parse('dompetkampus://topup?amount=$amount');
+        try {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } catch (e) {
+          debugPrint('Gagal membuka deeplink topup: $e');
+        }
+
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -71,7 +79,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
               child: FeatureIcon(icon: Icons.check_rounded, tone: 'green', size: 70, iconSize: 40),
             ),
             content: Text(
-              'Penarikan Dana sebesar ${CurrencyFormatter.formatRupiah(amount)} berhasil!\nDana telah ditransfer ke akun E-Money Anda.',
+              'Penarikan Dana sebesar ${CurrencyFormatter.formatRupiah(amount)} berhasil!\nSistem mencoba mengalihkan ke aplikasi E-Money Anda.',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.w500),
             ),
