@@ -69,11 +69,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (success && mounted) {
         if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {
           final Uri uri = Uri.parse(
-              'dompetnusantara://pay?merchant_id=TE01&merchant_name=Toko%20Emas%20Digital&amount=${widget.price}');
-          if (await canLaunchUrl(uri)) {
+              'dompetkampus://pay?merchant_id=TE01&merchant_name=Toko%20Emas%20Digital&amount=${widget.price}');
+          try {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
-          } else {
-            throw Exception('Gagal membuka Dompet Nusantara. Pastikan aplikasi E-Money sudah terinstall.');
+          } catch (e) {
+            throw Exception('Gagal membuka Dompet Nusantara. Pastikan aplikasi E-Money sudah berjalan/di-install. Error: $e');
           }
         }
 
