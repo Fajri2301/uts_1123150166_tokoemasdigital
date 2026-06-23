@@ -18,13 +18,16 @@ class TransactionService {
     }
   }
 
-  Future<bool> buyDigitalGold(double grams, String paymentMethod) async {
+  Future<int?> buyDigitalGold(double grams, String paymentMethod) async {
     try {
       final response = await _apiClient.dio.post('/gold/buy', data: {
         'gram_amount': grams,
         'payment_method': paymentMethod,
       });
-      return response.data['success'] == true;
+      if (response.data['success'] == true) {
+        return response.data['transaction_id'] as int?;
+      }
+      return null;
     } catch (e) {
       if (e is DioException && e.response != null) {
         final data = e.response?.data;

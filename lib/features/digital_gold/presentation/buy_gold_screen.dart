@@ -43,16 +43,25 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
       return;
     }
 
+    final totalPrice = grams * _pricePerGram;
     setState(() => _isLoading = true);
 
     try {
-      final success = await _transactionService.buyDigitalGold(grams, _selectedPaymentMethod);
+      final transactionId = await _transactionService.buyDigitalGold(grams, _selectedPaymentMethod);
       
-      if (success && mounted) {
+      if (transactionId != null && mounted) {
         if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {
-          final totalPrice = grams * _pricePerGram;
-          final Uri uri = Uri.parse(
-              'dompetkampus://pay?merchant_id=TE01&merchant_name=Beli%20Emas%20Digital&amount=$totalPrice');
+          final uri = Uri(
+            scheme: 'dompetkampus',
+            host: 'pay',
+            queryParameters: {
+              'merchant_id': 'TK-EMAS-01',
+              'merchant_name': 'Toko Emas Digital',
+              'amount': totalPrice.toString(),
+              'description': 'Pembelian $grams Gram Emas Digital',
+              'reference': transactionId.toString(),
+            },
+          );
           try {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           } catch (e) {
