@@ -63,7 +63,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
       final success = await _transactionService.withdrawCash(amount);
       
       if (success && mounted) {
-        final Uri uri = Uri.parse('dompetkampus://topup?amount=$amount');
+        final Uri uri = Uri.parse('danantara://topup?amount=$amount');
         try {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         } catch (e) {

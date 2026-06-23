@@ -68,7 +68,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (success && mounted) {
         if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {
           final Uri uri = Uri.parse(
-              'dompetkampus://pay?merchant_id=TE01&merchant_name=Toko%20Emas%20Digital&amount=${widget.price}');
+              'danantara://pay?merchant_id=TE01&merchant_name=Toko%20Emas%20Digital&amount=${widget.price}');
           try {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           } catch (e) {

@@ -52,7 +52,7 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
       if (transactionId != null && mounted) {
         if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {
           final uri = Uri(
-            scheme: 'dompetkampus',
+            scheme: 'danantara',
             host: 'pay',
             queryParameters: {
               'merchant_id': 'TK-EMAS-01',
