@@ -73,14 +73,15 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            backgroundColor: AppColors.surface,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.3))),
             title: const Center(
-              child: FeatureIcon(icon: Icons.check_rounded, tone: 'green', size: 70, iconSize: 40),
+              child: FeatureIcon(icon: Icons.check_circle_rounded, tone: 'green', size: 70, iconSize: 40),
             ),
             content: Text(
               'Pembelian ${grams.toStringAsFixed(3)} gr Emas Digital berhasil!',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontFamily: 'Poppins', color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
             ),
             actions: [
               AppButton(
@@ -95,7 +96,7 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: AppColors.error));
       }
     } finally {
       if (mounted) {
@@ -112,13 +113,13 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.ink, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Beli Emas Digital', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 17)),
+        title: const Text('Beli Emas Digital', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 17)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -129,20 +130,20 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: AppColors.shadowSoft,
+                border: Border.all(color: AppColors.darkGray),
               ),
               child: Column(
                 children: [
-                  const Text('Harga Beli Saat Ini', style: TextStyle(color: AppColors.slate500, fontSize: 13)),
+                  const Text('Harga Beli Saat Ini', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textSecondary, fontSize: 13)),
                   const SizedBox(height: 4),
-                  Text('${CurrencyFormatter.formatRupiah(_pricePerGram)} / gr', style: const TextStyle(color: AppColors.ink, fontSize: 18, fontWeight: FontWeight.w800)),
+                  Text('${CurrencyFormatter.formatRupiah(_pricePerGram)} / gr', style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 18, fontWeight: FontWeight.w800)),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Jumlah Beli (Gram)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.slate600)),
+            const Text('Jumlah Beli (Gram)', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
             const SizedBox(height: 8),
             AppField(
               label: '',
@@ -152,22 +153,22 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 24),
-            const Text('Metode Pembayaran', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.slate600)),
+            const Text('Metode Pembayaran', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.line, width: 1.5),
+                border: Border.all(color: AppColors.darkGray, width: 1.5),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: _selectedPaymentMethod,
-                  dropdownColor: Colors.white,
+                  dropdownColor: AppColors.surface,
                   isExpanded: true,
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.slate400),
-                  style: const TextStyle(color: AppColors.ink, fontSize: 14, fontWeight: FontWeight.w600),
+                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
+                  style: const TextStyle(fontFamily: 'Poppins', color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                   items: _paymentMethods.map((method) => DropdownMenuItem(value: method, child: Text(method))).toList(),
                   onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
                 ),
@@ -176,12 +177,12 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
             const SizedBox(height: 32),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: AppColors.darkGray, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.3))),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Total Bayar', style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w700)),
-                  Text(CurrencyFormatter.formatRupiah(totalPrice), style: const TextStyle(color: AppColors.primaryDark, fontSize: 18, fontWeight: FontWeight.w800)),
+                  const Text('Total Bayar', style: TextStyle(fontFamily: 'Poppins', color: AppColors.primaryLightGold, fontWeight: FontWeight.w700)),
+                  Text(CurrencyFormatter.formatRupiah(totalPrice), style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryGold, fontSize: 18, fontWeight: FontWeight.w800)),
                 ],
               ),
             ),

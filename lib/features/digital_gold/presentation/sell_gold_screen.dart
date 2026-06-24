@@ -67,14 +67,15 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            backgroundColor: AppColors.surface,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.3))),
             title: const Center(
-              child: FeatureIcon(icon: Icons.check_rounded, tone: 'green', size: 70, iconSize: 40),
+              child: FeatureIcon(icon: Icons.check_circle_rounded, tone: 'green', size: 70, iconSize: 40),
             ),
             content: Text(
               'Penjualan ${grams.toStringAsFixed(3)} gr Emas Digital berhasil!\nDana telah ditransfer ke rekening Anda.',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontFamily: 'Poppins', color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
             ),
             actions: [
               AppButton(
@@ -89,7 +90,7 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: AppColors.error));
       }
     } finally {
       if (mounted) {
@@ -106,13 +107,13 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.ink, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Jual Emas Digital', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 17)),
+        title: const Text('Tukar Saldo ke Uang Tunai', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 17)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -125,12 +126,12 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: AppColors.shadowSoft),
+                    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.darkGray)),
                     child: Column(
                       children: [
-                        const Text('Harga Jual Saat Ini', style: TextStyle(color: AppColors.slate500, fontSize: 12)),
+                        const Text('Harga Jual Saat Ini', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textSecondary, fontSize: 12)),
                         const SizedBox(height: 4),
-                        Text('${CurrencyFormatter.formatRupiah(_pricePerGram)} / gr', style: const TextStyle(color: AppColors.ink, fontSize: 15, fontWeight: FontWeight.w800)),
+                        Text('${CurrencyFormatter.formatRupiah(_pricePerGram)} / gr', style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 15, fontWeight: FontWeight.w800)),
                       ],
                     ),
                   ),
@@ -139,12 +140,12 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: AppColors.shadowSoft),
+                    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.darkGray)),
                     child: Column(
                       children: [
-                        const Text('Saldo Emas Anda', style: TextStyle(color: AppColors.slate500, fontSize: 12)),
+                        const Text('Saldo Emas Anda', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textSecondary, fontSize: 12)),
                         const SizedBox(height: 4),
-                        Text('${_currentBalance.toStringAsFixed(3)} gr', style: const TextStyle(color: AppColors.primary, fontSize: 16, fontWeight: FontWeight.w800)),
+                        Text('${_currentBalance.toStringAsFixed(3)} gr', style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 16, fontWeight: FontWeight.w800)),
                       ],
                     ),
                   ),
@@ -152,7 +153,7 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            const Text('Jumlah Jual (Gram)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.slate600)),
+            const Text('Jumlah Penukaran (Gram)', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
             const SizedBox(height: 8),
             AppField(
               label: '',
@@ -164,18 +165,18 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
             const SizedBox(height: 32),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: AppColors.greenSurface, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: AppColors.darkGray, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.3))),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Total Diterima', style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w700)),
-                  Text(CurrencyFormatter.formatRupiah(totalPrice), style: const TextStyle(color: AppColors.green, fontSize: 18, fontWeight: FontWeight.w800)),
+                  const Text('Total Diterima', style: TextStyle(fontFamily: 'Poppins', color: AppColors.primaryLightGold, fontWeight: FontWeight.w700)),
+                  Text(CurrencyFormatter.formatRupiah(totalPrice), style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryGold, fontSize: 18, fontWeight: FontWeight.w800)),
                 ],
               ),
             ),
             const SizedBox(height: 24),
             AppButton(
-              label: 'Jual Sekarang',
+              label: 'Tukar Sekarang',
               onPressed: (totalPrice > 0 && grams <= _currentBalance) ? _handleSell : null,
               isLoading: _isLoading,
             ),

@@ -278,8 +278,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Container(
             margin: const EdgeInsets.only(top: 16),
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: AppColors.line2)),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: AppColors.darkGray.withValues(alpha: 0.2))),
             ),
             child: Row(
               children: actions.map((a) {
@@ -299,9 +299,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 7),
                           Text(a['label'] as String,
                               style: const TextStyle(
+                                fontFamily: 'Poppins',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.slate600,
+                                color: AppColors.darkGray,
                               )),
                         ],
                       ),
