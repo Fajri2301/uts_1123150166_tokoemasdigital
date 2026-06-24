@@ -15,6 +15,8 @@ import 'package:toko_emas_digital/features/digital_gold/presentation/buy_gold_sc
 import 'package:toko_emas_digital/features/digital_gold/presentation/sell_gold_screen.dart';
 import 'package:toko_emas_digital/features/digital_gold/presentation/withdraw_screen.dart';
 import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
+import 'package:toko_emas_digital/common/widgets/gold_price_chart.dart';
+import 'package:toko_emas_digital/common/widgets/app_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -122,11 +124,34 @@ class _HomeScreenState extends State<HomeScreen> {
               offset: const Offset(0, -32),
               child: Column(
                 children: [
+                  // --- NEW CHART COMPONENT ---
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildGoldPriceRow(),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: AppColors.shadowSoft,
+                      ),
+                      child: Column(
+                        children: [
+                          const GoldPriceChart(),
+                          const SizedBox(height: 24),
+                          _buildGoldPriceRow(),
+                          const SizedBox(height: 16),
+                          AppButton(
+                            label: 'Lihat Grafik Lengkap',
+                            onPressed: () {},
+                            variant: AppButtonVariant.soft,
+                            fullWidth: true,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 18),
+                  // --- END NEW CHART COMPONENT ---
+                  const SizedBox(height: 24),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: _buildQuickActions(),
@@ -186,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(22),
         boxShadow: AppColors.shadowCard,
       ),
@@ -197,13 +222,14 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Row(
                 children: [
-                  const AppLogo(size: 26, light: false),
+                  const Icon(Icons.account_balance_wallet_rounded, color: AppColors.darkGray, size: 24),
                   const SizedBox(width: 7),
-                  const Text('Saldo Emas',
+                  const Text('Total Aset Emas',
                       style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.slate500,
+                        color: AppColors.darkGray,
                       )),
                 ],
               ),
@@ -216,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                  child: CircularProgressIndicator(color: AppColors.darkGray),
                 );
               }
               final balances = snapshot.data ?? {'grams': 0.0, 'rupiah': 0.0};
@@ -233,45 +259,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           '${grams.toStringAsFixed(3)} gr',
                           style: const TextStyle(
+                            fontFamily: 'Poppins',
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.ink,
+                            color: AppColors.darkGray,
                             letterSpacing: -0.5,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text('Total Gram', style: TextStyle(color: AppColors.slate500, fontSize: 11, fontWeight: FontWeight.w600)),
+                        Text('≈ ${currencyFormat.format(rupiah)}', style: const TextStyle(color: AppColors.darkGray, fontFamily: 'Roboto Mono', fontSize: 13, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
-                  Container(width: 1, height: 40, color: AppColors.line2, margin: const EdgeInsets.symmetric(horizontal: 12)),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          currencyFormat.format(rupiah),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.green,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Saldo Tunai', style: TextStyle(color: AppColors.slate500, fontSize: 11, fontWeight: FontWeight.w600)),
-                            GestureDetector(
-                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WithdrawScreen())),
-                              child: const Text('Tarik', style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold)),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                  const Icon(Icons.diamond_rounded, size: 64, color: AppColors.darkGray),
                 ],
               );
             }
@@ -323,9 +323,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.bg,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: AppColors.shadowSoft,
+              border: Border.all(color: AppColors.darkGray),
             ),
             child: Row(
               children: [
@@ -338,14 +338,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: const [
                       Text('Harga Beli',
                           style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 10.5,
-                              color: AppColors.slate500,
+                              color: AppColors.textSecondary,
                               fontWeight: FontWeight.w600)),
-                      Text('Rp 1.230.000',
+                      Text('Rp 1.104.000',
                           style: TextStyle(
+                              fontFamily: 'Roboto Mono', // or Poppins if Roboto Mono not available
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.ink)),
+                              color: AppColors.textPrimary)),
                     ],
                   ),
                 ),
@@ -358,9 +360,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.bg,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: AppColors.shadowSoft,
+              border: Border.all(color: AppColors.darkGray),
             ),
             child: Row(
               children: [
@@ -373,14 +375,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: const [
                       Text('Harga Jual',
                           style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 10.5,
-                              color: AppColors.slate500,
+                              color: AppColors.textSecondary,
                               fontWeight: FontWeight.w600)),
-                      Text('Rp 1.150.000',
+                      Text('Rp 1.109.000',
                           style: TextStyle(
+                              fontFamily: 'Roboto Mono', // or Poppins if Roboto Mono not available
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.ink)),
+                              color: AppColors.textPrimary)),
                     ],
                   ),
                 ),
@@ -401,9 +405,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: AppColors.shadowSoft,
+        border: Border.all(color: AppColors.darkGray),
       ),
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
       child: Row(
@@ -419,9 +423,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 8),
                 Text(f['label'] as String,
                     style: const TextStyle(
+                      fontFamily: 'Poppins',
                       fontSize: 11.8,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.slate600,
+                      color: AppColors.textSecondary,
                     )),
               ],
             ),
@@ -438,7 +443,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Text(
           title,
           style: const TextStyle(
-            color: AppColors.ink,
+            fontFamily: 'Poppins',
+            color: AppColors.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -446,7 +452,8 @@ class _HomeScreenState extends State<HomeScreen> {
         const Text(
           'Lihat Semua',
           style: TextStyle(
-            color: AppColors.primary,
+            fontFamily: 'Poppins',
+            color: AppColors.primaryGold,
             fontSize: 13,
             fontWeight: FontWeight.w700,
           ),
