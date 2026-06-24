@@ -15,7 +15,6 @@ class DigitalGoldService {
       return 0.0;
     }
   }
-  final ApiClient _apiClient = ApiClient();
 
   // Buy digital gold with Transaction for safety
   Future<bool> buyGold({
