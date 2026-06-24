@@ -5,6 +5,7 @@ import '../../../common/widgets/app_button.dart';
 import '../../../common/widgets/app_field.dart';
 import '../services/digital_gold_service.dart';
 import '../../../core/utils/currency_formatter.dart';
+import 'checkout_gold_screen.dart';
 
 class ConvertGoldScreen extends StatefulWidget {
   const ConvertGoldScreen({super.key});
@@ -73,104 +74,11 @@ class _ConvertGoldScreenState extends State<ConvertGoldScreen> {
       return;
     }
 
-    final addressController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    bool isProcessing = false;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Container(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-                top: 24,
-                left: 24,
-                right: 24,
-              ),
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'Tukar dengan ${item['name']}',
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Saldo akan dipotong sebesar ${item['weight']} gram.',
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    AppField(
-                      label: 'Alamat Pengiriman',
-                      placeholder: 'Masukkan alamat lengkap beserta kode pos',
-                      controller: addressController,
-                      maxLines: 3,
-                      validator: (val) => val == null || val.isEmpty ? 'Alamat wajib diisi' : null,
-                    ),
-                    const SizedBox(height: 24),
-                    AppButton(
-                      label: 'Konfirmasi Penukaran',
-                      isLoading: isProcessing,
-                      onPressed: () async {
-                        if (!formKey.currentState!.validate()) return;
-                        setModalState(() => isProcessing = true);
-                        
-                        try {
-                          bool success = await _digitalGoldService.convertToPhysical(
-                            userId: FirebaseAuth.instance.currentUser!.uid,
-                            gramAmount: item['weight'],
-                            address: addressController.text,
-                          );
-
-                          if (success && mounted) {
-                            Navigator.pop(context); // close sheet
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Berhasil mengajukan penukaran fisik!'),
-                                backgroundColor: AppColors.success,
-                              ),
-                            );
-                            Navigator.of(this.context).pop(true); // go back
-                          }
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(e.toString().replaceAll('Exception: ', '')),
-                              backgroundColor: AppColors.error,
-                            ),
-                          );
-                        } finally {
-                          setModalState(() => isProcessing = false);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-        );
-      }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CheckoutGoldScreen(item: item),
+      ),
     );
   }
 
