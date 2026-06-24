@@ -72,9 +72,9 @@ class AppButton extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontFamily: 'PlusJakartaSans',
+                  fontFamily: 'Poppins',
                   fontSize: fontSize,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: fg,
                   letterSpacing: 0.1,
                 ),
@@ -89,34 +89,34 @@ class AppButton extends StatelessWidget {
   (Color, Color, List<BoxShadow>, Border?) _resolveStyle() {
     return switch (variant) {
       AppButtonVariant.primary => (
-          AppColors.primary,
-          Colors.white,
+          AppColors.primaryGold,
+          AppColors.bg,
           AppColors.shadowPrimary,
           null,
         ),
-      AppButtonVariant.dark => (AppColors.ink, Colors.white, [], null),
-      AppButtonVariant.soft => (AppColors.primarySurface, AppColors.primary, [], null),
-      AppButtonVariant.ghost => (Colors.transparent, AppColors.slate600, [], null),
+      AppButtonVariant.dark => (AppColors.surface, AppColors.textPrimary, [], null),
+      AppButtonVariant.soft => (AppColors.darkGray, AppColors.primaryGold, [], null),
+      AppButtonVariant.ghost => (Colors.transparent, AppColors.textSecondary, [], null),
       AppButtonVariant.outline => (
-          Colors.white,
-          AppColors.ink,
+          Colors.transparent,
+          AppColors.primaryGold,
           [],
-          Border.all(color: AppColors.line, width: 1.5),
+          Border.all(color: AppColors.primaryGold, width: 1.5),
         ),
       AppButtonVariant.outlineWhite => (
           Colors.transparent,
-          Colors.white,
+          AppColors.textPrimary,
           [],
-          Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.5),
+          Border.all(color: AppColors.textPrimary.withValues(alpha: 0.7), width: 1.5),
         ),
       AppButtonVariant.white => (
-          Colors.white,
-          AppColors.primary,
+          AppColors.textPrimary,
+          AppColors.bg,
           [BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 20, offset: const Offset(0, 8))],
           null,
         ),
-      AppButtonVariant.danger => (AppColors.red, Colors.white, [], null),
-      AppButtonVariant.success => (AppColors.green, Colors.white, [], null),
+      AppButtonVariant.danger => (AppColors.error, AppColors.textPrimary, [], null),
+      AppButtonVariant.success => (AppColors.success, AppColors.textPrimary, [], null),
     };
   }
 }
