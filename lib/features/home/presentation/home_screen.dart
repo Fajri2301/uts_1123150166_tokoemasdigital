@@ -4,7 +4,6 @@ import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
 import 'package:toko_emas_digital/common/widgets/product_card.dart';
 import 'package:toko_emas_digital/common/widgets/feature_icon.dart';
 import 'package:toko_emas_digital/common/widgets/app_avatar.dart';
-import 'package:toko_emas_digital/common/widgets/app_logo.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/catalog_service.dart';
 import 'package:toko_emas_digital/features/physical_gold/models/product_model.dart';
 import 'package:intl/intl.dart';
@@ -13,10 +12,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
 import 'package:toko_emas_digital/features/digital_gold/presentation/buy_gold_screen.dart';
 import 'package:toko_emas_digital/features/digital_gold/presentation/sell_gold_screen.dart';
-import 'package:toko_emas_digital/features/digital_gold/presentation/withdraw_screen.dart';
+import 'package:toko_emas_digital/features/digital_gold/presentation/convert_gold_screen.dart';
 import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
 import 'package:toko_emas_digital/common/widgets/gold_price_chart.dart';
-import 'package:toko_emas_digital/common/widgets/app_button.dart';
+import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,85 +24,138 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(_pulseController);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
   Future<void> _handleRefresh() async {
-    // Delay to let the refresh animation play
     await Future.delayed(const Duration(milliseconds: 800));
-    // Trigger rebuild to re-fetch FutureBuilder data
     if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: RefreshIndicator(
-        onRefresh: _handleRefresh,
-        color: AppColors.primary,
-        child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          children: [
-            // Gradient header
-            Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(28),
-                  bottomRight: Radius.circular(28),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: RadialGradient(
+          colors: [Color(0xFF1A150A), Colors.black],
+          center: Alignment(0, -0.4),
+          radius: 0.8,
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: RefreshIndicator(
+          onRefresh: _handleRefresh,
+          color: AppColors.primaryGold,
+          backgroundColor: AppColors.surface,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              _buildSliverAppBar(),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24).copyWith(bottom: 120),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    _buildDualBalanceCard(context),
+                    const SizedBox(height: 32),
+                    _buildMarketChartSection(),
+                    const SizedBox(height: 32),
+                    _buildQuickActions(),
+                    const SizedBox(height: 32),
+                    _buildSectionTitle('Emas Fisik'),
+                    const SizedBox(height: 16),
+                    _buildProductCatalog(),
+                  ]),
                 ),
               ),
-              padding: EdgeInsets.fromLTRB(
-                  20, MediaQuery.of(context).padding.top + 12, 20, 94),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSliverAppBar() {
+    return SliverAppBar(
+      pinned: true,
+      backgroundColor: Colors.black.withValues(alpha: 0.7),
+      elevation: 0,
+      expandedHeight: 80,
+      collapsedHeight: 70,
+      toolbarHeight: 70,
+      flexibleSpace: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 12),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AppAvatar(
-                      name: 'Fajri',
-                      size: 44,
-                      bg: Colors.white.withValues(alpha: 0.25)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Selamat datang,',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white70,
-                            )),
-                        Text(FirebaseAuth.instance.currentUser?.displayName ?? 'Pengguna',
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: -0.2,
-                            )),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.3)),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: const AppAvatar(name: 'Invest', size: 40, bg: Colors.transparent),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Selamat datang,', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
+                          Text(
+                            FirebaseAuth.instance.currentUser?.displayName ?? 'Investor Danantara',
+                            style: const TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary, height: 1.2),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   Stack(
                     children: [
                       Container(
-                        width: 42,
-                        height: 42,
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.18),
-                          borderRadius: BorderRadius.circular(14),
+                          shape: BoxShape.circle,
+                          color: AppColors.surface.withValues(alpha: 0.5),
                         ),
-                        child: const Icon(Icons.notifications_outlined,
-                            size: 21, color: Colors.white),
+                        child: const Icon(Icons.notifications_rounded, color: AppColors.primaryGold, size: 24),
                       ),
                       Positioned(
-                        top: 10,
-                        right: 11,
+                        top: 4,
+                        right: 4,
                         child: Container(
-                          width: 8,
-                          height: 8,
+                          width: 10,
+                          height: 10,
                           decoration: BoxDecoration(
-                            color: AppColors.amber,
+                            color: AppColors.error,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(color: Colors.black, width: 2),
                           ),
                         ),
                       ),
@@ -112,285 +164,210 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            // Balance Card (overlaps the header's bottom edge)
-            Transform.translate(
-              offset: const Offset(0, -46),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildGoldBalanceCard(context),
-              ),
-            ),
-            Transform.translate(
-              offset: const Offset(0, -32),
-              child: Column(
-                children: [
-                  // --- NEW CHART COMPONENT ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: AppColors.shadowSoft,
-                      ),
-                      child: Column(
-                        children: [
-                          const GoldPriceChart(),
-                          const SizedBox(height: 24),
-                          _buildGoldPriceRow(),
-                          const SizedBox(height: 16),
-                          AppButton(
-                            label: 'Lihat Grafik Lengkap',
-                            onPressed: () {},
-                            variant: AppButtonVariant.soft,
-                            fullWidth: true,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // --- END NEW CHART COMPONENT ---
-                  const SizedBox(height: 24),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildQuickActions(),
-                  ),
-                  const SizedBox(height: 24),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildSectionTitle('Katalog Produk'),
-                  ),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildProductCatalog(),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
       ),
     );
   }
 
-  Widget _buildGoldBalanceCard(BuildContext context) {
-    final actions = [
-      {
-        'icon': Icons.add_circle_outline_rounded,
-        'label': 'Beli',
-        'tone': 'gold',
-        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BuyGoldScreen()))
-      },
-      {
-        'icon': Icons.sell_outlined,
-        'label': 'Jual',
-        'tone': 'red',
-        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SellGoldScreen()))
-      },
-      {
-        'icon': Icons.swap_horiz_rounded,
-        'label': 'Tukar',
-        'tone': 'violet',
-        'onTap': () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Pilih emas fisik di bawah lalu bayar dengan Saldo Emas Digital'))
-          );
-        }
-      },
-      {
-        'icon': Icons.history_rounded,
-        'label': 'Riwayat',
-        'tone': 'slate',
-        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TransactionsScreen()))
-      },
-    ];
+  Widget _buildDualBalanceCard(BuildContext context) {
+    return FutureBuilder<Map<String, double>>(
+      future: TransactionService().getWalletBalance(),
+      builder: (context, snapshot) {
+        final balances = snapshot.data ?? {'grams': 0.0, 'rupiah': 0.0};
+        final grams = balances['grams']!;
+        final rupiah = balances['rupiah']!;
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: AppColors.shadowCard,
-      ),
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.account_balance_wallet_rounded, color: AppColors.darkGray, size: 24),
-                  const SizedBox(width: 7),
-                  const Text('Total Aset Emas',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.darkGray,
-                      )),
-                ],
-              ),
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.15)),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 10)),
             ],
           ),
-          const SizedBox(height: 12),
-          FutureBuilder<Map<String, double>>(
-            future: TransactionService().getWalletBalance(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: CircularProgressIndicator(color: AppColors.darkGray),
-                );
-              }
-              final balances = snapshot.data ?? {'grams': 0.0, 'rupiah': 0.0};
-              final grams = balances['grams']!;
-              final rupiah = balances['rupiah']!;
-              final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
-              
-              return Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${grams.toStringAsFixed(3)} gr',
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 26,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.darkGray,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text('≈ ${currencyFormat.format(rupiah)}', style: const TextStyle(color: AppColors.darkGray, fontFamily: 'Roboto Mono', fontSize: 13, fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.diamond_rounded, size: 64, color: AppColors.darkGray),
-                ],
-              );
-            }
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 16),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: AppColors.darkGray.withValues(alpha: 0.2))),
-            ),
-            child: Row(
-              children: actions.map((a) {
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: a['onTap'] as VoidCallback,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Column(
-                        children: [
-                          FeatureIcon(
-                            icon: a['icon'] as IconData,
-                            tone: a['tone'] as String,
-                            size: 46,
-                            iconSize: 22,
-                          ),
-                          const SizedBox(height: 7),
-                          Text(a['label'] as String,
-                              style: const TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.darkGray,
-                              )),
-                        ],
+          child: Stack(
+            children: [
+              // Abstract gold mesh background
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.15,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      gradient: RadialGradient(
+                        colors: [AppColors.primaryGold, Colors.transparent],
+                        center: const Alignment(0.8, -0.8),
+                        radius: 1.5,
                       ),
                     ),
                   ),
-                );
-              }).toList(),
-            ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('SALDO EMAS', style: TextStyle(fontFamily: 'Inter', fontSize: 10, color: AppColors.primaryLightGold, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
+                                children: [
+                                  Text(grams.toStringAsFixed(3), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
+                                  const SizedBox(width: 4),
+                                  Text('gr', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 12, color: AppColors.primaryGold.withValues(alpha: 0.6))),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(width: 1, height: 40, color: AppColors.primaryGold.withValues(alpha: 0.1)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Text('SALDO RUPIAH', style: TextStyle(fontFamily: 'Inter', fontSize: 10, color: AppColors.primaryLightGold, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
+                                children: [
+                                  Text('Rp', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 12, color: AppColors.primaryGold.withValues(alpha: 0.6))),
+                                  const SizedBox(width: 4),
+                                  Text(CurrencyFormatter.formatRupiah(rupiah).replaceAll('Rp ', ''), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Divider(height: 1, color: Colors.white10),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildActionBtn(Icons.add_shopping_cart_rounded, 'Beli', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BuyGoldScreen()))),
+                        _buildActionBtn(Icons.sell_rounded, 'Jual', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SellGoldScreen()))),
+                        _buildActionBtn(Icons.sync_alt_rounded, 'Tukar', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConvertGoldScreen()))),
+                        _buildActionBtn(Icons.history_rounded, 'Riwayat', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TransactionsScreen()))),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildActionBtn(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.surface.withValues(alpha: 0.4),
+              border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.2)),
+            ),
+            child: Icon(icon, color: AppColors.primaryGold, size: 24),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textPrimary)),
         ],
       ),
     );
   }
 
-  Widget _buildGoldPriceRow() {
-    return Row(
+  Widget _buildMarketChartSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.bg,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.darkGray),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(colors: [AppColors.primaryGold, AppColors.primaryDark]).createShader(bounds),
+              child: const Text('Harga Pasar', style: TextStyle(fontFamily: 'Poppins', fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
             ),
-            child: Row(
+            Row(
               children: [
-                const FeatureIcon(
-                    icon: Icons.trending_up_rounded, tone: 'green', size: 38, iconSize: 19),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text('Harga Beli',
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 10.5,
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w600)),
-                      Text('Rp 1.104.000',
-                          style: TextStyle(
-                              fontFamily: 'Roboto Mono', // or Poppins if Roboto Mono not available
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary)),
-                    ],
-                  ),
+                const Text('Live', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.primaryGold)),
+                const SizedBox(width: 4),
+                FadeTransition(
+                  opacity: _pulseAnimation,
+                  child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.primaryGold, shape: BoxShape.circle)),
                 ),
               ],
             ),
-          ),
+          ],
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-            decoration: BoxDecoration(
-              color: AppColors.bg,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.darkGray),
-            ),
-            child: Row(
-              children: [
-                const FeatureIcon(
-                    icon: Icons.trending_down_rounded, tone: 'red', size: 36, iconSize: 18),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Column(
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.15)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text('Harga Jual',
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 10.5,
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w600)),
-                      Text('Rp 1.109.000',
-                          style: TextStyle(
-                              fontFamily: 'Roboto Mono', // or Poppins if Roboto Mono not available
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary)),
+                    children: [
+                      const Text('Harga Beli', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
+                      const Text('Rp 1.054.000/gr', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary)),
+                      Row(
+                        children: [
+                          const Icon(Icons.trending_up_rounded, color: Colors.greenAccent, size: 14),
+                          const SizedBox(width: 2),
+                          const Text('+0.42%', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 10, color: Colors.greenAccent)),
+                        ],
+                      ),
                     ],
                   ),
-                ),
-              ],
-            ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text('Harga Jual', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
+                      const Text('Rp 960.000/gr', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(Icons.trending_down_rounded, color: Colors.redAccent, size: 14),
+                          const SizedBox(width: 2),
+                          const Text('-0.12%', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 10, color: Colors.redAccent)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const GoldPriceChart(),
+            ],
           ),
         ),
       ],
@@ -398,66 +375,48 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildQuickActions() {
-    final features = [
-      {'icon': Icons.storefront_outlined, 'label': 'Fisik', 'tone': 'gold'},
-      {'icon': Icons.diamond_outlined, 'label': 'Perhiasan', 'tone': 'violet'},
-      {'icon': Icons.local_shipping_outlined, 'label': 'Tracking', 'tone': 'blue'},
-      {'icon': Icons.admin_panel_settings_outlined, 'label': 'Admin', 'tone': 'red'},
-    ];
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.darkGray),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: features.map((f) {
-          return GestureDetector(
-            onTap: () {},
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FeatureIcon(
-                    icon: f['icon'] as IconData, tone: f['tone'] as String, size: 50, iconSize: 24),
-                const SizedBox(height: 8),
-                Text(f['label'] as String,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 11.8,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
-                    )),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildSmallActionBtn(Icons.account_balance_rounded, 'Tarik Tunai'),
+        _buildSmallActionBtn(Icons.redeem_rounded, 'Promo'),
+        _buildSmallActionBtn(Icons.support_agent_rounded, 'Bantuan'),
+        _buildSmallActionBtn(Icons.grid_view_rounded, 'Lainnya'),
+      ],
+    );
+  }
+
+  Widget _buildSmallActionBtn(IconData icon, String label) {
+    return Column(
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.surface.withValues(alpha: 0.4),
+            border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.15)),
+          ),
+          child: Icon(icon, color: AppColors.primaryGold, size: 24),
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: const TextStyle(fontFamily: 'Inter', fontSize: 11, color: AppColors.textPrimary), textAlign: TextAlign.center),
+      ],
     );
   }
 
   Widget _buildSectionTitle(String title) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            color: AppColors.textPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+        ShaderMask(
+          shaderCallback: (bounds) => const LinearGradient(colors: [AppColors.primaryGold, AppColors.primaryDark]).createShader(bounds),
+          child: Text(title, style: const TextStyle(fontFamily: 'Poppins', fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
         ),
         const Text(
           'Lihat Semua',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            color: AppColors.primaryGold,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
+          style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.primaryGold),
         ),
       ],
     );
@@ -470,24 +429,12 @@ class _HomeScreenState extends State<HomeScreen> {
       stream: CatalogService().getProducts(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
-          );
-        }
-
-        if (snapshot.hasError) {
-          return Center(
-            child: Text('Terjadi kesalahan: ${snapshot.error}',
-                style: const TextStyle(color: AppColors.slate600)),
-          );
+          return const Center(child: CircularProgressIndicator(color: AppColors.primaryGold));
         }
 
         final products = snapshot.data ?? [];
         if (products.isEmpty) {
-          return const Center(
-            child: Text('Katalog produk masih kosong.',
-                style: TextStyle(color: AppColors.slate500)),
-          );
+          return const Center(child: Text('Katalog kosong.', style: TextStyle(color: AppColors.textSecondary)));
         }
 
         return GridView.builder(
@@ -503,11 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
           itemCount: products.length,
           itemBuilder: (context, index) {
             final product = products[index];
-            return ProductCard(
-              name: product.name,
-              price: currencyFormat.format(product.price),
-              description: product.description,
-              imageUrl: product.imageUrl,
+            return GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
@@ -525,6 +468,47 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.surface.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.15)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.darkGray.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(image: NetworkImage(product.imageUrl), fit: BoxFit.cover),
+                        ),
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            margin: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGold.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.2)),
+                            ),
+                            child: const Text('99.9%', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(product.name, style: const TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 2),
+                    const Text('24 Karat', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 11, color: AppColors.textSecondary)),
+                    const SizedBox(height: 4),
+                    Text(currencyFormat.format(product.price), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 14, color: AppColors.primaryGold)),
+                  ],
+                ),
+              ),
             );
           },
         );
