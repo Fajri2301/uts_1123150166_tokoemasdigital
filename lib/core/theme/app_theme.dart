@@ -7,40 +7,39 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
-      primaryColor: AppColors.primary,
+      brightness: Brightness.dark,
+      primaryColor: AppColors.primaryGold,
       scaffoldBackgroundColor: AppColors.bg,
       
-      // Font PlusJakartaSans
-      textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.light().textTheme).apply(
-        bodyColor: AppColors.ink,
-        displayColor: AppColors.ink,
+      // Font Poppins (Primary Font)
+      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme).apply(
+        bodyColor: AppColors.textPrimary,
+        displayColor: AppColors.textPrimary,
       ),
 
       // Konfigurasi AppBar
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         elevation: 0,
         centerTitle: true,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
         ),
-        iconTheme: IconThemeData(color: AppColors.ink),
+        iconTheme: IconThemeData(color: AppColors.textPrimary),
         titleTextStyle: TextStyle(
-          color: AppColors.ink,
-          fontSize: 17,
-          fontWeight: FontWeight.bold,
+          color: AppColors.textPrimary,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Poppins',
         ),
       ),
-
-
 
       // Konfigurasi Button (ElevatedButton)
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.primaryGold,
+          foregroundColor: AppColors.bg,
           minimumSize: const Size(double.infinity, 54),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -49,6 +48,7 @@ class AppTheme {
             fontSize: 16,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.1,
+            fontFamily: 'Poppins',
           ),
         ),
       ),
@@ -56,25 +56,27 @@ class AppTheme {
       // Konfigurasi Input (TextField)
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+        fillColor: AppColors.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        labelStyle: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Poppins'),
+        hintStyle: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Poppins'),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.line, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.darkGray, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.line, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.darkGray, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5),
         ),
       ),
 
-      dividerColor: AppColors.line2,
+      dividerColor: AppColors.darkGray,
       dividerTheme: const DividerThemeData(
-        color: AppColors.line2,
+        color: AppColors.darkGray,
         thickness: 1,
       ),
     );
