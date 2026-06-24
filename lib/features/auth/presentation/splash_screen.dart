@@ -5,7 +5,6 @@ import 'package:toko_emas_digital/features/auth/presentation/login_screen.dart';
 import 'package:toko_emas_digital/features/home/presentation/main_screen.dart';
 import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_screen.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
-import 'package:toko_emas_digital/core/utils/color_extension.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -29,7 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
     if (mounted) {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Cek Role User: Admin atau User?
         String role = await _authService.getUserRole(user.uid);
         
         if (mounted) {
@@ -54,39 +52,43 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bg,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 100,
-              height: 100,
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.goldAccent,
-                borderRadius: BorderRadius.circular(20),
+                shape: BoxShape.circle,
+                gradient: AppColors.primaryGradient,
+                boxShadow: AppColors.shadowPrimary,
               ),
-              child: Icon(
-                Icons.monetization_on,
-                size: 60,
-                color: AppColors.background,
+              child: const Icon(
+                Icons.dashboard_customize_rounded, // Placeholder for gold ingot
+                size: 64,
+                color: AppColors.bg,
               ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              'Toko Emas Digital',
+            const SizedBox(height: 32),
+            const Text(
+              'Gold Century',
               style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColors.goldAccent,
+                fontFamily: 'Poppins',
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primaryLightGold,
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Investasi Emas Mudah & Aman',
+            const Text(
+              'Investasi Emas Digital\nAman, Mudah, Terpercaya',
+              textAlign: TextAlign.center,
               style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 14,
                 color: AppColors.textSecondary,
+                height: 1.5,
               ),
             ),
           ],
