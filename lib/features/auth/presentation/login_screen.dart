@@ -6,7 +6,6 @@ import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_sc
 import 'package:toko_emas_digital/features/auth/presentation/register_screen.dart';
 import 'package:toko_emas_digital/common/widgets/app_field.dart';
 import 'package:toko_emas_digital/common/widgets/app_button.dart';
-import 'package:toko_emas_digital/common/widgets/app_logo.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/utils/app_validator.dart';
 
@@ -106,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.bg,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -116,26 +115,31 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                const AppLogo(size: 80, light: true),
-                const SizedBox(height: 32),
-                const Text(
-                  'Selamat Datang',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.ink,
-                    letterSpacing: -0.5,
-                  ),
-                  textAlign: TextAlign.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.dashboard_customize_rounded, color: AppColors.primaryGold, size: 32),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Gold Century',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryLightGold,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 48),
                 const Text(
-                  'Masuk ke akun Toko Emas Anda untuk melanjutkan',
+                  'Login ke Akun Anda',
                   style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.slate500,
+                    fontFamily: 'Poppins',
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
 
@@ -150,14 +154,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(color: AppColors.red, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: AppColors.red, fontWeight: FontWeight.w600, fontFamily: 'Poppins'),
                       textAlign: TextAlign.center,
                     ),
                   ),
 
                 AppField(
-                  label: 'Email',
-                  placeholder: 'Masukkan email',
+                  label: 'Alamat Email',
+                  placeholder: 'Masukkan email Anda',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -178,7 +182,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'Lupa Password?',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        color: AppColors.primaryGold,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
 
                 AppButton(
                   label: 'Masuk',
@@ -189,35 +209,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 24),
 
                 Row(
-                  children: [
-                    const Expanded(child: Divider(color: AppColors.line)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: const Text(
-                        'Atau masuk dengan',
-                        style: TextStyle(color: AppColors.slate500, fontSize: 13),
-                      ),
-                    ),
-                    const Expanded(child: Divider(color: AppColors.line)),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                AppButton(
-                  label: 'Google',
-                  onPressed: _isLoading ? () {} : _handleGoogleLogin,
-                  variant: AppButtonVariant.outline,
-                  icon: const Icon(Icons.g_mobiledata),
-                ),
-                
-                const SizedBox(height: 32),
-
-                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       'Belum punya akun? ',
-                      style: TextStyle(color: AppColors.slate500),
+                      style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Poppins', fontSize: 13),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -228,12 +224,38 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Daftar',
                         style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryGold,
+                          fontFamily: 'Poppins',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
+                ),
+
+                const SizedBox(height: 32),
+
+                Row(
+                  children: [
+                    const Expanded(child: Divider(color: AppColors.darkGray)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: const Text(
+                        'atau masuk dengan',
+                        style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Poppins', fontSize: 12),
+                      ),
+                    ),
+                    const Expanded(child: Divider(color: AppColors.darkGray)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                AppButton(
+                  label: 'Google',
+                  onPressed: _isLoading ? () {} : _handleGoogleLogin,
+                  variant: AppButtonVariant.outlineWhite,
+                  icon: const Icon(Icons.g_mobiledata, size: 28),
                 ),
               ],
             ),
