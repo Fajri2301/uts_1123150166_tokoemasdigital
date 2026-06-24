@@ -82,10 +82,10 @@ class _AppFieldState extends State<AppField> {
           Text(
             widget.label!,
             style: const TextStyle(
-              fontFamily: 'PlusJakartaSans',
+              fontFamily: 'Poppins',
               fontSize: 13.5,
               fontWeight: FontWeight.w600,
-              color: AppColors.slate600,
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -93,16 +93,16 @@ class _AppFieldState extends State<AppField> {
         AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: _focused ? AppColors.primary : AppColors.line,
+              color: _focused ? AppColors.primaryGold : AppColors.darkGray,
               width: 1.0,
             ),
             boxShadow: _focused
                 ? [
                     BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.1), blurRadius: 0, spreadRadius: 4)
+                        color: AppColors.primaryGold.withValues(alpha: 0.1), blurRadius: 0, spreadRadius: 4)
                   ]
                 : [],
           ),
@@ -112,7 +112,7 @@ class _AppFieldState extends State<AppField> {
                 const SizedBox(width: 14),
                 ColorFiltered(
                   colorFilter: ColorFilter.mode(
-                    _focused ? AppColors.primary : AppColors.slate400,
+                    _focused ? AppColors.primaryGold : AppColors.textSecondary,
                     BlendMode.srcIn,
                   ),
                   child: widget.prefixIcon!,
@@ -135,18 +135,18 @@ class _AppFieldState extends State<AppField> {
                     onEditingComplete: widget.onEditingComplete,
                     validator: widget.validator,
                     style: const TextStyle(
-                      fontFamily: 'PlusJakartaSans',
+                      fontFamily: 'Poppins',
                       fontSize: 15.5,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.ink,
+                      color: AppColors.textPrimary,
                     ),
                     decoration: InputDecoration(
                       hintText: widget.placeholder,
                       hintStyle: const TextStyle(
-                        fontFamily: 'PlusJakartaSans',
+                        fontFamily: 'Poppins',
                         fontSize: 15.5,
                         fontWeight: FontWeight.w400,
-                        color: AppColors.slate300,
+                        color: AppColors.darkGray,
                       ),
                       border: InputBorder.none,
                       isDense: true,
