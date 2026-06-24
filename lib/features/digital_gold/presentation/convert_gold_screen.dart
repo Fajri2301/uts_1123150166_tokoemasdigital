@@ -4,6 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../common/widgets/app_button.dart';
 import '../../../common/widgets/app_field.dart';
 import '../services/digital_gold_service.dart';
+import '../../../core/utils/currency_formatter.dart';
 
 class ConvertGoldScreen extends StatefulWidget {
   const ConvertGoldScreen({super.key});
@@ -13,55 +14,164 @@ class ConvertGoldScreen extends StatefulWidget {
 }
 
 class _ConvertGoldScreenState extends State<ConvertGoldScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _gramController = TextEditingController();
-  final _addressController = TextEditingController();
   final _digitalGoldService = DigitalGoldService();
-
   bool _isLoading = false;
-  String? _errorMessage;
+  double _userBalance = 0.0;
 
-  Future<void> _handleConvertGold() async {
-    if (!_formKey.currentState!.validate()) return;
+  final List<Map<String, dynamic>> _catalogItems = [
+    {
+      'name': '1g Gold Bar',
+      'purity': '999.9 Purity',
+      'weight': 1.0,
+      'image': 'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&q=80&w=600',
+      'tag': 'IN STOCK'
+    },
+    {
+      'name': '5g Gold Bar',
+      'purity': 'Certified LBMA',
+      'weight': 5.0,
+      'image': 'https://images.unsplash.com/photo-1610375279624-b13180b5fa86?auto=format&fit=crop&q=80&w=600',
+      'tag': 'POPULAR'
+    },
+    {
+      'name': 'Gold Ring Elegant',
+      'purity': '22K Solid',
+      'weight': 8.4,
+      'image': 'https://images.unsplash.com/photo-1605100804763-247f66156ce4?auto=format&fit=crop&q=80&w=600',
+      'tag': ''
+    },
+    {
+      'name': 'Gold Bracelet',
+      'purity': '24K Artisan',
+      'weight': 15.2,
+      'image': 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=600',
+      'tag': ''
+    },
+  ];
 
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+  @override
+  void initState() {
+    super.initState();
+    _loadBalance();
+  }
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      double grams = double.parse(_gramController.text);
-      String address = _addressController.text;
-
-      bool success = await _digitalGoldService.convertToPhysical(
-        userId: user.uid,
-        gramAmount: grams,
-        address: address,
-      );
-
-      if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Berhasil mengajukan konversi emas!'),
-            backgroundColor: AppColors.green,
-          ),
-        );
-        Navigator.of(context).pop(true);
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
-      });
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+  Future<void> _loadBalance() async {
+    final balance = await _digitalGoldService.getBalance();
+    if (mounted) {
+      setState(() => _userBalance = balance);
     }
+  }
+
+  void _showCheckoutSheet(Map<String, dynamic> item) {
+    if (_userBalance < item['weight']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Saldo emas digital Anda tidak cukup untuk menukar item ini.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final addressController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool isProcessing = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                top: 24,
+                left: 24,
+                right: 24,
+              ),
+              decoration: const BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Tukar dengan ${item['name']}',
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Saldo akan dipotong sebesar ${item['weight']} gram.',
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    AppField(
+                      label: 'Alamat Pengiriman',
+                      placeholder: 'Masukkan alamat lengkap beserta kode pos',
+                      controller: addressController,
+                      maxLines: 3,
+                      validator: (val) => val == null || val.isEmpty ? 'Alamat wajib diisi' : null,
+                    ),
+                    const SizedBox(height: 24),
+                    AppButton(
+                      label: 'Konfirmasi Penukaran',
+                      isLoading: isProcessing,
+                      onPressed: () async {
+                        if (!formKey.currentState!.validate()) return;
+                        setModalState(() => isProcessing = true);
+                        
+                        try {
+                          bool success = await _digitalGoldService.convertToPhysical(
+                            userId: FirebaseAuth.instance.currentUser!.uid,
+                            gramAmount: item['weight'],
+                            address: addressController.text,
+                          );
+
+                          if (success && mounted) {
+                            Navigator.pop(context); // close sheet
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Berhasil mengajukan penukaran fisik!'),
+                                backgroundColor: AppColors.success,
+                              ),
+                            );
+                            Navigator.of(this.context).pop(true); // go back
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(e.toString().replaceAll('Exception: ', '')),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
+                        } finally {
+                          setModalState(() => isProcessing = false);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        );
+      }
+    );
   }
 
   @override
@@ -69,108 +179,158 @@ class _ConvertGoldScreenState extends State<ConvertGoldScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.ink, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Konversi Emas Fisik',
-          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 17),
-        ),
-        centerTitle: true,
+        title: const Text('Gold Store', style: TextStyle(fontFamily: 'Poppins')),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.blueSurface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.blue.withOpacity(0.3)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Hero Section
+            Container(
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.15)),
+                image: DecorationImage(
+                  image: const NetworkImage('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=600'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(AppColors.surface.withValues(alpha: 0.8), BlendMode.darken),
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.info_outline_rounded, color: AppColors.blue, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: const Text(
-                        'Konversi minimal 1 gram. Emas fisik akan dikirimkan ke alamat Anda. Pastikan alamat lengkap.',
-                        style: TextStyle(color: AppColors.blue, fontSize: 13, height: 1.4),
-                      ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGold.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ],
-                ),
+                    child: const Text(
+                      'EXCLUSIVE ASSET COLLECTION',
+                      style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryLightGold, letterSpacing: 1.2),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Tukar Saldo Anda dengan Emas Murni',
+                    style: TextStyle(fontFamily: 'Poppins', fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.textPrimary, height: 1.2),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Saldo saat ini: ${_userBalance.toStringAsFixed(3)} gr',
+                    style: const TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.primaryGold, fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
+            ),
 
-              // Gram Input
-              AppField(
-                label: 'Jumlah Emas (gram)',
-                hint: 'Minimal 1',
-                controller: _gramController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Jumlah wajib diisi';
-                  }
-                  double? grams = double.tryParse(value);
-                  if (grams == null || grams < 1) {
-                    return 'Minimal konversi adalah 1 gram';
-                  }
-                  return null;
-                },
+            // Catalog Title
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Curated Inventory',
+                style: TextStyle(fontFamily: 'Poppins', fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
               ),
-              const SizedBox(height: 16),
+            ),
+            const SizedBox(height: 16),
 
-              // Address Input
-              AppField(
-                label: 'Alamat Pengiriman Lengkap',
-                hint: 'Masukkan alamat lengkap beserta kode pos',
-                controller: _addressController,
-                maxLines: 4,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Alamat wajib diisi';
-                  }
-                  return null;
-                },
+            // Product Grid
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 0.65,
               ),
-              const SizedBox(height: 24),
-
-              // Error Message
-              if (_errorMessage != null)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.only(bottom: 24),
+              itemCount: _catalogItems.length,
+              itemBuilder: (context, index) {
+                final item = _catalogItems[index];
+                return Container(
                   decoration: BoxDecoration(
-                    color: AppColors.redSurface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.red.withOpacity(0.3)),
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.1)),
                   ),
-                  child: Text(
-                    _errorMessage!,
-                    style: const TextStyle(color: AppColors.red, fontSize: 13),
-                    textAlign: TextAlign.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Image
+                      Expanded(
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                              child: Image.network(item['image'], fit: BoxFit.cover),
+                            ),
+                            if (item['tag'] != '')
+                              Positioned(
+                                top: 8, left: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.bg.withValues(alpha: 0.7),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.3)),
+                                  ),
+                                  child: Text(
+                                    item['tag'],
+                                    style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 9, color: AppColors.primaryLightGold, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      // Details
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item['name'],
+                              style: const TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              item['purity'],
+                              style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 10, color: AppColors.textSecondary),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              '${item['weight']} gr',
+                              style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.primaryLightGold),
+                            ),
+                            const SizedBox(height: 12),
+                            AppButton(
+                              label: 'Tukar',
+                              size: AppButtonSize.sm,
+                              onPressed: () => _showCheckoutSheet(item),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-
-              // Convert Button
-              AppButton(
-                text: 'Proses Konversi',
-                icon: Icons.print_rounded,
-                isLoading: _isLoading,
-                onPressed: _isLoading ? () {} : _handleConvertGold,
-              ),
-            ],
-          ),
+                );
+              },
+            ),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );
