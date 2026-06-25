@@ -5,6 +5,7 @@ import 'package:toko_emas_digital/features/home/presentation/home_screen.dart';
 import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
 import 'package:toko_emas_digital/features/orders/presentation/orders_screen.dart';
 import 'package:toko_emas_digital/features/profile/presentation/profile_screen.dart';
+import 'package:toko_emas_digital/features/digital_gold/presentation/portfolio_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,6 +19,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = const [
     HomeScreen(),
+    PortfolioScreen(),
     TransactionsScreen(),
     OrdersScreen(),
     ProfileScreen(),
@@ -56,9 +58,10 @@ class _MainScreenState extends State<MainScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _buildNavItem(0, Icons.home_rounded, 'Home'),
-                      _buildNavItem(1, Icons.account_balance_wallet_rounded, 'Transaksi'),
-                      _buildNavItem(2, Icons.receipt_long_rounded, 'Pesanan'),
-                      _buildNavItem(3, Icons.person_rounded, 'Profile'),
+                      _buildNavItem(1, Icons.pie_chart_rounded, 'Porto'),
+                      _buildNavItem(2, Icons.account_balance_wallet_rounded, 'Trans'),
+                      _buildNavItem(3, Icons.receipt_long_rounded, 'Pesanan'),
+                      _buildNavItem(4, Icons.person_rounded, 'Profile'),
                     ],
                   ),
                 ),
