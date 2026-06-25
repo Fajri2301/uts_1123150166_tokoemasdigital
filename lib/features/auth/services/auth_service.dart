@@ -26,6 +26,24 @@ class AuthService {
     }
   }
 
+  // Sync user manually and get updated data
+  Future<Map<String, dynamic>?> syncUser() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        final response = await _apiClient.dio.post('/auth/sync', data: {
+          'name': user.displayName ?? 'User Toko Emas',
+          'email': user.email ?? '',
+        });
+        return response.data as Map<String, dynamic>?;
+      }
+      return null;
+    } catch (e) {
+      print('Failed to sync user: $e');
+      return null;
+    }
+  }
+
   // Sign up with email and password
   Future<User?> signUp({
     required String email,
