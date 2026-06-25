@@ -7,6 +7,8 @@ import 'package:toko_emas_digital/core/theme/app_theme.dart';
 import 'package:toko_emas_digital/features/auth/presentation/splash_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:toko_emas_digital/core/network/api_client.dart';
+import 'package:provider/provider.dart';
+import 'package:toko_emas_digital/features/admin/providers/admin_profile_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +45,16 @@ void main() async {
     // Tetap jalankan aplikasi tapi mungkin akan muncul error di layar jika Firebase dipanggil
   }
   
-  runApp(const TokoEmasApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AdminProfileProvider()),
+      ],
+      child: const TokoEmasApp(),
+    ),
+  );
+}
+
 class TokoEmasApp extends StatelessWidget {
   const TokoEmasApp({Key? key}) : super(key: key);
 

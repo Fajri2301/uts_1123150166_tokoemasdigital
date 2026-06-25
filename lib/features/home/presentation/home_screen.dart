@@ -14,6 +14,7 @@ import 'package:toko_emas_digital/features/digital_gold/services/transaction_ser
 import 'package:toko_emas_digital/features/digital_gold/presentation/buy_gold_screen.dart';
 import 'package:toko_emas_digital/features/digital_gold/presentation/sell_gold_screen.dart';
 import 'package:toko_emas_digital/features/digital_gold/presentation/convert_gold_screen.dart';
+import 'package:toko_emas_digital/features/digital_gold/presentation/withdraw_screen.dart';
 import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
 import 'package:toko_emas_digital/common/widgets/gold_price_chart.dart';
 import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
@@ -244,7 +245,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 children: [
                                   Text('Rp', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 12, color: AppColors.primaryGold.withValues(alpha: 0.6))),
                                   const SizedBox(width: 4),
-                                  Text(CurrencyFormatter.formatRupiah(rupiah).replaceAll('Rp ', ''), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
+                                  Expanded(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerRight,
+                                      child: Text(CurrencyFormatter.formatRupiah(rupiah).replaceAll('Rp ', ''), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
@@ -262,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         _buildActionBtn(Icons.add_shopping_cart_rounded, 'Beli', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BuyGoldScreen()))),
                         _buildActionBtn(Icons.sell_rounded, 'Jual', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SellGoldScreen()))),
                         _buildActionBtn(Icons.sync_alt_rounded, 'Tukar', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConvertGoldScreen()))),
-                        _buildActionBtn(Icons.history_rounded, 'Riwayat', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TransactionsScreen()))),
+                        _buildActionBtn(Icons.account_balance_wallet_rounded, 'Withdraw', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WithdrawScreen()))),
                       ],
                     ),
                   ],

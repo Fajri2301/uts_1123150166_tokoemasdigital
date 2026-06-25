@@ -6,6 +6,9 @@ import 'package:toko_emas_digital/common/widgets/app_field.dart';
 import 'package:toko_emas_digital/common/widgets/feature_icon.dart';
 import '../services/digital_gold_service.dart';
 import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../physical_gold/presentation/map_selection_screen.dart';
 
 class CheckoutGoldScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -20,7 +23,18 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
   final _addressController = TextEditingController();
   final _digitalGoldService = DigitalGoldService();
   bool _isLoading = false;
-  int _selectedShipping = 0; // 0 = Vault Express, 1 = Secured Logistics
+  
+  String _deliveryOption = 'Dikirim';
+  double _distanceKm = 0.0;
+  double _shippingFee = 0.0;
+  String _shippingPaymentMethod = 'Saldo Uang Aplikasi';
+
+  final List<String> _paymentMethods = [
+    'Saldo Uang Aplikasi',
+    'COD (Bayar di Tempat)',
+  ];
+
+  double get _finalShippingFee => _deliveryOption == 'Dikirim' ? _shippingFee : 0.0;
 
   @override
   void dispose() {
@@ -42,7 +56,7 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
       bool success = await _digitalGoldService.convertToPhysical(
         userId: FirebaseAuth.instance.currentUser!.uid,
         gramAmount: widget.item['weight'],
-        address: _addressController.text.trim(),
+        address: _deliveryOption == 'Ambil di Toko' ? 'Ambil di Toko Fisik (Jl. Sudirman No. 45)' : _addressController.text.trim(),
       );
 
       if (success && mounted) {
@@ -143,8 +157,6 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final shippingFee = _selectedShipping == 0 ? 50000.0 : 35000.0;
-    
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
@@ -171,6 +183,52 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
             _buildStepIndicator(),
             const SizedBox(height: 32),
             
+            // Delivery Option Segment
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF262626).withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _deliveryOption = 'Dikirim'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: _deliveryOption == 'Dikirim' ? AppColors.primaryGold.withValues(alpha: 0.2) : Colors.transparent,
+                          borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+                        ),
+                        child: Center(
+                          child: Text('Dikirim', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, color: _deliveryOption == 'Dikirim' ? AppColors.primaryGold : Colors.white)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(width: 1, height: 40, color: AppColors.primaryGold.withValues(alpha: 0.3)),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _deliveryOption = 'Ambil di Toko'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: _deliveryOption == 'Ambil di Toko' ? AppColors.primaryGold.withValues(alpha: 0.2) : Colors.transparent,
+                          borderRadius: const BorderRadius.horizontal(right: Radius.circular(16)),
+                        ),
+                        child: Center(
+                          child: Text('Ambil di Toko', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, color: _deliveryOption == 'Ambil di Toko' ? AppColors.primaryGold : Colors.white)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            
+            if (_deliveryOption == 'Dikirim') ...[
             // Shipping Address Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -194,20 +252,65 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Alamat Baru', style: TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryGold.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                      Row(
+                        children: [
+                          const Text('Alamat Baru', style: TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGold.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text('UTAMA', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
+                          ),
+                        ],
+                      ),
+                      TextButton.icon(
+                        style: TextButton.styleFrom(
+                           foregroundColor: AppColors.primaryGold,
+                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                           backgroundColor: const Color(0xFF151311),
+                           shape: RoundedRectangleBorder(
+                             borderRadius: BorderRadius.circular(12),
+                             side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.3)),
+                           ),
                         ),
-                        child: const Text('UTAMA', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
+                        icon: const Icon(Icons.location_on_rounded, size: 16),
+                        label: const Text('Buka Maps', style: TextStyle(fontFamily: 'Poppins', fontSize: 12, fontWeight: FontWeight.w600)),
+                        onPressed: () async {
+                          final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => const MapSelectionScreen()));
+                          if (result != null && result is Map<String, dynamic>) {
+                            setState(() {
+                              _addressController.text = result['address'];
+                              LatLng dest = result['latLng'];
+                              const LatLng storeLocation = LatLng(-6.1753924, 106.8271528); // Monas
+                              double distanceInMeters = Geolocator.distanceBetween(
+                                storeLocation.latitude, storeLocation.longitude,
+                                dest.latitude, dest.longitude
+                              );
+                              _distanceKm = distanceInMeters / 1000;
+                              _shippingFee = _distanceKm * 5000; // Rp 5.000 per km
+                            });
+                          }
+                        },
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
+                  if (_distanceKm > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.route_rounded, color: AppColors.primaryGold, size: 16),
+                          const SizedBox(width: 8),
+                          Text('Jarak ke Toko: ${_distanceKm.toStringAsFixed(1)} km', style: const TextStyle(fontFamily: 'Inter', color: AppColors.primaryLightGold, fontSize: 12, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
                   AppField(
                     label: '',
                     placeholder: 'Ketik alamat pengiriman lengkap di sini...',
@@ -220,24 +323,32 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
             
             const SizedBox(height: 32),
             
-            // Shipping Method
-            const Text('Shipping Method', style: TextStyle(fontFamily: 'Poppins', fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+            // Payment Method for Shipping Fee
+            const Text('Metode Pembayaran Ongkos Kirim', style: TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
             const SizedBox(height: 12),
-            _buildShippingOption(
-              index: 0,
-              title: 'Vault Express',
-              price: 50000,
-              subtitle: 'Next Day Delivery • Fully Insured • Secure Handling',
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF262626).withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.3)),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _shippingPaymentMethod,
+                  dropdownColor: const Color(0xFF151311),
+                  isExpanded: true,
+                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primaryGold),
+                  style: const TextStyle(fontFamily: 'Inter', color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                  items: _paymentMethods.map((method) {
+                    return DropdownMenuItem(value: method, child: Text(method));
+                  }).toList(),
+                  onChanged: (val) => setState(() => _shippingPaymentMethod = val!),
+                ),
+              ),
             ),
-            const SizedBox(height: 12),
-            _buildShippingOption(
-              index: 1,
-              title: 'Secured Logistics',
-              price: 35000,
-              subtitle: '2-3 Business Days • Standard Insurance',
-            ),
-            
             const SizedBox(height: 32),
+            ],
             
             // Order Summary
             Container(
@@ -309,16 +420,26 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Shipping Fee (${_selectedShipping == 0 ? 'Vault Express' : 'Secured Logistics'})', style: const TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textSecondary)),
-                            Text(CurrencyFormatter.formatRupiah(shippingFee), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 14, color: AppColors.textPrimary)),
+                            const Text('Biaya Pengiriman', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textSecondary)),
+                            Text(_finalShippingFee > 0 ? CurrencyFormatter.formatRupiah(_finalShippingFee) : 'Gratis', style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 14, color: AppColors.textPrimary)),
                           ],
                         ),
+                        if (_deliveryOption == 'Dikirim') ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Pembayaran Ongkir via', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textSecondary)),
+                              Text(_shippingPaymentMethod, style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 12, color: AppColors.primaryGold)),
+                            ],
+                          ),
+                        ],
                         const SizedBox(height: 8),
                         const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Insurance', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textSecondary)),
-                            Text('Included', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 14, color: AppColors.textPrimary)),
+                            Text('Asuransi Pengiriman', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textSecondary)),
+                            Text('Termasuk', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 14, color: AppColors.textPrimary)),
                           ],
                         ),
                       ],
@@ -331,7 +452,7 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Total Biaya Kirim', style: TextStyle(fontFamily: 'Poppins', fontSize: 16, color: AppColors.textPrimary)),
-                        Text(CurrencyFormatter.formatRupiah(shippingFee), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.primaryGold)),
+                        Text(CurrencyFormatter.formatRupiah(_finalShippingFee), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.primaryGold)),
                       ],
                     ),
                   ),
@@ -383,57 +504,6 @@ class _CheckoutGoldScreenState extends State<CheckoutGoldScreen> {
               ],
             ),
             const SizedBox(height: 32),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildShippingOption({required int index, required String title, required double price, required String subtitle}) {
-    final isSelected = _selectedShipping == index;
-    
-    return GestureDetector(
-      onTap: () => setState(() => _selectedShipping = index),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? AppColors.primaryGold : Colors.transparent),
-          boxShadow: isSelected ? [BoxShadow(color: AppColors.primaryGold.withValues(alpha: 0.1), blurRadius: 8, spreadRadius: 1)] : [],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 20,
-              height: 20,
-              margin: const EdgeInsets.only(top: 2, right: 16),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: isSelected ? AppColors.primaryGold : AppColors.darkGray, width: 2),
-              ),
-              alignment: Alignment.center,
-              child: isSelected
-                  ? Container(width: 10, height: 10, decoration: const BoxDecoration(color: AppColors.primaryGold, shape: BoxShape.circle))
-                  : null,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(title, style: const TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                      Text(CurrencyFormatter.formatRupiah(price), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 11, color: AppColors.primaryLightGold)),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(subtitle, style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: AppColors.textSecondary)),
-                ],
-              ),
-            ),
           ],
         ),
       ),

@@ -96,7 +96,7 @@ class _GoldPriceChartState extends State<GoldPriceChart> {
               lineTouchData: LineTouchData(
                 handleBuiltInTouches: true,
                 touchTooltipData: LineTouchTooltipData(
-                  tooltipBgColor: AppColors.surface,
+                  getTooltipColor: (LineBarSpot touchedSpot) => AppColors.surface,
                   tooltipRoundedRadius: 8,
                   getTooltipItems: (List<LineBarSpot> touchedSpots) {
                     return touchedSpots.map((spot) {
