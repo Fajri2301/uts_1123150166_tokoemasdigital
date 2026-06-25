@@ -5,9 +5,12 @@ import 'package:toko_emas_digital/core/constants/firebase_config.dart';
 import 'package:toko_emas_digital/core/services/notification_service.dart';
 import 'package:toko_emas_digital/core/theme/app_theme.dart';
 import 'package:toko_emas_digital/features/auth/presentation/splash_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:toko_emas_digital/core/network/api_client.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   
   // Inisialisasi Firebase secara eksplisit
   try {
@@ -41,8 +44,6 @@ void main() async {
   }
   
   runApp(const TokoEmasApp());
-}
-
 class TokoEmasApp extends StatelessWidget {
   const TokoEmasApp({Key? key}) : super(key: key);
 
@@ -50,6 +51,7 @@ class TokoEmasApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Toko Emas Digital',
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const SplashScreen(),

@@ -52,3 +52,4 @@ GoogleService-Info.plist
 
 # Config
 **/lib/core/constants/firebase_config.dart
+.env
