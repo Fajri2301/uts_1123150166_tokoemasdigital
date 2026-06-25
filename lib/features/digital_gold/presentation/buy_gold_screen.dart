@@ -6,6 +6,7 @@ import 'package:toko_emas_digital/common/widgets/app_field.dart';
 import 'package:toko_emas_digital/common/widgets/feature_icon.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:toko_emas_digital/core/network/api_client.dart';
 
 class BuyGoldScreen extends StatefulWidget {
   const BuyGoldScreen({super.key});
@@ -18,14 +19,39 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
   final _gramController = TextEditingController();
   final _transactionService = TransactionService();
   
-  double _pricePerGram = 1230000.0;
+  double _pricePerGram = 0.0;
   bool _isLoading = false;
+  bool _isLoadingPrice = true;
   String _selectedPaymentMethod = 'Saldo Tunai Aplikasi';
 
   final List<String> _paymentMethods = [
     'Saldo Tunai Aplikasi',
     'Dompet Nusantara (E-Money)',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchGoldPrice();
+  }
+
+  Future<void> _fetchGoldPrice() async {
+    try {
+      final response = await ApiClient().dio.get('/gold-price');
+      if (response.data['success'] == true) {
+        setState(() {
+          _pricePerGram = double.parse(response.data['data']['price_per_gram'].toString());
+          _isLoadingPrice = false;
+        });
+      }
+    } catch (e) {
+      // Fallback
+      setState(() {
+        _pricePerGram = 1230000.0;
+        _isLoadingPrice = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -47,9 +73,12 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final transactionId = await _transactionService.buyDigitalGold(grams, _selectedPaymentMethod);
+      final result = await _transactionService.buyDigitalGold(grams, _selectedPaymentMethod);
       
-      if (transactionId != null && mounted) {
+      if (result != null && mounted) {
+        final transactionId = result['transaction_id'] as int;
+        final exactTotalPrice = result['total_price'] as double;
+
         if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {
           final uri = Uri(
             scheme: 'danantara',
@@ -57,7 +86,7 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
             queryParameters: {
               'merchant_id': 'TK-EMAS-01',
               'merchant_name': 'Toko Emas Digital',
-              'amount': totalPrice.toString(),
+              'amount': exactTotalPrice.toString(),
               'description': 'Pembelian $grams Gram Emas Digital',
               'reference': transactionId.toString(),
             },
@@ -69,17 +98,26 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
           }
         }
 
+        final isEMoney = _selectedPaymentMethod == 'Dompet Nusantara (E-Money)';
+
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
             backgroundColor: AppColors.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.3))),
-            title: const Center(
-              child: FeatureIcon(icon: Icons.check_circle_rounded, tone: 'green', size: 70, iconSize: 40),
+            title: Center(
+              child: FeatureIcon(
+                icon: isEMoney ? Icons.access_time_rounded : Icons.check_circle_rounded, 
+                tone: isEMoney ? 'gold' : 'green', 
+                size: 70, 
+                iconSize: 40
+              ),
             ),
             content: Text(
-              'Pembelian ${grams.toStringAsFixed(3)} gr Emas Digital berhasil!',
+              isEMoney 
+                ? 'Dialihkan ke Dompet Nusantara.\nSegera selesaikan pembayaran Anda.'
+                : 'Pembelian ${grams.toStringAsFixed(3)} gr Emas Digital berhasil!',
               textAlign: TextAlign.center,
               style: const TextStyle(fontFamily: 'Poppins', color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
             ),
@@ -138,7 +176,9 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
                 children: [
                   const Text('Harga Beli Saat Ini', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textSecondary, fontSize: 13)),
                   const SizedBox(height: 4),
-                  Text('${CurrencyFormatter.formatRupiah(_pricePerGram)} / gr', style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 18, fontWeight: FontWeight.w800)),
+                  _isLoadingPrice
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.primaryGold, strokeWidth: 2))
+                      : Text('${CurrencyFormatter.formatRupiah(_pricePerGram)} / gr', style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 18, fontWeight: FontWeight.w800)),
                 ],
               ),
             ),

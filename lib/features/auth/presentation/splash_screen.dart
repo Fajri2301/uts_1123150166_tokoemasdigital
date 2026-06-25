@@ -5,6 +5,8 @@ import 'package:toko_emas_digital/features/auth/presentation/login_screen.dart';
 import 'package:toko_emas_digital/features/home/presentation/main_screen.dart';
 import 'package:toko_emas_digital/features/admin/presentation/admin_dashboard_screen.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
+import 'package:toko_emas_digital/features/profile/services/user_service.dart';
+import 'package:toko_emas_digital/features/profile/presentation/pin_lock_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -36,9 +38,29 @@ class _SplashScreenState extends State<SplashScreen> {
               MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
             );
           } else {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const MainScreen()),
-            );
+            // Check if user has PIN
+            try {
+              final userService = UserService();
+              final profile = await userService.getProfile();
+              if (mounted) {
+                if (profile['has_pin'] == true) {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const PinLockScreen()),
+                  );
+                } else {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const MainScreen()),
+                  );
+                }
+              }
+            } catch (e) {
+              // If fetching profile fails, fallback to main screen
+              if (mounted) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const MainScreen()),
+                );
+              }
+            }
           }
         }
       } else {

@@ -9,7 +9,7 @@ class UserService {
       final response = await _apiClient.dio.get('/user/profile');
       return response.data['data'];
     } catch (e) {
-      if (e is DioException) {
+      if (e is DioException && e.response?.data is Map) {
         throw Exception(e.response?.data['error'] ?? 'Gagal mengambil data profil');
       }
       throw Exception('Terjadi kesalahan jaringan');
@@ -20,8 +20,19 @@ class UserService {
     try {
       await _apiClient.dio.post('/user/pin', data: {'pin': pin});
     } catch (e) {
-      if (e is DioException) {
+      if (e is DioException && e.response?.data is Map) {
         throw Exception(e.response?.data['error'] ?? 'Gagal memperbarui PIN');
+      }
+      throw Exception('Terjadi kesalahan jaringan');
+    }
+  }
+
+  Future<void> verifyPIN(String pin) async {
+    try {
+      await _apiClient.dio.post('/user/pin/verify', data: {'pin': pin});
+    } catch (e) {
+      if (e is DioException && e.response?.data is Map) {
+        throw Exception(e.response?.data['error'] ?? 'Gagal memverifikasi PIN');
       }
       throw Exception('Terjadi kesalahan jaringan');
     }
@@ -34,7 +45,7 @@ class UserService {
         'bank_account': bankAccount,
       });
     } catch (e) {
-      if (e is DioException) {
+      if (e is DioException && e.response?.data is Map) {
         throw Exception(e.response?.data['error'] ?? 'Gagal memperbarui data Bank');
       }
       throw Exception('Terjadi kesalahan jaringan');
@@ -45,10 +56,27 @@ class UserService {
     try {
       await _apiClient.dio.post('/user/kyc');
     } catch (e) {
-      if (e is DioException) {
+      if (e is DioException && e.response?.data is Map) {
         throw Exception(e.response?.data['error'] ?? 'Gagal memverifikasi KYC');
       }
       throw Exception('Terjadi kesalahan jaringan');
+    }
+  }
+
+  Future<void> updateFCMToken(String token) async {
+    try {
+      await _apiClient.dio.post('/user/fcm-token', data: {'fcm_token': token});
+    } catch (e) {
+      // Ignored for now
+    }
+  }
+
+  Future<List<dynamic>> getNotifications() async {
+    try {
+      final response = await _apiClient.dio.get('/user/notifications');
+      return response.data['data'] as List<dynamic>;
+    } catch (e) {
+      throw Exception('Gagal mengambil notifikasi');
     }
   }
 }

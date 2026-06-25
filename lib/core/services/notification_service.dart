@@ -1,5 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:toko_emas_digital/core/network/api_client.dart';
+import 'package:toko_emas_digital/core/constants/app_colors.dart';
+import 'package:toko_emas_digital/features/profile/services/user_service.dart';
 
 class NotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
@@ -23,6 +27,14 @@ class NotificationService {
         print('FCM Token: $token');
       }
 
+      if (token != null) {
+        try {
+          await UserService().updateFCMToken(token);
+        } catch (e) {
+          if (kDebugMode) print('Failed to sync FCM token: $e');
+        }
+      }
+
       // Handle background messages
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -37,7 +49,28 @@ class NotificationService {
           if (kDebugMode) {
             print('Message also contained a notification: ${message.notification}');
           }
-          // You can show a local notification here if needed
+          
+          final context = navigatorKey.currentContext;
+          if (context != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '${message.notification!.title}\n${message.notification!.body}',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                backgroundColor: AppColors.primaryGold,
+                duration: const Duration(seconds: 4),
+                behavior: SnackBarBehavior.floating,
+                action: SnackBarAction(
+                  label: 'Lihat',
+                  textColor: Colors.black,
+                  onPressed: () {
+                    // Navigate to notifications page or handle click
+                  },
+                ),
+              ),
+            );
+          }
         }
       });
     } else {

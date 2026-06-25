@@ -361,7 +361,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           handleBuiltInTouches: true,
           touchTooltipData: LineTouchTooltipData(
             getTooltipColor: (LineBarSpot touchedSpot) => AppColors.surface,
-            tooltipRoundedRadius: 8,
             getTooltipItems: (List<LineBarSpot> touchedSpots) {
               return touchedSpots.map((spot) {
                 return LineTooltipItem(

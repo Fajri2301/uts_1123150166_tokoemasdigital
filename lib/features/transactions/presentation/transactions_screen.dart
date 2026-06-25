@@ -208,6 +208,20 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
     final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
+    // Override colors if status is not success
+    final isPending = trx.status == 'pending';
+    final isFailed = trx.status == 'failed';
+    
+    if (isPending) {
+      iconColor = Colors.orangeAccent;
+      iconBg = Colors.orangeAccent.withValues(alpha: 0.1);
+      glowColor = Colors.orangeAccent;
+    } else if (isFailed) {
+      iconColor = Colors.grey;
+      iconBg = Colors.grey.withValues(alpha: 0.1);
+      glowColor = Colors.transparent;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
@@ -233,14 +247,46 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: isFailed ? AppColors.textSecondary : Colors.white,
+                        ),
+                      ),
+                    ),
+                    if (isPending) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.orangeAccent.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.orangeAccent),
+                        ),
+                        child: const Text('Pending', style: TextStyle(fontSize: 9, color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                    if (isFailed) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.grey),
+                        ),
+                        child: const Text('Gagal', style: TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -263,7 +309,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   fontFamily: 'Roboto Mono',
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isSell || isConvert ? Colors.redAccent : Colors.greenAccent,
+                  color: isFailed 
+                      ? AppColors.textSecondary 
+                      : (isPending ? Colors.orangeAccent : (isSell || isConvert ? Colors.redAccent : Colors.greenAccent)),
+                  decoration: isFailed ? TextDecoration.lineThrough : null,
                 ),
               ),
               const SizedBox(height: 4),
@@ -272,7 +321,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 12,
-                  color: AppColors.primaryGold.withValues(alpha: 0.7),
+                  color: isFailed ? AppColors.textSecondary.withValues(alpha: 0.5) : AppColors.primaryGold.withValues(alpha: 0.7),
+                  decoration: isFailed ? TextDecoration.lineThrough : null,
                 ),
               ),
             ],

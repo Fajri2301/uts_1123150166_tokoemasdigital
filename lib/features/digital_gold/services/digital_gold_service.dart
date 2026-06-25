@@ -81,8 +81,14 @@ class DigitalGoldService {
 
   // Get current gold price
   Future<double> getCurrentGoldPrice() async {
-    // Pada arsitektur nyata, ini biasanya memanggil API pihak ketiga
-    // Untuk simulasi ini kita asumsikan harga statis atau bisa dipanggil dari API Golang
-    return 1230000.0;
+    try {
+      final response = await _apiClient.dio.get('/gold-price');
+      if (response.data['success'] == true) {
+        return double.parse(response.data['data']['price_per_gram'].toString());
+      }
+      return 1230000.0;
+    } catch (e) {
+      return 1230000.0;
+    }
   }
 }

@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/currency_formatter.dart';
+import '../../core/network/api_client.dart';
 
 class GoldPriceChart extends StatefulWidget {
   const GoldPriceChart({super.key});
@@ -13,8 +16,75 @@ class _GoldPriceChartState extends State<GoldPriceChart> {
   String selectedFilter = '1M';
   final List<String> filters = ['1D', '1W', '1M', '1Y', 'ALL'];
 
+  List<FlSpot> _spots = [];
+  double _currentPrice = 0.0;
+  double _previousPrice = 0.0;
+  bool _isLoading = true;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHistory();
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _fetchHistory();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _fetchHistory() async {
+    try {
+      final response = await ApiClient().dio.get('/gold-price/history');
+      if (response.data['success'] == true) {
+        final List<dynamic> data = response.data['data'];
+        if (data.isNotEmpty) {
+          final reversedData = data.reversed.toList();
+          List<FlSpot> spots = [];
+          for (int i = 0; i < reversedData.length; i++) {
+            spots.add(FlSpot(i.toDouble(), (reversedData[i]['price_per_gram'] as num).toDouble()));
+          }
+          
+          setState(() {
+            _spots = spots;
+            _currentPrice = (data.first['price_per_gram'] as num).toDouble();
+            if (data.length > 1) {
+              _previousPrice = (data[1]['price_per_gram'] as num).toDouble();
+            } else {
+              _previousPrice = _currentPrice;
+            }
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Failed to fetch history: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator(color: AppColors.primaryGold));
+    }
+
+    double diff = _currentPrice - _previousPrice;
+    double percent = _previousPrice > 0 ? (diff / _previousPrice) * 100 : 0.0;
+    bool isUp = diff >= 0;
+    String sign = isUp ? '+' : '';
+    Color statusColor = isUp ? AppColors.success : AppColors.error;
+
+    double minY = _spots.isEmpty ? 0 : _spots.map((e) => e.y).reduce((a, b) => a < b ? a : b);
+    double maxY = _spots.isEmpty ? 1 : _spots.map((e) => e.y).reduce((a, b) => a > b ? a : b);
+    double padding = (maxY - minY) * 0.1;
+    if (padding == 0) padding = _currentPrice * 0.01;
+    minY -= padding;
+    maxY += padding;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -35,23 +105,23 @@ class _GoldPriceChartState extends State<GoldPriceChart> {
             const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'Rp 1.109.000 /gr',
-                  style: TextStyle(
-                    fontFamily: 'Roboto Mono', // or Poppins if Roboto Mono not available
+                  '${CurrencyFormatter.formatRupiah(_currentPrice)} /gr',
+                  style: const TextStyle(
+                    fontFamily: 'Roboto Mono',
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryLightGold,
                   ),
                 ),
                 Text(
-                  '+12.000 (+1,09%)',
+                  '$sign${CurrencyFormatter.formatRupiah(diff.abs())} ($sign${percent.abs().toStringAsFixed(2)}%)',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.success,
+                    color: statusColor,
                   ),
                 ),
               ],
@@ -97,12 +167,10 @@ class _GoldPriceChartState extends State<GoldPriceChart> {
                 handleBuiltInTouches: true,
                 touchTooltipData: LineTouchTooltipData(
                   getTooltipColor: (LineBarSpot touchedSpot) => AppColors.surface,
-                  tooltipRoundedRadius: 8,
                   getTooltipItems: (List<LineBarSpot> touchedSpots) {
                     return touchedSpots.map((spot) {
-                      final valueInMillion = spot.y * 100000;
                       return LineTooltipItem(
-                        'Rp ${valueInMillion.toStringAsFixed(0)}',
+                        CurrencyFormatter.formatRupiah(spot.y),
                         const TextStyle(
                           color: AppColors.primaryGold,
                           fontWeight: FontWeight.bold,
@@ -116,92 +184,37 @@ class _GoldPriceChartState extends State<GoldPriceChart> {
               gridData: FlGridData(
                 show: true,
                 drawVerticalLine: false,
-                horizontalInterval: 1,
+                horizontalInterval: padding > 0 ? padding * 2 : 10000,
                 getDrawingHorizontalLine: (value) {
                   return FlLine(
-                    color: AppColors.darkGray.withOpacity(0.3),
+                    color: AppColors.darkGray.withValues(alpha: 0.3),
                     strokeWidth: 1,
                     dashArray: [5, 5],
                   );
                 },
               ),
               titlesData: FlTitlesData(
-                show: true,
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 22,
-                    interval: 2,
-                    getTitlesWidget: (value, meta) {
-                      if (value % 2 != 0) return const Text('');
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          '${value.toInt()}H',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 35,
-                    interval: 1,
-                    getTitlesWidget: (value, meta) {
-                      return Text(
-                        '${value.toInt()}K',
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
-                      );
-                    },
-                  ),
-                ),
+                show: false,
               ),
               borderData: FlBorderData(show: false),
               minX: 0,
-              maxX: 8,
-              minY: 2,
-              maxY: 8,
+              maxX: _spots.isEmpty ? 1 : _spots.last.x,
+              minY: minY,
+              maxY: maxY,
               lineBarsData: [
                 LineChartBarData(
-                  spots: const [
-                    FlSpot(0, 3),
-                    FlSpot(1, 3.5),
-                    FlSpot(2, 4),
-                    FlSpot(3, 3.8),
-                    FlSpot(4, 5),
-                    FlSpot(5, 4.8),
-                    FlSpot(6, 6),
-                    FlSpot(7, 5.5),
-                    FlSpot(8, 7),
-                  ],
+                  spots: _spots.isEmpty ? [const FlSpot(0, 0)] : _spots,
                   isCurved: true,
-                  color: AppColors.primaryGold,
+                  color: statusColor,
                   barWidth: 3,
                   isStrokeCapRound: true,
-                  dotData: FlDotData(
-                    show: true,
-                    getDotPainter: (spot, percent, barData, index) {
-                      if (index == 8) {
-                        return FlDotCirclePainter(
-                          radius: 4,
-                          color: AppColors.primaryGold,
-                          strokeWidth: 2,
-                          strokeColor: Colors.white,
-                        );
-                      }
-                      return FlDotCirclePainter(radius: 0, color: Colors.transparent);
-                    },
-                  ),
+                  dotData: FlDotData(show: false),
                   belowBarData: BarAreaData(
                     show: true,
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.primaryGold.withOpacity(0.3),
-                        AppColors.primaryGold.withOpacity(0.0),
+                        statusColor.withValues(alpha: 0.3),
+                        statusColor.withValues(alpha: 0.0),
                       ],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,

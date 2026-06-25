@@ -15,7 +15,7 @@ class ApiClient {
   }
 
   ApiClient._internal() {
-    final String baseUrl = dotenv.env['BASE_URL'] ?? 'http://10.0.2.2:8081/v1';
+    final String baseUrl = dotenv.env['BASE_URL'] ?? 'http://192.168.1.5:8081/v1';
 
     dio = Dio(BaseOptions(
       baseUrl: baseUrl,
@@ -46,7 +46,9 @@ class ApiClient {
           } else if (e.response!.statusCode == 500) {
             errorMessage = 'Server sedang mengalami gangguan (500).';
           } else {
-            errorMessage = e.response!.data['message'] ?? errorMessage;
+            if (e.response!.data is Map) {
+              errorMessage = e.response!.data['message'] ?? e.response!.data['error'] ?? errorMessage;
+            }
           }
         } else if (e.type == DioExceptionType.connectionTimeout || 
                    e.type == DioExceptionType.receiveTimeout) {

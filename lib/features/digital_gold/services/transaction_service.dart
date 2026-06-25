@@ -18,14 +18,17 @@ class TransactionService {
     }
   }
 
-  Future<int?> buyDigitalGold(double grams, String paymentMethod) async {
+  Future<Map<String, dynamic>?> buyDigitalGold(double grams, String paymentMethod) async {
     try {
       final response = await _apiClient.dio.post('/gold/buy', data: {
         'gram_amount': grams,
         'payment_method': paymentMethod,
       });
       if (response.data['success'] == true) {
-        return response.data['transaction_id'] as int?;
+        return {
+          'transaction_id': response.data['transaction_id'] as int,
+          'total_price': (response.data['total_price'] as num).toDouble(),
+        };
       }
       return null;
     } catch (e) {

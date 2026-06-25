@@ -5,6 +5,7 @@ import 'package:toko_emas_digital/common/widgets/app_button.dart';
 import 'package:toko_emas_digital/common/widgets/app_field.dart';
 import 'package:toko_emas_digital/common/widgets/feature_icon.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
+import 'package:toko_emas_digital/core/network/api_client.dart';
 
 class SellGoldScreen extends StatefulWidget {
   const SellGoldScreen({super.key});
@@ -17,14 +18,33 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
   final _gramController = TextEditingController();
   final _transactionService = TransactionService();
   
-  double _pricePerGram = 1150000.0; // Harga jual
+  double _pricePerGram = 0.0;
   double _currentBalance = 0.0;
   bool _isLoading = false;
+  bool _isLoadingPrice = true;
 
   @override
   void initState() {
     super.initState();
     _loadBalance();
+    _fetchGoldPrice();
+  }
+
+  Future<void> _fetchGoldPrice() async {
+    try {
+      final response = await ApiClient().dio.get('/gold-price');
+      if (response.data['success'] == true) {
+        setState(() {
+          _pricePerGram = double.parse(response.data['data']['price_per_gram'].toString());
+          _isLoadingPrice = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _pricePerGram = 1150000.0;
+        _isLoadingPrice = false;
+      });
+    }
   }
 
   Future<void> _loadBalance() async {
@@ -129,9 +149,11 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
                     decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.darkGray)),
                     child: Column(
                       children: [
-                        const Text('Harga Jual Saat Ini', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textSecondary, fontSize: 12)),
+                        const Text('Harga Jual Saat Ini', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textSecondary, fontSize: 13)),
                         const SizedBox(height: 4),
-                        Text('${CurrencyFormatter.formatRupiah(_pricePerGram)} / gr', style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 15, fontWeight: FontWeight.w800)),
+                        _isLoadingPrice
+                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.primaryGold, strokeWidth: 2))
+                          : Text('${CurrencyFormatter.formatRupiah(_pricePerGram)} / gr', style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 15, fontWeight: FontWeight.w800)),
                       ],
                     ),
                   ),
