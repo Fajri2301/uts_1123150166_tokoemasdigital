@@ -134,7 +134,7 @@ class _ConvertGoldScreenState extends State<ConvertGoldScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Saldo saat ini: ${_userBalance.toStringAsFixed(3)} gr',
+                    'Saldo saat ini: ${CurrencyFormatter.formatGram(_userBalance)}',
                     style: const TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.primaryGold, fontWeight: FontWeight.w600),
                   ),
                 ],
@@ -220,7 +220,7 @@ class _ConvertGoldScreenState extends State<ConvertGoldScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              '${item['weight']} gr',
+                              CurrencyFormatter.formatGram((item['weight'] as num).toDouble()),
                               style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.primaryLightGold),
                             ),
                             const SizedBox(height: 12),

@@ -223,7 +223,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               Expanded(
                 child: _buildSubInfo(
                   'Saldo Emas',
-                  '${_grams.toStringAsFixed(4)} gr',
+                  CurrencyFormatter.formatGram(_grams),
                   Icons.monitor_weight_outlined,
                 ),
               ),

@@ -167,7 +167,7 @@ class _SellGoldScreenState extends State<SellGoldScreen> {
                       children: [
                         const Text('Saldo Emas Anda', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textSecondary, fontSize: 12)),
                         const SizedBox(height: 4),
-                        Text('${_currentBalance.toStringAsFixed(3)} gr', style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 16, fontWeight: FontWeight.w800)),
+                        Text(CurrencyFormatter.formatGram(_currentBalance), style: const TextStyle(fontFamily: 'Roboto Mono', color: AppColors.primaryLightGold, fontSize: 16, fontWeight: FontWeight.w800)),
                       ],
                     ),
                   ),

@@ -125,7 +125,7 @@ class _AdminTransactionsScreenState extends State<AdminTransactionsScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    goldAmount > 0 ? '${goldAmount.toStringAsFixed(3)} gr' : '-',
+                    goldAmount > 0 ? CurrencyFormatter.formatGram(goldAmount) : '-',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

@@ -304,7 +304,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${isSell ? '-' : isConvert ? '-' : '+'}${trx.grams.toStringAsFixed(3)} gr',
+                '${isSell ? '-' : isConvert ? '-' : '+'}${CurrencyFormatter.formatGram(trx.grams)}',
                 style: TextStyle(
                   fontFamily: 'Roboto Mono',
                   fontSize: 16,

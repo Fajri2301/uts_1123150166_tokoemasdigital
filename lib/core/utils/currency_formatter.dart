@@ -19,7 +19,20 @@ class CurrencyFormatter {
   }
 
   static String formatGram(double amount) {
-    return '${amount.toStringAsFixed(amount.truncateToDouble() == amount ? 0 : 2)} gr';
+    if (amount >= 1000) {
+      // Convert to kg
+      final kg = amount / 1000;
+      final display = kg == kg.truncateToDouble()
+          ? kg.toStringAsFixed(0)
+          : kg.toStringAsFixed(3).replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '');
+      return '$display kg';
+    } else {
+      // Display in gram
+      final display = amount == amount.truncateToDouble()
+          ? amount.toStringAsFixed(0)
+          : amount.toStringAsFixed(2).replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '');
+      return '$display gr';
+    }
   }
 
   static String formatDate(DateTime date) {
