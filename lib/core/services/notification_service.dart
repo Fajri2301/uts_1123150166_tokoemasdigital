@@ -1,15 +1,36 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:toko_emas_digital/core/network/api_client.dart';
-import 'package:toko_emas_digital/core/constants/app_colors.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:toko_emas_digital/features/profile/services/user_service.dart';
+
+// Notification channel untuk Android
+const AndroidNotificationChannel _channel = AndroidNotificationChannel(
+  'toko_emas_high_importance', // id
+  'Notifikasi Toko Emas', // name
+  description: 'Notifikasi transaksi dan promo dari Toko Emas Digital.',
+  importance: Importance.high,
+);
+
+final FlutterLocalNotificationsPlugin _localNotif = FlutterLocalNotificationsPlugin();
 
 class NotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
   Future<void> initialize() async {
-    // Request permission for iOS and Android 13+
+    // 1. Inisialisasi flutter_local_notifications
+    const AndroidInitializationSettings androidInit =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initSettings =
+        InitializationSettings(android: androidInit);
+    await _localNotif.initialize(initSettings);
+
+    // 2. Buat Android Notification Channel (wajib untuk Android 8+)
+    await _localNotif
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_channel);
+
+    // 3. Minta izin FCM (Android 13+ & iOS)
     NotificationSettings settings = await _fcm.requestPermission(
       alert: true,
       badge: true,
@@ -17,16 +38,18 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      if (kDebugMode) {
-        print('User granted permission');
-      }
-      
-      // Get the token (Useful for sending notifications to specific users)
-      String? token = await _fcm.getToken();
-      if (kDebugMode) {
-        print('FCM Token: $token');
-      }
+      if (kDebugMode) print('FCM Permission granted');
 
+      // 4. Pastikan foreground notifications tampil
+      await _fcm.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      // 5. Dapatkan & kirim FCM Token ke backend
+      String? token = await _fcm.getToken();
+      if (kDebugMode) print('FCM Token: $token');
       if (token != null) {
         try {
           await UserService().updateFCMToken(token);
@@ -35,55 +58,48 @@ class NotificationService {
         }
       }
 
-      // Handle background messages
+      // 6. Handle background messages
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-      // Handle foreground messages
+      // 7. Handle foreground messages — tampilkan sebagai heads-up popup
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         if (kDebugMode) {
-          print('Got a message whilst in the foreground!');
-          print('Message data: ${message.data}');
+          print('Foreground message: ${message.notification?.title}');
         }
 
-        if (message.notification != null) {
-          if (kDebugMode) {
-            print('Message also contained a notification: ${message.notification}');
-          }
-          
-          final context = navigatorKey.currentContext;
-          if (context != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '${message.notification!.title}\n${message.notification!.body}',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                backgroundColor: AppColors.primaryGold,
-                duration: const Duration(seconds: 4),
-                behavior: SnackBarBehavior.floating,
-                action: SnackBarAction(
-                  label: 'Lihat',
-                  textColor: Colors.black,
-                  onPressed: () {
-                    // Navigate to notifications page or handle click
-                  },
-                ),
+        final notification = message.notification;
+        final android = message.notification?.android;
+
+        if (notification != null && android != null) {
+          _localNotif.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                _channel.id,
+                _channel.name,
+                channelDescription: _channel.description,
+                importance: Importance.high,
+                priority: Priority.high,
+                icon: '@mipmap/ic_launcher',
+                ticker: notification.title,
               ),
-            );
-          }
+            ),
+          );
         }
       });
     } else {
-      if (kDebugMode) {
-        print('User declined or has not accepted permission');
-      }
+      if (kDebugMode) print('FCM Permission denied');
     }
   }
 }
 
-// Global background message handler
+// Handler untuk background/terminated messages
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (kDebugMode) {
-    print("Handling a background message: ${message.messageId}");
+    print('Background message: ${message.messageId}');
   }
 }
+
