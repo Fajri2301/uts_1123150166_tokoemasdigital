@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
+import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
 import 'package:toko_emas_digital/features/digital_gold/models/transaction_model.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
 import 'package:intl/intl.dart';
