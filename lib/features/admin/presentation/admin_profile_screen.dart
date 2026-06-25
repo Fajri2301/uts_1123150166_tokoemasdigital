@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/utils/color_extension.dart';
 import 'package:toko_emas_digital/common/widgets/custom_app_bar.dart';
@@ -19,7 +18,6 @@ class AdminProfileScreen extends StatefulWidget {
 class _AdminProfileScreenState extends State<AdminProfileScreen> {
   final AuthService _authService = AuthService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool _isLoading = true;
   Map<String, dynamic>? _userData;
@@ -38,11 +36,31 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        final doc = await _firestore.collection('users').doc(user.uid).get();
-        if (mounted) {
-          setState(() {
-            _userData = doc.data();
-          });
+        // Sync with Golang backend
+        try {
+          final res = await _authService.syncUser();
+          if (res != null && res.containsKey('data')) {
+            if (mounted) {
+              setState(() {
+                _userData = {
+                  'name': res['data']['name'] ?? user.displayName ?? '',
+                  'email': res['data']['email'] ?? user.email ?? '',
+                  'role': res['data']['role'] ?? 'admin',
+                };
+              });
+            }
+          }
+        } catch (e) {
+          // Fallback if backend is down
+          if (mounted) {
+            setState(() {
+              _userData = {
+                'name': user.displayName ?? '',
+                'email': user.email ?? '',
+                'role': 'admin',
+              };
+            });
+          }
         }
       }
     } catch (e) {
@@ -92,13 +110,13 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
             _buildMenuTile(
               Icons.person_outline,
               'Edit Profil',
-              'Nama, Telepon, Alamat',
+              'Ubah Nama Admin',
               () => _navigateToEditProfile(),
             ),
             _buildMenuTile(
               Icons.email_outlined,
               'Edit Email',
-              user?.email ?? 'Email',
+              _userData?['email'] ?? user?.email ?? 'Email',
               () => _navigateToEditEmail(),
             ),
             _buildMenuTile(
@@ -159,7 +177,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            user?.email ?? 'admin@tokoemas.com',
+            _userData?['email'] ?? user?.email ?? 'admin@tokoemas.com',
             style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 14,
@@ -229,7 +247,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => EditProfileScreen(
-          userData: _userData!,
+          userData: _userData ?? {},
           onUpdate: _loadUserData,
         ),
       ),
@@ -249,7 +267,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
   void _navigateToEditPassword() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => EditPasswordScreen(),
+        builder: (_) => const EditPasswordScreen(),
       ),
     );
   }
@@ -351,28 +369,22 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthService _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameController;
-  late TextEditingController _phoneController;
-  late TextEditingController _addressController;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.userData['name'] ?? '');
-    _phoneController = TextEditingController(text: widget.userData['phone_number'] ?? '');
-    _addressController = TextEditingController(text: widget.userData['address'] ?? '');
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -386,11 +398,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        await _firestore.collection('users').doc(user.uid).update({
-          'name': _nameController.text.trim(),
-          'phone_number': _phoneController.text.trim(),
-          'address': _addressController.text.trim(),
-        });
+        // Update display name di Firebase Auth
+        await user.updateDisplayName(_nameController.text.trim());
+        // Reload the user so the new display name is present
+        await user.reload();
+        
+        // Sync perubahan ke Golang Backend
+        await _authService.syncUser();
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -452,29 +466,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
-              CustomInputField(
-                hintText: 'Nomor Telepon',
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Nomor telepon wajib diisi';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomInputField(
-                hintText: 'Alamat',
-                controller: _addressController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Alamat wajib diisi';
-                  }
-                  return null;
-                },
-              ),
               const SizedBox(height: 32),
               _isLoading
                   ? const Center(
@@ -507,7 +498,7 @@ class EditEmailScreen extends StatefulWidget {
 
 class _EditEmailScreenState extends State<EditEmailScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AuthService _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
@@ -545,17 +536,15 @@ class _EditEmailScreenState extends State<EditEmailScreen> {
         await user.reauthenticateWithCredential(credential);
 
         // Update email in Firebase Auth
-        await user.updateEmail(_emailController.text.trim());
+        await user.verifyBeforeUpdateEmail(_emailController.text.trim());
 
-        // Update email in Firestore
-        await _firestore.collection('users').doc(user.uid).update({
-          'email': _emailController.text.trim(),
-        });
+        // Sync perubahan ke Golang Backend
+        await _authService.syncUser();
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Email berhasil diperbarui'),
+              content: Text('Email berhasil diperbarui (Mohon verifikasi email baru Anda)'),
               backgroundColor: Color(0xFF4CAF50),
             ),
           );

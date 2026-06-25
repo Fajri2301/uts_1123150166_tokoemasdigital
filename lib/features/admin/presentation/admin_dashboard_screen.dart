@@ -14,7 +14,7 @@ import 'admin_transactions_screen.dart';
 import 'admin_gold_price_screen.dart';
 import 'admin_users_screen.dart';
 import 'admin_categories_screen.dart';
-import 'edit_profile_screen.dart';
+import 'admin_profile_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({Key? key}) : super(key: key);
@@ -238,117 +238,4 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 }
 
-// --- SUB SCREEN 3: PROFIL ADMIN ---
-class AdminProfileScreen extends StatelessWidget {
-  const AdminProfileScreen({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final authService = AuthService();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-          children: [
-            const SizedBox(height: 20),
-            // Header Profil
-            Center(
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: AppColors.goldAccent,
-                    child: const Icon(Icons.person, size: 50, color: Colors.black),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    user?.displayName ?? 'Administrator',
-                    style: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    user?.email ?? 'admin@tokoemas.com',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
-            
-            // Menu Pengaturan
-            _buildMenuTile(Icons.person_outline, 'Edit Profil', () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
-            }),
-            _buildMenuTile(Icons.notifications_none, 'Pengaturan Notifikasi', () {}),
-            _buildMenuTile(Icons.info_outline, 'Tentang Aplikasi', () {}),
-            
-            const SizedBox(height: 40),
-            
-            // Tombol Logout
-            ListTile(
-              onTap: () async {
-                // Tambahkan dialog konfirmasi untuk keamanan
-                bool? confirmLogout = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: const Color(0xFF1A1A1A),
-                    title: const Text('Keluar Akun', style: TextStyle(color: Colors.white)),
-                    content: const Text('Apakah Anda yakin ingin keluar dari panel admin?', style: TextStyle(color: Colors.white70)),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Batal', style: TextStyle(color: Colors.white70)),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Keluar', style: TextStyle(color: Colors.redAccent)),
-                      ),
-                    ],
-                  ),
-                );
-
-                if (confirmLogout == true) {
-                  try {
-                    await authService.signOut();
-                    if (context.mounted) {
-                      // Gunakan Navigator secara eksplisit untuk pindah halaman
-                      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Gagal keluar: $e')),
-                      );
-                    }
-                  }
-                }
-              },
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text('Keluar Akun', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              tileColor: Colors.redAccent.withOpacity(0.1),
-            ),
-          ],
-        ),
-    );
-  }
-
-  Widget _buildMenuTile(IconData icon, String title, VoidCallback onTap) {
-    return Column(
-      children: [
-        ListTile(
-          onTap: onTap,
-          leading: Icon(icon, color: AppColors.goldAccent),
-          title: Text(title, style: TextStyle(color: AppColors.textPrimary)),
-          trailing: Icon(Icons.arrow_forward_ios, color: AppColors.textSecondary, size: 16),
-        ),
-        Divider(color: AppColors.divider, height: 1),
-      ],
-    );
-  }
-}
