@@ -3,6 +3,8 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/utils/currency_formatter.dart';
 import 'package:toko_emas_digital/common/widgets/admin_scaffold.dart';
+import 'package:toko_emas_digital/common/widgets/custom_input_field.dart';
+import 'package:toko_emas_digital/common/widgets/gold_button.dart';
 import '../services/admin_service.dart';
 
 class AdminGoldPriceScreen extends StatefulWidget {
@@ -152,26 +154,16 @@ class _AdminGoldPriceScreenState extends State<AdminGoldPriceScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            TextFormField(
+            CustomInputField(
+              hintText: 'Masukkan harga baru (Rp)',
               controller: _priceController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: const TextStyle(color: Colors.white, fontSize: 18),
-              decoration: InputDecoration(
-                hintText: 'Masukkan harga baru',
-                hintStyle: const TextStyle(color: Color(0xFF666666)),
-                prefixText: 'Rp ',
-                prefixStyle: const TextStyle(color: Color(0xFFB0B0B0)),
-                filled: true,
-                fillColor: const Color(0xFF1A1A1A),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.padding,
-                  vertical: 12,
-                ),
-              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Harga wajib diisi';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 32),
 
@@ -182,25 +174,9 @@ class _AdminGoldPriceScreenState extends State<AdminGoldPriceScreen> {
                       valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
                     ),
                   )
-                : SizedBox(
-                    height: AppDimensions.buttonHeight,
-                    child: ElevatedButton(
-                      onPressed: _handleUpdate,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFD700),
-                        foregroundColor: const Color(0xFF0D0D0D),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-                        ),
-                      ),
-                      child: const Text(
-                        'Update Harga Emas',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                : GoldButton(
+                    text: 'Update Harga Emas',
+                    onPressed: _handleUpdate,
                   ),
           ],
         ),

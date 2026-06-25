@@ -27,25 +27,52 @@ class CustomInputField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.divider,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
-          ),
-          child: TextFormField(
-            controller: controller,
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            validator: validator,
-            maxLines: maxLines,
-            style: TextStyle(color: AppColors.textPrimary),
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: TextStyle(color: AppColors.textSecondary),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.padding,
-                vertical: 12,
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          validator: validator,
+          maxLines: maxLines,
+          style: const TextStyle(color: AppColors.textPrimary),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(color: AppColors.textSecondary),
+            filled: true,
+            fillColor: AppColors.divider,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.padding,
+              vertical: 16,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+              borderSide: BorderSide(
+                color: AppColors.goldAccent.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+              borderSide: const BorderSide(
+                color: AppColors.goldAccent,
+                width: 1.5,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+              borderSide: const BorderSide(
+                color: Colors.redAccent,
+                width: 1,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusButton),
+              borderSide: const BorderSide(
+                color: Colors.redAccent,
+                width: 1.5,
               ),
             ),
           ),
