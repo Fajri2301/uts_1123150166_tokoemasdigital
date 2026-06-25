@@ -5,6 +5,8 @@ import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/network/api_client.dart';
 import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
 import 'package:toko_emas_digital/common/widgets/gold_button.dart';
+import 'package:toko_emas_digital/features/digital_gold/presentation/buy_gold_screen.dart';
+import 'package:toko_emas_digital/features/digital_gold/presentation/sell_gold_screen.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({super.key});
@@ -277,11 +279,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           child: GoldButton(
             text: 'Beli',
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fitur Beli Emas sedang dikembangkan')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BuyGoldScreen()),
               );
             },
-            icon: Icons.add_shopping_cart,
           ),
         ),
         const SizedBox(width: 16),
@@ -289,12 +291,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           child: GoldButton(
             text: 'Jual',
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fitur Jual Emas sedang dikembangkan')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SellGoldScreen()),
               );
             },
             isSecondary: true,
-            icon: Icons.sell_outlined,
           ),
         ),
       ],
@@ -355,6 +357,25 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
     return LineChart(
       LineChartData(
+        lineTouchData: LineTouchData(
+          handleBuiltInTouches: true,
+          touchTooltipData: LineTouchTooltipData(
+            tooltipBgColor: AppColors.surface,
+            tooltipRoundedRadius: 8,
+            getTooltipItems: (List<LineBarSpot> touchedSpots) {
+              return touchedSpots.map((spot) {
+                return LineTooltipItem(
+                  CurrencyFormatter.formatRupiah(spot.y),
+                  const TextStyle(
+                    color: AppColors.primaryGold,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                );
+              }).toList();
+            },
+          ),
+        ),
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
@@ -391,7 +412,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               },
             ),
           ),
-          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 45,
+              getTitlesWidget: (value, meta) {
+                // Show values like "1.20M"
+                final valueInMillion = value / 1000000;
+                return Text(
+                  '${valueInMillion.toStringAsFixed(2)}M',
+                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                );
+              },
+            ),
+          ),
         ),
         borderData: FlBorderData(show: false),
         minX: 0,

@@ -93,9 +93,78 @@ class _GoldPriceChartState extends State<GoldPriceChart> {
           height: 180,
           child: LineChart(
             LineChartData(
-              gridData: FlGridData(show: false),
-              titlesData: FlTitlesData(show: false),
+              lineTouchData: LineTouchData(
+                handleBuiltInTouches: true,
+                touchTooltipData: LineTouchTooltipData(
+                  tooltipBgColor: AppColors.surface,
+                  tooltipRoundedRadius: 8,
+                  getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                    return touchedSpots.map((spot) {
+                      final valueInMillion = spot.y * 100000;
+                      return LineTooltipItem(
+                        'Rp ${valueInMillion.toStringAsFixed(0)}',
+                        const TextStyle(
+                          color: AppColors.primaryGold,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      );
+                    }).toList();
+                  },
+                ),
+              ),
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: false,
+                horizontalInterval: 1,
+                getDrawingHorizontalLine: (value) {
+                  return FlLine(
+                    color: AppColors.darkGray.withOpacity(0.3),
+                    strokeWidth: 1,
+                    dashArray: [5, 5],
+                  );
+                },
+              ),
+              titlesData: FlTitlesData(
+                show: true,
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 22,
+                    interval: 2,
+                    getTitlesWidget: (value, meta) {
+                      if (value % 2 != 0) return const Text('');
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          '${value.toInt()}H',
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 35,
+                    interval: 1,
+                    getTitlesWidget: (value, meta) {
+                      return Text(
+                        '${value.toInt()}K',
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                      );
+                    },
+                  ),
+                ),
+              ),
               borderData: FlBorderData(show: false),
+              minX: 0,
+              maxX: 8,
+              minY: 2,
+              maxY: 8,
               lineBarsData: [
                 LineChartBarData(
                   spots: const [
@@ -113,13 +182,26 @@ class _GoldPriceChartState extends State<GoldPriceChart> {
                   color: AppColors.primaryGold,
                   barWidth: 3,
                   isStrokeCapRound: true,
-                  dotData: FlDotData(show: false),
+                  dotData: FlDotData(
+                    show: true,
+                    getDotPainter: (spot, percent, barData, index) {
+                      if (index == 8) {
+                        return FlDotCirclePainter(
+                          radius: 4,
+                          color: AppColors.primaryGold,
+                          strokeWidth: 2,
+                          strokeColor: Colors.white,
+                        );
+                      }
+                      return FlDotCirclePainter(radius: 0, color: Colors.transparent);
+                    },
+                  ),
                   belowBarData: BarAreaData(
                     show: true,
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.primaryGold.withValues(alpha: 0.3),
-                        AppColors.primaryGold.withValues(alpha: 0.0),
+                        AppColors.primaryGold.withOpacity(0.3),
+                        AppColors.primaryGold.withOpacity(0.0),
                       ],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
