@@ -104,56 +104,11 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           Row(
             children: [
               IconButton(
-                onPressed: () => _showChangePasswordDialog(context, userId, name),
-                icon: Icon(Icons.lock_reset, color: AppColors.goldAccent),
-                tooltip: 'Ganti Password',
-              ),
-              IconButton(
                 onPressed: () => _confirmDeleteUser(context, userId, name),
                 icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
                 tooltip: 'Hapus User',
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showChangePasswordDialog(BuildContext context, String userId, String name) {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: Text('Ganti Password - $name', style: const TextStyle(color: Colors.white, fontSize: 18)),
-        content: TextField(
-          controller: controller,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: 'Password Baru',
-            hintStyle: TextStyle(color: AppColors.textSecondary),
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.goldAccent)),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal', style: TextStyle(color: Colors.white70)),
-          ),
-          TextButton(
-            onPressed: () async {
-              if (controller.text.isEmpty) return;
-              Navigator.pop(context);
-              // Not applicable anymore without Firebase Auth backend changes
-              Navigator.pop(context);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Ubah password di-disable pada Golang migration sementara')),
-                );
-              }
-            },
-            child: Text('Simpan', style: TextStyle(color: AppColors.goldAccent)),
           ),
         ],
       ),
