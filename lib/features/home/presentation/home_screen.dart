@@ -18,6 +18,7 @@ import 'package:toko_emas_digital/features/digital_gold/presentation/withdraw_sc
 import 'package:toko_emas_digital/features/transactions/presentation/transactions_screen.dart';
 import 'package:toko_emas_digital/common/widgets/gold_price_chart.dart';
 import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
+import 'package:toko_emas_digital/features/notifications/presentation/notifications_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -138,30 +139,40 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ),
                     ],
                   ),
-                  Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.surface.withValues(alpha: 0.5),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationsScreen(),
                         ),
-                        child: const Icon(Icons.notifications_rounded, color: AppColors.primaryGold, size: 24),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: Container(
-                          width: 10,
-                          height: 10,
+                      );
+                    },
+                    child: Stack(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppColors.error,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black, width: 2),
+                            color: AppColors.surface.withValues(alpha: 0.5),
+                          ),
+                          child: const Icon(Icons.notifications_rounded, color: AppColors.primaryGold, size: 24),
+                        ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: AppColors.error,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.black, width: 2),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
