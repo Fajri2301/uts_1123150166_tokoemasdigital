@@ -118,30 +118,40 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.dashboard_customize_rounded, color: AppColors.primaryGold, size: 32),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Gold Century',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryLightGold,
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.darkGray,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.3)),
                       ),
+                      child: const Icon(Icons.dashboard_customize_rounded, color: AppColors.primaryGold, size: 36),
                     ),
                   ],
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 24),
                 const Text(
-                  'Login ke Akun Anda',
+                  'Gold Century',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryLightGold,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 8),
+                const Text(
+                  'Selamat datang kembali di pusat investasi emas digital Anda.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 48),
 
                 if (_errorMessage != null)
                   Container(
@@ -159,54 +169,95 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                AppField(
-                  label: 'Alamat Email',
-                  placeholder: 'Masukkan email Anda',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return 'Email wajib diisi';
-                    if (!AppValidator.isValidEmail(value)) return 'Email tidak valid';
-                    return null;
-                  },
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppColors.darkGray),
+                    boxShadow: AppColors.shadowCard,
+                  ),
+                  child: Column(
+                    children: [
+                      AppField(
+                        label: 'Alamat Email',
+                        placeholder: 'Masukkan email Anda',
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Email wajib diisi';
+                          if (!AppValidator.isValidEmail(value)) return 'Email tidak valid';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      AppField(
+                        label: 'Password',
+                        placeholder: 'Masukkan password',
+                        controller: _passwordController,
+                        isPassword: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Password wajib diisi';
+                          if (!AppValidator.isValidPassword(value)) return 'Password minimal 6 karakter';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {},
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            'Lupa Password?',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              color: AppColors.primaryGold,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      AppButton(
+                        label: 'Masuk ke Akun',
+                        onPressed: _handleLogin,
+                        isLoading: _isLoading,
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 20),
-                AppField(
-                  label: 'Password',
-                  placeholder: 'Masukkan password',
-                  controller: _passwordController,
-                  isPassword: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return 'Password wajib diisi';
-                    if (!AppValidator.isValidPassword(value)) return 'Password minimal 6 karakter';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Lupa Password?',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: AppColors.primaryGold,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                
+                const SizedBox(height: 32),
+
+                Row(
+                  children: [
+                    const Expanded(child: Divider(color: AppColors.darkGray)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: const Text(
+                        'Atau masuk dengan',
+                        style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Poppins', fontSize: 12),
                       ),
                     ),
-                  ),
+                    const Expanded(child: Divider(color: AppColors.darkGray)),
+                  ],
                 ),
                 const SizedBox(height: 24),
 
                 AppButton(
-                  label: 'Masuk',
-                  onPressed: _handleLogin,
-                  isLoading: _isLoading,
+                  label: 'Google',
+                  onPressed: _isLoading ? () {} : _handleGoogleLogin,
+                  variant: AppButtonVariant.outlineWhite,
+                  icon: const Icon(Icons.g_mobiledata, size: 28),
                 ),
-                
-                const SizedBox(height: 24),
+
+                const SizedBox(height: 32),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -222,40 +273,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       },
                       child: const Text(
-                        'Daftar',
+                        'Daftar Sekarang',
                         style: TextStyle(
-                          color: AppColors.primaryGold,
+                          color: AppColors.primaryLightGold,
                           fontFamily: 'Poppins',
                           fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ],
-                ),
-
-                const SizedBox(height: 32),
-
-                Row(
-                  children: [
-                    const Expanded(child: Divider(color: AppColors.darkGray)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: const Text(
-                        'atau masuk dengan',
-                        style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Poppins', fontSize: 12),
-                      ),
-                    ),
-                    const Expanded(child: Divider(color: AppColors.darkGray)),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                AppButton(
-                  label: 'Google',
-                  onPressed: _isLoading ? () {} : _handleGoogleLogin,
-                  variant: AppButtonVariant.outlineWhite,
-                  icon: const Icon(Icons.g_mobiledata, size: 28),
                 ),
               ],
             ),
