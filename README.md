@@ -138,15 +138,7 @@ Aplikasi telah menggunakan sistem desain "Gold Century" yang terlihat mahal, mod
 
 *(Status admin diatur lewat database pada tabel `users` dengan mengubah kolom `role` menjadi "admin").*
 
-## 📝 Git Commit Convention
 
-Format: `fajri : pesan`
-
-Contoh:
-```bash
-git commit -m "fajri : tambah fitur login"
-git commit -m "fajri : fix bug pada checkout"
-```
 
 ## 👥 Developer
 
@@ -154,5 +146,3 @@ git commit -m "fajri : fix bug pada checkout"
 - NIM: 1123150166
 - GitHub: [@Fajri2301](https://github.com/Fajri2301)
 
-## 📄 License
-MIT License - UTS Mobile Programming
