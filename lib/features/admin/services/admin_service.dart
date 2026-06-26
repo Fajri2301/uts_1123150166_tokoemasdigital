@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 
 class AdminService {
@@ -164,5 +163,18 @@ class AdminService {
 
   List<String> getTransactionStatuses() {
     return ['pending', 'diproses', 'dikirim', 'selesai', 'failed'];
+  }
+
+  // Broadcast Notification
+  Future<Map<String, dynamic>> broadcastNotification(String title, String body) async {
+    try {
+      final response = await _apiClient.dio.post('/admin/broadcast-notification', data: {
+        'title': title,
+        'body': body,
+      });
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      throw Exception('Gagal broadcast notifikasi: $e');
+    }
   }
 }
