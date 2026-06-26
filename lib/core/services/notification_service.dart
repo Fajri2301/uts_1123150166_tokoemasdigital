@@ -25,7 +25,7 @@ class NotificationService {
       iOS: initializationSettingsDarwin,
     );
 
-    await _localNotifications.initialize(initializationSettings);
+    await _localNotifications.initialize(settings: initializationSettings);
 
     // 2. Minta izin FCM (Android 13+ & iOS)
     NotificationSettings settings = await _fcm.requestPermission(
@@ -81,12 +81,11 @@ class NotificationService {
           const NotificationDetails notificationDetails =
               NotificationDetails(android: androidNotificationDetails);
 
-          // Tampilkan notifikasi secara paksa
           _localNotifications.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            notificationDetails,
+            id: notification.hashCode,
+            title: notification.title,
+            body: notification.body,
+            notificationDetails: notificationDetails,
           );
         }
       });
