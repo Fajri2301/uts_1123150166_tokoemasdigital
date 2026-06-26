@@ -462,22 +462,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  ImageProvider _getImageProvider(String imageUrl) {
-    if (imageUrl.contains('base64,')) {
-      try {
-        final base64String = imageUrl.split(',').last;
-        final Uint8List bytes = base64Decode(base64String);
-        return MemoryImage(bytes);
-      } catch (e) {
-        // Fallback
-      }
-    }
-    if (imageUrl.isNotEmpty && imageUrl != 'placeholder') {
-      return NetworkImage(imageUrl);
-    }
-    return const NetworkImage('https://via.placeholder.com/150');
-  }
-
   Widget _buildProductCatalog() {
     final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
@@ -488,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           return const Center(child: CircularProgressIndicator(color: AppColors.primaryGold));
         }
 
-        final products = snapshot.data ?? [];
+        final products = (snapshot.data ?? []).take(6).toList();
         if (products.isEmpty) {
           return const Center(child: Text('Katalog kosong.', style: TextStyle(color: AppColors.textSecondary)));
         }
@@ -501,12 +485,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             crossAxisCount: AppDimensions.gridColumns,
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            childAspectRatio: AppDimensions.gridAspectRatio,
+            childAspectRatio: 0.7, // Matching CatalogScreen ratio for consistency
           ),
           itemCount: products.length,
           itemBuilder: (context, index) {
             final product = products[index];
-            return GestureDetector(
+            return ProductCard(
+              name: product.name,
+              price: currencyFormat.format(product.price),
+              description: product.description,
+              imageUrl: product.imageUrl,
               onTap: () {
                 Navigator.push(
                   context,
@@ -524,47 +512,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ),
                 );
               },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.15)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.darkGray.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(image: _getImageProvider(product.imageUrl), fit: BoxFit.cover),
-                        ),
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: Container(
-                            margin: const EdgeInsets.all(8),
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryGold.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.2)),
-                            ),
-                            child: const Text('99.9%', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(product.name, style: const TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 2),
-                    const Text('24 Karat', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 11, color: AppColors.textSecondary)),
-                    const SizedBox(height: 4),
-                    Text(currencyFormat.format(product.price), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 14, color: AppColors.primaryGold)),
-                  ],
-                ),
-              ),
             );
           },
         );
