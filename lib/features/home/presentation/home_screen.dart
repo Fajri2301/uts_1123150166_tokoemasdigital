@@ -362,41 +362,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Harga Beli', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
-                      const Text('Rp 1.054.000/gr', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary)),
-                      Row(
-                        children: [
-                          const Icon(Icons.trending_up_rounded, color: Colors.greenAccent, size: 14),
-                          const SizedBox(width: 2),
-                          const Text('+0.42%', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 10, color: Colors.greenAccent)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Text('Harga Jual', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
-                      const Text('Rp 960.000/gr', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Icon(Icons.trending_down_rounded, color: Colors.redAccent, size: 14),
-                          const SizedBox(width: 2),
-                          const Text('-0.12%', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 10, color: Colors.redAccent)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
               const GoldPriceChart(),
             ],
           ),
