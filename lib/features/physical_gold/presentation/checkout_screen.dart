@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
@@ -12,12 +14,14 @@ class CheckoutScreen extends StatefulWidget {
   final String productId;
   final String productName;
   final double price;
+  final String imageUrl;
 
   const CheckoutScreen({
     super.key,
     required this.productId,
     required this.productName,
     required this.price,
+    required this.imageUrl,
   });
 
   @override
@@ -271,17 +275,37 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  ImageProvider _getImageProvider(String url) {
+    if (url.contains('base64,')) {
+      try {
+        final base64String = url.split(',').last;
+        final Uint8List bytes = base64Decode(base64String);
+        return MemoryImage(bytes);
+      } catch (e) {
+        // Fallback
+      }
+    }
+    if (url.isNotEmpty && url != 'placeholder') {
+      return NetworkImage(url);
+    }
+    return const AssetImage('assets/images/placeholder.png'); // Fallback
+  }
+
   Widget _buildProductInfo() {
     return _buildGlassCard(
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               color: AppColors.primaryGold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
+              image: DecorationImage(
+                image: _getImageProvider(widget.imageUrl),
+                fit: BoxFit.cover,
+              ),
             ),
-            child: const Icon(Icons.diamond_outlined, color: AppColors.primaryGold, size: 32),
           ),
           const SizedBox(width: 16),
           Expanded(

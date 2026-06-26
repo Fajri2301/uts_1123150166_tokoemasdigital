@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
@@ -13,6 +15,22 @@ class ProductDetailScreen extends StatelessWidget {
     required this.product,
     required this.productId,
   });
+
+  ImageProvider _getImageProvider(String url) {
+    if (url.contains('base64,')) {
+      try {
+        final base64String = url.split(',').last;
+        final Uint8List bytes = base64Decode(base64String);
+        return MemoryImage(bytes);
+      } catch (e) {
+        // Fallback
+      }
+    }
+    if (url.isNotEmpty && url != 'placeholder') {
+      return NetworkImage(url);
+    }
+    return const AssetImage('assets/images/placeholder.png'); // Fallback
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +73,9 @@ class ProductDetailScreen extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      imageUrl.isNotEmpty
-                          ? Image.network(
-                              imageUrl,
+                      imageUrl.isNotEmpty && imageUrl != 'placeholder'
+                          ? Image(
+                              image: _getImageProvider(imageUrl),
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
                             )
@@ -211,7 +229,7 @@ class ProductDetailScreen extends StatelessWidget {
                               return;
                             }
                             Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => CheckoutScreen(productId: productId, productName: name, price: price)),
+                              MaterialPageRoute(builder: (_) => CheckoutScreen(productId: productId, productName: name, price: price, imageUrl: imageUrl)),
                             );
                           },
                           child: const Text('Beli Sekarang', style: TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.bold)),
