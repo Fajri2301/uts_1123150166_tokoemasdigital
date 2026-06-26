@@ -290,6 +290,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                                 )
                               : DropdownButtonFormField<String>(
                                   value: _selectedCategory,
+                                  isExpanded: true,
                                   onChanged: (String? newValue) {
                                     if (newValue != null) {
                                       setState(() {
@@ -300,7 +301,10 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                                   items: _categories.map<DropdownMenuItem<String>>((String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
-                                      child: Text(value),
+                                      child: Text(
+                                        value,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     );
                                   }).toList(),
                                   decoration: InputDecoration(
