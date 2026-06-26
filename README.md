@@ -49,6 +49,23 @@ Namun, untuk mencapai skalabilitas level _Production_ dan standar arsitektur ind
 - Penyimpanan gambar di-handle langsung melalui backend via **Base64** atau penyimpanan internal API (menggantikan Supabase Storage).
 - **Golang (Gin + GORM)** kini menjadi otak utama (Centralized Backend), sehingga aplikasi Flutter murni bertindak sebagai _Client_ yang berkomunikasi melalui HTTP REST API yang aman.
 
+## 📺 Presentasi Video
+🎥 **[Klik di sini untuk menonton presentasi Toko Emas Digital di YouTube](https://youtube.com/...)** *(Silakan ganti link ini dengan link video YouTube Anda)*
+
+## 📸 Screenshots UI
+
+Aplikasi ini menggunakan tema desain **Gold Century Pro Max** yang elegan dan modern.
+
+| Home Screen | Emas Digital | Fisik & Checkout |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/home.jpeg" width="200" alt="Home Screen"> | <img src="docs/screenshots/digital.jpeg" width="200" alt="Emas Digital"> | <img src="docs/screenshots/checkout.jpeg" width="200" alt="Checkout"> |
+
+| Admin Dashboard | Kelola Produk | Transaksi (Status) |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/admin_dashboard.jpeg" width="200" alt="Admin Dashboard"> | <img src="docs/screenshots/admin_product.jpeg" width="200" alt="Kelola Produk"> | <img src="docs/screenshots/admin_transaction.jpeg" width="200" alt="Transaksi"> |
+
+*(Note: Simpan file screenshot di dalam folder `docs/screenshots/` dengan nama yang sesuai seperti di atas)*
+
 ## 📂 Struktur Folder (Frontend - Flutter)
 
 ```
@@ -73,7 +90,9 @@ lib/
 
 ### 1. Clone Repository & Setup Backend
 
-Silakan operasikan Backend Go (`be-tokoemas`) terlebih dahulu. Panduan instalasi dan `.env` lengkap tersedia di folder backend.
+Silakan operasikan Backend Go (`be-tokoemas`)
+repo (`https://github.com/Fajri2301/be-tokoemas-golang.git`)
+terlebih dahulu. Panduan instalasi dan `.env` lengkap tersedia di folder backend.
 Pastikan backend berjalan di URL yang sesuai (misal: `http://192.168.0.x:8080`) dan sinkronkan dengan `ApiClient` di Flutter.
 
 ### 2. Setup Frontend Flutter
