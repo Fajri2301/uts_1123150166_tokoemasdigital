@@ -39,6 +39,16 @@ Aplikasi toko emas digital premium berbasis **Flutter** untuk Frontend, di-suppo
 | **Firebase FCM** | Layanan Push Notification (Broadcast & Transactional) |
 | **Provider** | State management (Frontend) |
 
+### 🔄 Riwayat Migrasi (Backend Evolution)
+Pada awalnya, aplikasi ini dibangun sepenuhnya secara _Serverless_ menggunakan:
+- **Firebase Firestore** sebagai database utama (NoSQL).
+- **Supabase Storage** untuk penyimpanan _file_ / gambar produk.
+
+Namun, untuk mencapai skalabilitas level _Production_ dan standar arsitektur industri, sistem dirombak dan bermigrasi sepenuhnya (Full-stack API-Driven):
+- Database utama dipindahkan ke **Relational Database (SQLite/PostgreSQL)** agar relasi data (transaksi, produk, user) lebih terstruktur dan aman.
+- Penyimpanan gambar di-handle langsung melalui backend via **Base64** atau penyimpanan internal API (menggantikan Supabase Storage).
+- **Golang (Gin + GORM)** kini menjadi otak utama (Centralized Backend), sehingga aplikasi Flutter murni bertindak sebagai _Client_ yang berkomunikasi melalui HTTP REST API yang aman.
+
 ## 📂 Struktur Folder (Frontend - Flutter)
 
 ```
