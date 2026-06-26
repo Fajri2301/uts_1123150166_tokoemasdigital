@@ -50,22 +50,23 @@ Namun, untuk mencapai skalabilitas level _Production_ dan standar arsitektur ind
 - **Golang (Gin + GORM)** kini menjadi otak utama (Centralized Backend), sehingga aplikasi Flutter murni bertindak sebagai _Client_ yang berkomunikasi melalui HTTP REST API yang aman.
 
 ## 📺 Presentasi Video
-🎥 **[Klik di sini untuk menonton presentasi Toko Emas Digital di YouTube](https://youtube.com/...)** *(Silakan ganti link ini dengan link video YouTube Anda)*
+🎥 **[Klik di sini untuk menonton presentasi Toko Emas Digital di YouTube](https://youtu.be/SiLeV3ENvA4)**
 
 ## 📸 Screenshots UI
 
 Aplikasi ini menggunakan tema desain **Gold Century Pro Max** yang elegan dan modern.
 
-| Home Screen | Emas Digital | Fisik & Checkout |
+| Home Screen | Katalog Fisik | Portofolio & Chart |
 |:---:|:---:|:---:|
-| <img src="docs/screenshots/home.jpeg" width="200" alt="Home Screen"> | <img src="docs/screenshots/digital.jpeg" width="200" alt="Emas Digital"> | <img src="docs/screenshots/checkout.jpeg" width="200" alt="Checkout"> |
+| <img src="ss_halaman/home_user1.png" width="200" alt="Home Screen"> | <img src="ss_halaman/home_user2.png" width="200" alt="Katalog"> | <img src="ss_halaman/halamanportofolio.png" width="200" alt="Portofolio"> |
 
-| Admin Dashboard | Kelola Produk | Transaksi (Status) |
+| Beli Emas | Jual Emas | Lacak Pesanan |
 |:---:|:---:|:---:|
-| <img src="docs/screenshots/admin_dashboard.jpeg" width="200" alt="Admin Dashboard"> | <img src="docs/screenshots/admin_product.jpeg" width="200" alt="Kelola Produk"> | <img src="docs/screenshots/admin_transaction.jpeg" width="200" alt="Transaksi"> |
+| <img src="ss_halaman/halaman_beli-emas-digital.png" width="200" alt="Beli Emas"> | <img src="ss_halaman/halaman_jual.png" width="200" alt="Jual Emas"> | <img src="ss_halaman/lacak_pesanan.png" width="200" alt="Lacak"> |
 
-*(Note: Simpan file screenshot di dalam folder `docs/screenshots/` dengan nama yang sesuai seperti di atas)*
-
+| Checkout Fisik | Notifikasi | Profil & Saldo |
+|:---:|:---:|:---:|
+| <img src="ss_halaman/halaman_checkout.png" width="200" alt="Checkout"> | <img src="ss_halaman/halaman_notif.png" width="200" alt="Notifikasi"> | <img src="ss_halaman/halaman_profile.png" width="200" alt="Profil"> |
 ## 📂 Struktur Folder (Frontend - Flutter)
 
 ```
