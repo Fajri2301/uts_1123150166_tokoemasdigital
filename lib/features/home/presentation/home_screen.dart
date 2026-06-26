@@ -406,14 +406,28 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildQuickActions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildSmallActionBtn(Icons.diamond_outlined, 'Antam'),
-        _buildSmallActionBtn(Icons.workspace_premium_outlined, 'UBS'),
-        _buildSmallActionBtn(Icons.local_florist_outlined, 'Lotus Archi'),
-        _buildSmallActionBtn(Icons.storefront_outlined, 'Galeri 24'),
-      ],
+    final categories = [
+      {'name': 'Cincin', 'icon': Icons.radio_button_unchecked_rounded},
+      {'name': 'Kalung', 'icon': Icons.stream_rounded},
+      {'name': 'Gelang', 'icon': Icons.toll_rounded},
+      {'name': 'Anting', 'icon': Icons.headphones_outlined},
+      {'name': 'Batangan', 'icon': Icons.view_agenda_rounded},
+      {'name': 'Liontin', 'icon': Icons.diamond_outlined},
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      clipBehavior: Clip.none,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: categories.map((cat) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 28.0),
+            child: _buildSmallActionBtn(cat['icon'] as IconData, cat['name'] as String),
+          );
+        }).toList(),
+      ),
     );
   }
 
