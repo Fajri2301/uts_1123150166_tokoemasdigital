@@ -314,10 +314,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Grafik Harga (Simulasi)',
               style: TextStyle(
                 fontSize: 18,
@@ -325,12 +325,19 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 color: Colors.white,
               ),
             ),
-            Text(
-              '1 Bulan',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.primaryGold,
-                fontWeight: FontWeight.w500,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.blueAccent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blueAccent.withValues(alpha: 0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.auto_graph_rounded, color: Colors.blueAccent, size: 14),
+                  SizedBox(width: 4),
+                  Text('AI Prediksi: Naik 85%', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blueAccent)),
+                ],
               ),
             ),
           ],
@@ -338,7 +345,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         const SizedBox(height: 24),
         Container(
           height: 220,
-          padding: const EdgeInsets.only(right: 0, left: 0, top: 24, bottom: 0),
+          padding: const EdgeInsets.only(right: 16, left: 16, top: 24, bottom: 8),
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(24),
@@ -353,12 +360,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Widget _buildFlChart() {
     // Simulator data for beautiful chart presentation
     final List<FlSpot> spots = [
-      FlSpot(0, _currentPrice * 0.95),
-      FlSpot(1, _currentPrice * 0.97),
-      FlSpot(2, _currentPrice * 0.96),
+      FlSpot(0, _currentPrice * 0.93),
+      FlSpot(1, _currentPrice * 0.96),
+      FlSpot(2, _currentPrice * 0.94),
       FlSpot(3, _currentPrice * 0.98),
-      FlSpot(4, _currentPrice * 0.99),
-      FlSpot(5, _currentPrice * 1.01),
+      FlSpot(4, _currentPrice * 0.95),
+      FlSpot(5, _currentPrice * 0.99),
       FlSpot(6, _currentPrice),
     ];
 
@@ -384,11 +391,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
         gridData: FlGridData(
           show: true,
-          drawVerticalLine: false,
+          drawVerticalLine: true,
+          drawHorizontalLine: true,
           horizontalInterval: _currentPrice * 0.02,
+          verticalInterval: 1,
           getDrawingHorizontalLine: (value) {
             return FlLine(
               color: AppColors.darkGray.withValues(alpha: 0.3),
+              strokeWidth: 1,
+              dashArray: [5, 5],
+            );
+          },
+          getDrawingVerticalLine: (value) {
+            return FlLine(
+              color: AppColors.darkGray.withValues(alpha: 0.2),
               strokeWidth: 1,
               dashArray: [5, 5],
             );
@@ -420,10 +436,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             ),
           ),
         ),
-        borderData: FlBorderData(show: false),
-        minX: 0,
-        maxX: 6,
-        minY: _currentPrice * 0.94,
+        borderData: FlBorderData(
+          show: true,
+          border: Border(
+            bottom: BorderSide(color: AppColors.darkGray.withValues(alpha: 0.5), width: 1),
+            left: const BorderSide(color: Colors.transparent),
+            right: const BorderSide(color: Colors.transparent),
+            top: const BorderSide(color: Colors.transparent),
+          ),
+        ),
+        minX: -0.2,
+        maxX: 6.2,
+        minY: _currentPrice * 0.92,
         maxY: _currentPrice * 1.02,
         lineBarsData: [
           LineChartBarData(
