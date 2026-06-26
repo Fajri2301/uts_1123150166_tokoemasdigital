@@ -30,12 +30,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
+  late Future<Map<String, double>> _walletFuture;
+  late Stream<List<ProductModel>> _productsStream;
 
   @override
   void initState() {
     super.initState();
     _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat(reverse: true);
     _pulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(_pulseController);
+    _walletFuture = TransactionService().getWalletBalance();
+    _productsStream = CatalogService().getProducts().asBroadcastStream();
   }
 
   @override
@@ -45,8 +49,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Future<void> _handleRefresh() async {
+    setState(() {
+      _walletFuture = TransactionService().getWalletBalance();
+      _productsStream = CatalogService().getProducts().asBroadcastStream();
+    });
     await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) setState(() {});
   }
 
   @override
@@ -185,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Widget _buildDualBalanceCard(BuildContext context) {
     return FutureBuilder<Map<String, double>>(
-      future: TransactionService().getWalletBalance(),
+      future: _walletFuture,
       builder: (context, snapshot) {
         final balances = snapshot.data ?? {'grams': 0.0, 'rupiah': 0.0};
         final grams = balances['grams']!;
@@ -445,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
     return StreamBuilder<List<ProductModel>>(
-      stream: CatalogService().getProducts(),
+      stream: _productsStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator(color: AppColors.primaryGold));
