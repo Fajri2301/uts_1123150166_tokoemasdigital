@@ -154,17 +154,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           end: Alignment.bottomRight,
           colors: [
             AppColors.surface,
-            AppColors.surface.withOpacity(0.8),
+            AppColors.surface.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppColors.primaryGold.withOpacity(0.3),
+          color: AppColors.primaryGold.withValues(alpha: 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGold.withOpacity(0.05),
+            color: AppColors.primaryGold.withValues(alpha: 0.05),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -209,12 +209,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            CurrencyFormatter.formatRupiah(_currentAssetValue),
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryGold,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              CurrencyFormatter.formatRupiah(_currentAssetValue),
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryGold,
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -260,12 +264,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
         ),
       ],
@@ -331,11 +338,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         const SizedBox(height: 24),
         Container(
           height: 220,
-          padding: const EdgeInsets.only(right: 16, left: 0, top: 24, bottom: 0),
+          padding: const EdgeInsets.only(right: 0, left: 0, top: 24, bottom: 0),
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.darkGray.withOpacity(0.3)),
+            border: Border.all(color: AppColors.darkGray.withValues(alpha: 0.3)),
           ),
           child: _buildFlChart(),
         ),
@@ -381,7 +388,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           horizontalInterval: _currentPrice * 0.02,
           getDrawingHorizontalLine: (value) {
             return FlLine(
-              color: AppColors.darkGray.withOpacity(0.3),
+              color: AppColors.darkGray.withValues(alpha: 0.3),
               strokeWidth: 1,
               dashArray: [5, 5],
             );
@@ -391,6 +398,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           show: true,
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -408,20 +416,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   );
                 }
                 return const Text('');
-              },
-            ),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 45,
-              getTitlesWidget: (value, meta) {
-                // Show values like "1.20M"
-                final valueInMillion = value / 1000000;
-                return Text(
-                  '${valueInMillion.toStringAsFixed(2)}M',
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
-                );
               },
             ),
           ),
@@ -456,8 +450,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primaryGold.withOpacity(0.3),
-                  AppColors.primaryGold.withOpacity(0.0),
+                  AppColors.primaryGold.withValues(alpha: 0.3),
+                  AppColors.primaryGold.withValues(alpha: 0.0),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
