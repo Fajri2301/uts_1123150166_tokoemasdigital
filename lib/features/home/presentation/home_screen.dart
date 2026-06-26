@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
 import 'package:toko_emas_digital/core/constants/app_dimensions.dart';
@@ -19,6 +21,7 @@ import 'package:toko_emas_digital/features/transactions/presentation/transaction
 import 'package:toko_emas_digital/common/widgets/gold_price_chart.dart';
 import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
 import 'package:toko_emas_digital/features/notifications/presentation/notifications_screen.dart';
+import 'package:toko_emas_digital/features/physical_gold/presentation/catalog_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -86,7 +89,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     const SizedBox(height: 32),
                     _buildQuickActions(),
                     const SizedBox(height: 32),
-                    _buildSectionTitle('Emas Fisik'),
+                    _buildSectionTitle('Emas Fisik', onSeeAll: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const CatalogScreen()));
+                    }),
                     const SizedBox(height: 16),
                     _buildProductCatalog(),
                   ]),
@@ -431,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, {VoidCallback? onSeeAll}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -440,12 +445,37 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           shaderCallback: (bounds) => const LinearGradient(colors: [AppColors.primaryGold, AppColors.primaryDark]).createShader(bounds),
           child: Text(title, style: const TextStyle(fontFamily: 'Poppins', fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
         ),
-        const Text(
-          'Lihat Semua',
-          style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.primaryGold),
-        ),
+        if (onSeeAll != null)
+          GestureDetector(
+            onTap: onSeeAll,
+            child: const Text(
+              'Lihat Semua',
+              style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.primaryGold),
+            ),
+          )
+        else
+          const Text(
+            'Lihat Semua',
+            style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.primaryGold),
+          ),
       ],
     );
+  }
+
+  ImageProvider _getImageProvider(String imageUrl) {
+    if (imageUrl.contains('base64,')) {
+      try {
+        final base64String = imageUrl.split(',').last;
+        final Uint8List bytes = base64Decode(base64String);
+        return MemoryImage(bytes);
+      } catch (e) {
+        // Fallback
+      }
+    }
+    if (imageUrl.isNotEmpty && imageUrl != 'placeholder') {
+      return NetworkImage(imageUrl);
+    }
+    return const NetworkImage('https://via.placeholder.com/150');
   }
 
   Widget _buildProductCatalog() {
@@ -509,7 +539,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         decoration: BoxDecoration(
                           color: AppColors.darkGray.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(image: NetworkImage(product.imageUrl), fit: BoxFit.cover),
+                          image: DecorationImage(image: _getImageProvider(product.imageUrl), fit: BoxFit.cover),
                         ),
                         child: Align(
                           alignment: Alignment.topRight,
