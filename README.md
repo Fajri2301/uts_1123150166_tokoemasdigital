@@ -2,6 +2,9 @@
 
 Aplikasi toko emas digital premium berbasis **Flutter** untuk Frontend, di-support dengan backend tangguh menggunakan **Golang (Gin + GORM)**, serta integrasi **Firebase Cloud Messaging (FCM)** untuk notifikasi _real-time_.
 
+## 🔗 Repositori Terkait
+- **Backend (Golang API):** [https://github.com/Fajri2301/be-tokoemas-golang.git](https://github.com/Fajri2301/be-tokoemas-golang.git)
+
 ## 📱 Fitur Utama
 
 ### 👤 User Features
