@@ -428,15 +428,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               getTitlesWidget: (value, meta) {
                 const days = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
                 if (value.toInt() >= 0 && value.toInt() < days.length) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    space: 8.0,
                     child: Text(
                       days[value.toInt()],
                       style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
                     ),
                   );
                 }
-                return const Text('');
+                return const SizedBox.shrink();
               },
             ),
           ),
