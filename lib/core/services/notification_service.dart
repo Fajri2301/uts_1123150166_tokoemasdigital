@@ -1,16 +1,41 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:toko_emas_digital/core/constants/app_colors.dart';
-import 'package:toko_emas_digital/core/network/api_client.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:toko_emas_digital/features/profile/services/user_service.dart';
 
 class NotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-    // Minta izin FCM (Android 13+ & iOS)
+    // 1. Inisialisasi pengaturan untuk Android
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    
+    // Inisialisasi pengaturan untuk iOS/macOS
+    const DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+    );
+
+    await _localNotifications.initialize(initializationSettings);
+
+    // 2. Minta izin FCM (Android 13+ & iOS)
     NotificationSettings settings = await _fcm.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // 3. Konfigurasi agar FCM tetap memunculkan Heads-Up notification di Foreground (iOS)
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
@@ -30,46 +55,39 @@ class NotificationService {
         }
       }
 
-      // Handle background/terminated messages (FCM handles ini otomatis di status bar)
+      // Handle background/terminated messages
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-      // Handle foreground messages — tampilkan sebagai SnackBar di dalam aplikasi
+      // Handle foreground messages - PAKSA MUNCUL POPBAR SISTEM (menggunakan flutter_local_notifications)
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         if (kDebugMode) print('Foreground message: ${message.notification?.title}');
 
         final notification = message.notification;
+        final android = message.notification?.android;
+
         if (notification != null) {
-          final context = navigatorKey.currentContext;
-          if (context != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      notification.title ?? '',
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    if (notification.body != null)
-                      Text(
-                        notification.body!,
-                        style: const TextStyle(color: Colors.black87, fontSize: 12),
-                      ),
-                  ],
-                ),
-                backgroundColor: AppColors.primaryGold,
-                duration: const Duration(seconds: 5),
-                behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.all(12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            );
-          }
+          // Konfigurasi Notifikasi Channel (Penting untuk Android 8.0+)
+          const AndroidNotificationDetails androidNotificationDetails =
+              AndroidNotificationDetails(
+            'high_importance_channel', // channelId
+            'High Importance Notifications', // channelName
+            channelDescription: 'Channel ini digunakan untuk notifikasi penting/broadcast.',
+            importance: Importance.max,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+            showWhen: true,
+          );
+
+          const NotificationDetails notificationDetails =
+              NotificationDetails(android: androidNotificationDetails);
+
+          // Tampilkan notifikasi secara paksa
+          _localNotifications.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            notificationDetails,
+          );
         }
       });
     } else {
