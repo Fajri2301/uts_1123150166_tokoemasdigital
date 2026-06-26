@@ -409,30 +409,35 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildSmallActionBtn(Icons.account_balance_rounded, 'Tarik Tunai'),
-        _buildSmallActionBtn(Icons.redeem_rounded, 'Promo'),
-        _buildSmallActionBtn(Icons.support_agent_rounded, 'Bantuan'),
-        _buildSmallActionBtn(Icons.grid_view_rounded, 'Lainnya'),
+        _buildSmallActionBtn(Icons.diamond_outlined, 'Antam'),
+        _buildSmallActionBtn(Icons.workspace_premium_outlined, 'UBS'),
+        _buildSmallActionBtn(Icons.local_florist_outlined, 'Lotus Archi'),
+        _buildSmallActionBtn(Icons.storefront_outlined, 'Galeri 24'),
       ],
     );
   }
 
   Widget _buildSmallActionBtn(IconData icon, String label) {
-    return Column(
-      children: [
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.surface.withValues(alpha: 0.4),
-            border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.15)),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CatalogScreen(categoryFilter: label)));
+      },
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.surface.withValues(alpha: 0.4),
+              border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.15)),
+            ),
+            child: Icon(icon, color: AppColors.primaryGold, size: 24),
           ),
-          child: Icon(icon, color: AppColors.primaryGold, size: 24),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontFamily: 'Inter', fontSize: 11, color: AppColors.textPrimary), textAlign: TextAlign.center),
-      ],
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontFamily: 'Inter', fontSize: 11, color: AppColors.textPrimary), textAlign: TextAlign.center),
+        ],
+      ),
     );
   }
 

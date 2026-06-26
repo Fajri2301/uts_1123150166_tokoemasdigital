@@ -9,7 +9,9 @@ import 'package:toko_emas_digital/features/physical_gold/presentation/product_de
 import 'package:intl/intl.dart';
 
 class CatalogScreen extends StatefulWidget {
-  const CatalogScreen({super.key});
+  final String? categoryFilter;
+
+  const CatalogScreen({super.key, this.categoryFilter});
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
@@ -23,7 +25,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
-      appBar: const CustomAppBar(title: 'Katalog Emas Fisik'),
+      appBar: CustomAppBar(title: widget.categoryFilter != null ? 'Katalog ${widget.categoryFilter}' : 'Katalog Emas Fisik'),
       body: StreamBuilder<List<ProductModel>>(
         stream: _catalogService.getProducts(),
         builder: (context, snapshot) {
@@ -37,10 +39,20 @@ class _CatalogScreenState extends State<CatalogScreen> {
             );
           }
 
-          final products = snapshot.data ?? [];
+          var products = snapshot.data ?? [];
+          
+          if (widget.categoryFilter != null) {
+            products = products.where((p) => p.category.toLowerCase().contains(widget.categoryFilter!.toLowerCase())).toList();
+          }
+
           if (products.isEmpty) {
-            return const Center(
-              child: Text('Belum ada produk emas fisik.', style: TextStyle(color: AppColors.textSecondary)),
+            return Center(
+              child: Text(
+                widget.categoryFilter != null 
+                  ? 'Belum ada produk untuk kategori ${widget.categoryFilter}.'
+                  : 'Belum ada produk emas fisik.', 
+                style: const TextStyle(color: AppColors.textSecondary)
+              ),
             );
           }
 
