@@ -90,68 +90,91 @@ class _GoldPriceChartState extends State<GoldPriceChart> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.arrow_downward_rounded, color: AppColors.primaryGold, size: 16),
-                    const SizedBox(width: 4),
-                    const Text('Harga Beli', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${CurrencyFormatter.formatRupiah(_currentPrice)}/gr',
-                  style: const TextStyle(
-                    fontFamily: 'Roboto Mono',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryLightGold,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.arrow_downward_rounded, color: AppColors.primaryGold, size: 16),
+                      const SizedBox(width: 4),
+                      const Text('Harga Beli', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
+                    ],
                   ),
-                ),
-                Text(
-                  '$sign${CurrencyFormatter.formatRupiah(diff.abs())} ($sign${percent.abs().toStringAsFixed(2)}%)',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
+                  const SizedBox(height: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${CurrencyFormatter.formatRupiah(_currentPrice)}/gr',
+                      style: const TextStyle(
+                        fontFamily: 'Roboto Mono',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryLightGold,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '$sign${CurrencyFormatter.formatRupiah(diff.abs())} ($sign${percent.abs().toStringAsFixed(2)}%)',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: statusColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    const Text('Harga Jual', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.arrow_upward_rounded, color: AppColors.primaryGold, size: 16),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${CurrencyFormatter.formatRupiah(_currentPrice * 0.97)}/gr', // 3% spread
-                  style: const TextStyle(
-                    fontFamily: 'Roboto Mono',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Text('Harga Jual', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: AppColors.textSecondary)),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.arrow_upward_rounded, color: AppColors.primaryGold, size: 16),
+                    ],
                   ),
-                ),
-                Text(
-                  '$sign${CurrencyFormatter.formatRupiah(diff.abs() * 0.97)} ($sign${percent.abs().toStringAsFixed(2)}%)',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
+                  const SizedBox(height: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${CurrencyFormatter.formatRupiah(_currentPrice * 0.97)}/gr', // 3% spread
+                      style: const TextStyle(
+                        fontFamily: 'Roboto Mono',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '$sign${CurrencyFormatter.formatRupiah(diff.abs() * 0.97)} ($sign${percent.abs().toStringAsFixed(2)}%)',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: statusColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
