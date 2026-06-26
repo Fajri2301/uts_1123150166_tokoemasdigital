@@ -168,7 +168,7 @@ class AdminService {
   // Broadcast Notification
   Future<Map<String, dynamic>> broadcastNotification(String title, String body) async {
     try {
-      final response = await _apiClient.dio.post('/admin/broadcast-notification', data: {
+      final response = await _apiClient.dio.post('/admin/notifications/broadcast', data: {
         'title': title,
         'body': body,
       });
