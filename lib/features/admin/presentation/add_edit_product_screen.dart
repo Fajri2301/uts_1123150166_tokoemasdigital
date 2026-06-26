@@ -31,6 +31,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   late TextEditingController _weightController;
   late TextEditingController _karatController;
   late TextEditingController _imageUrlController;
+  late TextEditingController _stockController;
 
   List<String> _categories = ['Lainnya'];
   bool _isLoading = false;
@@ -51,6 +52,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
     _weightController = TextEditingController(text: widget.product?.weight.toString() ?? '');
     _karatController = TextEditingController(text: widget.product?.karat.toString() ?? '24');
     _imageUrlController = TextEditingController(text: widget.product?.imageUrl ?? '');
+    _stockController = TextEditingController(text: widget.product?.stock.toString() ?? '1');
 
     if (widget.product?.imageUrl.startsWith('data:image') ?? false) {
       _isUrlMode = false;
@@ -116,6 +118,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
     _weightController.dispose();
     _karatController.dispose();
     _imageUrlController.dispose();
+    _stockController.dispose();
     super.dispose();
   }
 
@@ -131,6 +134,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
       'category': _selectedCategory,
       'weight': int.tryParse(_weightController.text) ?? 0,
       'karat': int.tryParse(_karatController.text) ?? 24,
+      'stock': int.tryParse(_stockController.text) ?? 1,
       'image_url': _imageUrlController.text,
       'is_available': true,
       'seller_id': 'admin', // Default admin id
@@ -329,6 +333,10 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                   
                   _buildLabel('Kadar (Karat)'),
                   CustomInputField(hintText: '24', controller: _karatController, keyboardType: TextInputType.number),
+                  const SizedBox(height: 16),
+                  
+                  _buildLabel('Stok Produk'),
+                  CustomInputField(hintText: '10', controller: _stockController, keyboardType: TextInputType.number),
                   const SizedBox(height: 16),
                   
                   _buildLabel('Deskripsi Produk'),
