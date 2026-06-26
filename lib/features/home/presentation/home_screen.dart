@@ -266,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 crossAxisAlignment: CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
                                 children: [
-                                  Text('Rp', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 12, color: AppColors.primaryGold.withValues(alpha: 0.6))),
+                                  Text('', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 12, color: AppColors.primaryGold.withValues(alpha: 0.6))),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: FittedBox(

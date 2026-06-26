@@ -51,7 +51,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             color: AppColors.primaryGold,
             backgroundColor: AppColors.surface,
             child: GridView.builder(
-              padding: const EdgeInsets.all(AppSpacing.padding),
+              padding: const EdgeInsets.all(16.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: 16,
