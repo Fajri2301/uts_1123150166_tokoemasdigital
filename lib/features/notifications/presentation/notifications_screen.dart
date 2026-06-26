@@ -65,84 +65,97 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGold))
-          : _notifications.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Belum ada notifikasi.',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
-                  ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _notifications.length,
-                  separatorBuilder: (context, index) => const Divider(color: AppColors.darkGray, height: 24),
-                  itemBuilder: (context, index) {
-                    final notif = _notifications[index];
-                    final date = DateTime.parse(notif['created_at']).toLocal();
-                    final formattedDate = DateFormat('dd MMM yyyy, HH:mm').format(date);
-                    final isRead = notif['is_read'] == true;
+      body: RefreshIndicator(
+        onRefresh: _fetchNotifications,
+        color: AppColors.primaryGold,
+        backgroundColor: AppColors.surface,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGold))
+            : _notifications.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'Belum ada notifikasi.',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  )
+                : ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _notifications.length,
+                    separatorBuilder: (context, index) => const Divider(color: AppColors.darkGray, height: 24),
+                    itemBuilder: (context, index) {
+                      final notif = _notifications[index];
+                      final date = DateTime.parse(notif['created_at']).toLocal();
+                      final formattedDate = DateFormat('dd MMM yyyy, HH:mm').format(date);
+                      final isRead = notif['is_read'] == true;
 
-                    return Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isRead ? Colors.transparent : AppColors.surface.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.darkGray),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryGold.withValues(alpha: 0.2),
-                              shape: BoxShape.circle,
+                      return Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isRead ? Colors.transparent : AppColors.surface.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.darkGray),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryGold.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                notif['type'] == 'promo' ? Icons.local_offer : Icons.notifications_active,
+                                color: AppColors.primaryGold,
+                                size: 20,
+                              ),
                             ),
-                            child: Icon(
-                              notif['type'] == 'promo' ? Icons.local_offer : Icons.notifications_active,
-                              color: AppColors.primaryGold,
-                              size: 20,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    notif['title'] ?? '',
+                                    style: const TextStyle(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    notif['body'] ?? '',
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    formattedDate,
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  notif['title'] ?? '',
-                                  style: const TextStyle(
-                                    color: AppColors.textPrimary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  notif['body'] ?? '',
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  formattedDate,
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+      ),
     );
   }
 }
