@@ -266,95 +266,61 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                   CustomInputField(hintText: 'Contoh: Kalung Emas 24K', controller: _nameController),
                   const SizedBox(height: 16),
                   
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildLabel('Harga (Rp)'),
-                            CustomInputField(hintText: '2500000', controller: _priceController, keyboardType: TextInputType.number),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildLabel('Kategori'),
-                            _isLoadingCategories 
-                              ? const SizedBox(
-                                  height: 50, 
-                                  child: Center(child: CircularProgressIndicator(strokeWidth: 2))
-                                )
-                              : DropdownButtonFormField<String>(
-                                  value: _selectedCategory,
-                                  isExpanded: true,
-                                  onChanged: (String? newValue) {
-                                    if (newValue != null) {
-                                      setState(() {
-                                        _selectedCategory = newValue;
-                                      });
-                                    }
-                                  },
-                                  items: _categories.map<DropdownMenuItem<String>>((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    );
-                                  }).toList(),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.3)),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.3)),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: const BorderSide(color: Color(0xFFFFD700)),
-                                    ),
-                                  ),
-                                ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildLabel('Harga (Rp)'),
+                  CustomInputField(hintText: '2500000', controller: _priceController, keyboardType: TextInputType.number),
                   const SizedBox(height: 16),
                   
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildLabel('Berat (gram)'),
-                            CustomInputField(hintText: '5', controller: _weightController, keyboardType: TextInputType.number),
-                          ],
+                  _buildLabel('Kategori'),
+                  _isLoadingCategories 
+                    ? const SizedBox(
+                        height: 50, 
+                        child: Center(child: CircularProgressIndicator(strokeWidth: 2))
+                      )
+                    : DropdownButtonFormField<String>(
+                        value: _selectedCategory,
+                        isExpanded: true,
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              _selectedCategory = newValue;
+                            });
+                          }
+                        },
+                        items: _categories.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.3)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.3)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildLabel('Kadar (Karat)'),
-                            CustomInputField(hintText: '24', controller: _karatController, keyboardType: TextInputType.number),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  const SizedBox(height: 16),
+                  
+                  _buildLabel('Berat (gram)'),
+                  CustomInputField(hintText: '5', controller: _weightController, keyboardType: TextInputType.number),
+                  const SizedBox(height: 16),
+                  
+                  _buildLabel('Kadar (Karat)'),
+                  CustomInputField(hintText: '24', controller: _karatController, keyboardType: TextInputType.number),
                   const SizedBox(height: 16),
                   
                   _buildLabel('Deskripsi Produk'),
