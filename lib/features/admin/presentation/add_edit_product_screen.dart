@@ -295,21 +295,29 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
                             ),
                           );
                         }).toList(),
+                        dropdownColor: AppColors.divider,
+                        style: const TextStyle(color: AppColors.textPrimary),
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: AppColors.divider,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.3)),
+                            borderSide: BorderSide.none,
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: AppColors.textSecondary.withOpacity(0.3)),
+                            borderSide: BorderSide(
+                              color: AppColors.primaryGold.withOpacity(0.1),
+                              width: 1,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(color: Color(0xFFFFD700)),
+                            borderSide: const BorderSide(
+                              color: AppColors.primaryGold,
+                              width: 1.5,
+                            ),
                           ),
                         ),
                       ),
