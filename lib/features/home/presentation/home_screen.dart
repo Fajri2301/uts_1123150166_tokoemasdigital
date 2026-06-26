@@ -246,9 +246,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 crossAxisAlignment: CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
                                 children: [
-                                  Text(grams.toStringAsFixed(3), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
+                                  Text(grams >= 1000 ? (grams / 1000).toStringAsFixed(3) : grams.toStringAsFixed(3), style: const TextStyle(fontFamily: 'Roboto Mono', fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primaryGold)),
                                   const SizedBox(width: 4),
-                                  Text('gr', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 12, color: AppColors.primaryGold.withValues(alpha: 0.6))),
+                                  Text(grams >= 1000 ? 'kg' : 'gr', style: TextStyle(fontFamily: 'Roboto Mono', fontSize: 12, color: AppColors.primaryGold.withValues(alpha: 0.6))),
                                 ],
                               ),
                             ],
