@@ -429,7 +429,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 const days = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
                 if (value.toInt() >= 0 && value.toInt() < days.length) {
                   return SideTitleWidget(
-                    axisSide: meta.axisSide,
+                    meta: meta,
                     space: 8.0,
                     child: Text(
                       days[value.toInt()],
