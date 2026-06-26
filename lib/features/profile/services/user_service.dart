@@ -79,4 +79,12 @@ class UserService {
       throw Exception('Gagal mengambil notifikasi');
     }
   }
+
+  Future<void> markNotificationsAsRead() async {
+    try {
+      await _apiClient.dio.post('/user/notifications/read');
+    } catch (e) {
+      // Ignored for now
+    }
+  }
 }

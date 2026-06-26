@@ -22,6 +22,7 @@ import 'package:toko_emas_digital/common/widgets/gold_price_chart.dart';
 import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
 import 'package:toko_emas_digital/features/notifications/presentation/notifications_screen.dart';
 import 'package:toko_emas_digital/features/physical_gold/presentation/catalog_screen.dart';
+import 'package:toko_emas_digital/features/profile/services/user_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late Animation<double> _pulseAnimation;
   late Future<Map<String, double>> _walletFuture;
   late Stream<List<ProductModel>> _productsStream;
+  bool _hasUnreadNotif = false;
 
   @override
   void initState() {
@@ -43,6 +45,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _pulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(_pulseController);
     _walletFuture = TransactionService().getWalletBalance();
     _productsStream = CatalogService().getProducts().asBroadcastStream();
+    _checkUnreadNotif();
+  }
+
+  Future<void> _checkUnreadNotif() async {
+    try {
+      final notifs = await UserService().getNotifications();
+      if (!mounted) return;
+      setState(() {
+        _hasUnreadNotif = notifs.any((n) => n['is_read'] != true);
+      });
+    } catch (_) {}
   }
 
   @override
@@ -56,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _walletFuture = TransactionService().getWalletBalance();
       _productsStream = CatalogService().getProducts().asBroadcastStream();
     });
+    _checkUnreadNotif();
     await Future.delayed(const Duration(milliseconds: 800));
   }
 
@@ -158,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         MaterialPageRoute(
                           builder: (_) => const NotificationsScreen(),
                         ),
-                      );
+                      ).then((_) => _checkUnreadNotif());
                     },
                     child: Stack(
                       children: [
@@ -170,19 +184,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           ),
                           child: const Icon(Icons.notifications_rounded, color: AppColors.primaryGold, size: 24),
                         ),
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: AppColors.error,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.black, width: 2),
+                        if (_hasUnreadNotif)
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: AppColors.error,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.black, width: 2),
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ),

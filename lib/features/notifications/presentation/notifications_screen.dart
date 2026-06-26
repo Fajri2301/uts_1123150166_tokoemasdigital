@@ -49,6 +49,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         backgroundColor: AppColors.surface,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         elevation: 0,
+        actions: [
+          if (_notifications.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.done_all, color: AppColors.primaryGold),
+              tooltip: 'Tandai sudah dibaca',
+              onPressed: () async {
+                await _userService.markNotificationsAsRead();
+                setState(() {
+                  for (var notif in _notifications) {
+                    notif['is_read'] = true;
+                  }
+                });
+              },
+            ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGold))
