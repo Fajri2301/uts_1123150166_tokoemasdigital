@@ -317,14 +317,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Grafik Harga (Simulasi)',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            const Expanded(
+              child: Text(
+                'Grafik Harga (Simulasi)',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
@@ -333,6 +337,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 border: Border.all(color: Colors.blueAccent.withValues(alpha: 0.3)),
               ),
               child: const Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.auto_graph_rounded, color: Colors.blueAccent, size: 14),
                   SizedBox(width: 4),
