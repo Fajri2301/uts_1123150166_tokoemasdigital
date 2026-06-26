@@ -180,8 +180,17 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               expandedHeight: 160,
               pinned: true,
               backgroundColor: AppColors.surface,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
+              flexibleSpace: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final isScrolled = constraints.biggest.height <= (kToolbarHeight + MediaQuery.of(context).padding.top + 10);
+                  return FlexibleSpaceBar(
+                    centerTitle: true,
+                    title: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: isScrolled ? 1.0 : 0.0,
+                      child: const Text('Admin Panel', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                    background: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -292,10 +301,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       ),
                     ),
                   ),
-                ),
+                    ),
+                  );
+                },
               ),
-              title: const Text('Admin Panel', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-              titleTextStyle: const TextStyle(color: Colors.white),
             ),
 
             // ── BODY ──
