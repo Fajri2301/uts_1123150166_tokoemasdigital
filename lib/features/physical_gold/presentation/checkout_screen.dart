@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toko_emas_digital/core/constants/app_colors.dart';
@@ -40,6 +42,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   
   double _distanceKm = 0.0;
   double _shippingFee = 0.0;
+
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
+  bool _isPendingPayment = false;
   
   double get _finalShippingFee => _deliveryOption == 'Dikirim' ? _shippingFee : 0.0;
   double get _finalTotal => widget.price + _finalShippingFee;
@@ -52,7 +58,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _initAppLinks();
+  }
+
+  void _initAppLinks() {
+    _appLinks = AppLinks();
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      if (!mounted || !_isPendingPayment) return;
+      if (uri.scheme == 'tokoemas' && uri.host == 'payment_success') {
+        final status = uri.queryParameters['status'];
+        final errorMsg = uri.queryParameters['error'] ?? 'Pembayaran gagal atau dibatalkan.';
+        
+        setState(() => _isPendingPayment = false);
+        // Tutup dialog pending jika sedang terbuka
+        Navigator.of(context).pop(); 
+
+        if (status == 'success') {
+          _showSuccessDialog();
+        } else {
+          setState(() => _errorMessage = errorMsg);
+        }
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _linkSubscription?.cancel();
     _addressController.dispose();
     super.dispose();
   }
@@ -78,27 +112,81 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
 
       if (success && mounted) {
+        setState(() => _isLoading = false);
+
         if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {
-          final Uri uri = Uri.parse(
-              'danantara://pay?merchant_id=TE01&merchant_name=Toko%20Emas%20Digital&amount=$_finalTotal');
+          setState(() => _isPendingPayment = true);
+          _showPendingDialog();
+          
+          final Uri uri = Uri(
+            scheme: 'danantara',
+            host: 'pay',
+            queryParameters: {
+              'merchant_id': 'TE01',
+              'merchant_name': 'Toko Emas Digital',
+              'amount': _finalTotal.toString(),
+              'callbackUrl': 'tokoemas://payment_success',
+            },
+          );
           try {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           } catch (e) {
-            throw Exception('Gagal membuka Dompet Nusantara. Pastikan aplikasi E-Money sudah berjalan/di-install. Error: $e');
+            setState(() {
+              _isPendingPayment = false;
+              _errorMessage = 'Gagal membuka Dompet Nusantara. Pastikan aplikasi E-Money sudah terpasang. Error: $e';
+            });
+            Navigator.of(context).pop(); // Tutup pending dialog
           }
+        } else {
+          _showSuccessDialog();
         }
-
-        _showSuccessDialog();
       }
     } catch (e) {
       setState(() {
+        _isLoading = false;
         _errorMessage = e.toString().replaceAll('Exception: ', '');
       });
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
     }
+  }
+
+  void _showPendingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.3)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 16),
+            const CircularProgressIndicator(color: AppColors.primaryGold),
+            const SizedBox(height: 24),
+            const Text(
+              'Menunggu Pembayaran',
+              style: TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Anda dialihkan ke aplikasi Dompet Nusantara (Danantara). Selesaikan pembayaran di sana untuk melanjutkan.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Inter', height: 1.5, fontSize: 13),
+            ),
+            const SizedBox(height: 24),
+            TextButton(
+              onPressed: () {
+                setState(() => _isPendingPayment = false);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Batal', style: TextStyle(color: Colors.redAccent, fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showSuccessDialog() {
