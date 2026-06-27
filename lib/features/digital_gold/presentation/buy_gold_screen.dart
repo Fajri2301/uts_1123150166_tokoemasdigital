@@ -4,6 +4,8 @@ import 'package:toko_emas_digital/core/utils/currency_formatter.dart';
 import 'package:toko_emas_digital/common/widgets/app_button.dart';
 import 'package:toko_emas_digital/common/widgets/app_field.dart';
 import 'package:toko_emas_digital/common/widgets/feature_icon.dart';
+import 'dart:async';
+import 'package:app_links/app_links.dart';
 import 'package:toko_emas_digital/features/digital_gold/services/transaction_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:toko_emas_digital/core/network/api_client.dart';
@@ -29,10 +31,38 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
     'Dompet Nusantara (E-Money)',
   ];
 
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
+  bool _isPendingPayment = false;
+  String? _errorMessage;
+
   @override
   void initState() {
     super.initState();
     _fetchGoldPrice();
+    _initAppLinks();
+  }
+
+  void _initAppLinks() {
+    _appLinks = AppLinks();
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      if (!mounted || !_isPendingPayment) return;
+      if (uri.scheme == 'tokoemas' && uri.host == 'payment_success') {
+        final status = uri.queryParameters['status'];
+        final errorMsg = uri.queryParameters['error'] ?? 'Pembayaran gagal atau dibatalkan.';
+        
+        setState(() => _isPendingPayment = false);
+        // Tutup dialog pending jika sedang terbuka
+        Navigator.of(context).pop(); 
+
+        if (status == 'success') {
+          _showSuccessDialog(double.tryParse(_gramController.text) ?? 0.0);
+        } else {
+          setState(() => _errorMessage = errorMsg);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage!), backgroundColor: AppColors.error));
+        }
+      }
+    });
   }
 
   Future<void> _fetchGoldPrice() async {
@@ -55,6 +85,7 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
 
   @override
   void dispose() {
+    _linkSubscription?.cancel();
     _gramController.dispose();
     super.dispose();
   }
@@ -80,6 +111,9 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
         final exactTotalPrice = result['total_price'] as double;
 
         if (_selectedPaymentMethod == 'Dompet Nusantara (E-Money)') {
+          setState(() => _isPendingPayment = true);
+          _showPendingDialog();
+
           final uri = Uri(
             scheme: 'danantara',
             host: 'pay',
@@ -89,58 +123,104 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
               'amount': exactTotalPrice.toString(),
               'description': 'Pembelian $grams Gram Emas Digital',
               'reference': transactionId.toString(),
+              'callbackUrl': 'tokoemas://payment_success',
             },
           );
           try {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           } catch (e) {
+            setState(() => _isPendingPayment = false);
+            Navigator.of(context).pop(); // Tutup pending dialog
             throw Exception('Gagal membuka Dompet Nusantara. Pastikan aplikasi E-Money sudah berjalan/di-install.');
           }
+        } else {
+          _showSuccessDialog(grams);
         }
-
-        final isEMoney = _selectedPaymentMethod == 'Dompet Nusantara (E-Money)';
-
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            backgroundColor: AppColors.surface,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.3))),
-            title: Center(
-              child: FeatureIcon(
-                icon: isEMoney ? Icons.access_time_rounded : Icons.check_circle_rounded, 
-                tone: isEMoney ? 'gold' : 'green', 
-                size: 70, 
-                iconSize: 40
-              ),
-            ),
-            content: Text(
-              isEMoney 
-                ? 'Dialihkan ke Dompet Nusantara.\nSegera selesaikan pembayaran Anda.'
-                : 'Pembelian ${grams.toStringAsFixed(3)} gr Emas Digital berhasil!',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontFamily: 'Poppins', color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
-            ),
-            actions: [
-              AppButton(
-                label: 'Kembali ke Beranda',
-                onPressed: () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-              ),
-            ],
-          ),
-        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: AppColors.error));
       }
     } finally {
-      if (mounted) {
+      if (mounted && _selectedPaymentMethod != 'Dompet Nusantara (E-Money)') {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _showPendingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.3)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 16),
+            const CircularProgressIndicator(color: AppColors.primaryGold),
+            const SizedBox(height: 24),
+            const Text(
+              'Menunggu Pembayaran',
+              style: TextStyle(color: Colors.white, fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Anda dialihkan ke aplikasi Dompet Nusantara (Danantara). Selesaikan pembayaran di sana untuk melanjutkan.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Inter', height: 1.5, fontSize: 13),
+            ),
+            const SizedBox(height: 24),
+            TextButton(
+              onPressed: () {
+                setState(() => _isPendingPayment = false);
+                Navigator.of(context).pop();
+                setState(() => _isLoading = false);
+              },
+              child: const Text('Batal', style: TextStyle(color: Colors.redAccent, fontFamily: 'Poppins', fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessDialog(double grams) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.3))),
+        title: Center(
+          child: FeatureIcon(
+            icon: Icons.check_circle_rounded, 
+            tone: 'green', 
+            size: 70, 
+            iconSize: 40
+          ),
+        ),
+        content: Text(
+          'Pembelian ${grams.toStringAsFixed(3)} gr Emas Digital berhasil!',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontFamily: 'Poppins', color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+        actions: [
+          AppButton(
+            label: 'Selesai',
+            onPressed: () {
+              Navigator.of(context).pop(); // Tutup dialog
+              _gramController.clear(); // Reset input gram
+              setState(() {}); // Refresh UI
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
