@@ -125,7 +125,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               'merchant_id': 'TE01',
               'merchant_name': 'Toko Emas Digital',
               'amount': _finalTotal.toString(),
-              'callbackUrl': 'tokoemas://payment_success',
+              'callback': 'tokoemas://payment_success',
             },
           );
           try {

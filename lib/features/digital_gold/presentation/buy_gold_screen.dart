@@ -123,7 +123,7 @@ class _BuyGoldScreenState extends State<BuyGoldScreen> {
               'amount': exactTotalPrice.toString(),
               'description': 'Pembelian $grams Gram Emas Digital',
               'reference': transactionId.toString(),
-              'callbackUrl': 'tokoemas://payment_success',
+              'callback': 'tokoemas://payment_success',
             },
           );
           try {
